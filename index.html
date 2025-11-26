@@ -24,6 +24,7 @@
         body {
             transition: all 0.4s ease;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            padding-bottom: 80px; /* Space for bottom menu */
         }
         
         .dark body {
@@ -43,14 +44,14 @@
         
         .app-card {
             transition: all 0.3s ease;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
         .app-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px -10px rgba(139, 92, 246, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.3);
         }
         
         .gradient-bg {
@@ -63,52 +64,64 @@
             -webkit-text-fill-color: transparent;
         }
         
-        .language-flag {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 8px;
+        .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            padding: 10px 0;
         }
         
-        .floating-action-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+        .dark .bottom-menu {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
-            z-index: 100;
-            cursor: pointer;
+            padding: 8px 0;
+            border-radius: 12px;
             transition: all 0.3s ease;
         }
         
-        .floating-action-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.6);
+        .menu-item.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--primary-color);
         }
         
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #ef4444;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .menu-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .menu-item span {
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 500;
+        }
+        
+        .category-chip {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--primary-color);
+            font-size: 14px;
+            font-weight: 500;
+            margin: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-chip.active {
+            background: var(--primary-color);
+            color: white;
         }
         
         .skeleton-loader {
@@ -131,22 +144,6 @@
             }
         }
         
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
-            }
-        }
-        
         .slide-in {
             animation: slideIn 0.5s ease forwards;
         }
@@ -161,13 +158,60 @@
                 transform: translateY(0);
             }
         }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+        }
+        
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .setting-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .language-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .language-option:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .language-option.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .flag-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300">
     <!-- Loading Screen -->
     <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-50 flex flex-col items-center justify-center">
         <div class="relative">
-            <div class="w-20 h-20 rounded-2xl gradient-bg flex items-center justify-center pulse-animation">
+            <div class="w-20 h-20 rounded-2xl gradient-bg flex items-center justify-center">
                 <i class="fas fa-mobile-alt text-white text-2xl"></i>
             </div>
             <div class="mt-4 text-center">
@@ -181,13 +225,28 @@
     </div>
 
     <!-- Main App Container -->
-    <div id="app-container" class="max-w-7xl mx-auto px-4 py-6 hidden">
+    <div id="app-container" class="max-w-lg mx-auto px-4 py-4 hidden">
         <!-- Dynamic content will be loaded here -->
     </div>
 
-    <!-- Floating Action Button -->
-    <div id="fab" class="floating-action-btn hidden">
-        <i class="fas fa-plus"></i>
+    <!-- Bottom Menu Bar -->
+    <div class="bottom-menu">
+        <div class="max-w-lg mx-auto px-4">
+            <div class="grid grid-cols-3 gap-2">
+                <div class="menu-item active" onclick="navigate('home')">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </div>
+                <div class="menu-item" onclick="navigate('upload-app')">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Upload App</span>
+                </div>
+                <div class="menu-item" onclick="navigate('profile')">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Firebase Configuration -->
@@ -305,7 +364,9 @@
                 loginSuccess: "အောင်မြင်စွာဝင်ရောက်ပြီးပါပြီ",
                 loginError: "ဝင်ရောက်ရာတွင်အမှားတစ်ခုရှိနေပါသည်",
                 registerSuccess: "အကောင့်အောင်မြင်စွာဖွင့်ပြီးပါပြီ",
-                registerError: "အကောင့်ဖွင့်ရာတွင်အမှားတစ်ခုရှိနေပါသည်"
+                registerError: "အကောင့်ဖွင့်ရာတွင်အမှားတစ်ခုရှိနေပါသည်",
+                contactUs: "ဆက်သွယ်ရန်",
+                uploadApp: "အက်ပ်တင်ရန်"
             },
             english: {
                 appName: "ShareApp (Myanmar)",
@@ -376,15 +437,15 @@
                 loginSuccess: "Login successful",
                 loginError: "Error logging in",
                 registerSuccess: "Registration successful",
-                registerError: "Error registering"
+                registerError: "Error registering",
+                contactUs: "Contact Us",
+                uploadApp: "Upload App"
             }
-            // Other languages would follow the same pattern
         };
 
         // DOM Elements
         const APP_CONTAINER = document.getElementById('app-container');
         const LOADING_SCREEN = document.getElementById('loading-screen');
-        const FAB = document.getElementById('fab');
 
         // Initialize the app
         function initApp() {
@@ -393,41 +454,42 @@
                 if (user) {
                     state.currentUser = user;
                     // Get user profile from Firestore
-                    const userDoc = await getDoc(doc(db, 'users', user.uid));
-                    if (userDoc.exists()) {
-                        state.userProfile = userDoc.data();
-                    } else {
-                        // Create a new user profile
-                        state.userProfile = {
-                            uid: user.uid,
-                            displayName: user.displayName || 'User',
-                            email: user.email,
-                            photoURL: user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User') + '&background=8b5cf6&color=fff',
-                            language: state.language,
-                            darkMode: state.isDarkMode,
-                            createdAt: new Date().toISOString()
-                        };
-                        await setDoc(doc(db, 'users', user.uid), state.userProfile);
+                    try {
+                        const userDoc = await getDoc(doc(db, 'users', user.uid));
+                        if (userDoc.exists()) {
+                            state.userProfile = userDoc.data();
+                        } else {
+                            // Create a new user profile
+                            state.userProfile = {
+                                uid: user.uid,
+                                displayName: user.displayName || 'User',
+                                email: user.email,
+                                photoURL: user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User') + '&background=8b5cf6&color=fff',
+                                language: state.language,
+                                darkMode: state.isDarkMode,
+                                createdAt: new Date().toISOString()
+                            };
+                            await setDoc(doc(db, 'users', user.uid), state.userProfile);
+                        }
+                        
+                        // Update state with user preferences
+                        state.language = state.userProfile.language || state.language;
+                        state.isDarkMode = state.userProfile.darkMode !== undefined ? state.userProfile.darkMode : state.isDarkMode;
+                        
+                        // Check if user is admin
+                        state.isAdmin = state.userProfile.role === 'admin';
+                    } catch (error) {
+                        console.error("Error loading user profile:", error);
                     }
-                    
-                    // Update state with user preferences
-                    state.language = state.userProfile.language || state.language;
-                    state.isDarkMode = state.userProfile.darkMode !== undefined ? state.userProfile.darkMode : state.isDarkMode;
-                    
-                    // Apply user preferences
-                    applyUserPreferences();
-                    
-                    // Check if user is admin
-                    state.isAdmin = state.userProfile.role === 'admin';
-                    
-                    // Load user's apps
-                    loadUserApps();
                 } else {
                     state.currentUser = null;
                     state.userProfile = null;
                     state.userApps = [];
                     state.isAdmin = false;
                 }
+                
+                // Apply user preferences
+                applyUserPreferences();
                 
                 // Load all apps
                 loadAllApps();
@@ -436,7 +498,6 @@
                 setTimeout(() => {
                     LOADING_SCREEN.classList.add('hidden');
                     APP_CONTAINER.classList.remove('hidden');
-                    FAB.classList.remove('hidden');
                     render();
                 }, 1000);
             });
@@ -465,26 +526,6 @@
                 state.approvedApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 render();
             });
-            
-            // Pending apps listener (for admins)
-            if (state.isAdmin) {
-                const pendingQuery = query(appsColRef, where("status", "==", "pending"));
-                onSnapshot(pendingQuery, (snapshot) => {
-                    state.pendingApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    render();
-                });
-            }
-        }
-
-        // Load user's apps
-        function loadUserApps() {
-            if (!state.currentUser) return;
-            
-            const userAppsQuery = query(collection(db, 'apps'), where("submitterId", "==", state.currentUser.uid));
-            onSnapshot(userAppsQuery, (snapshot) => {
-                state.userApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                render();
-            });
         }
 
         // Translate function
@@ -498,6 +539,20 @@
             state.selectedAppId = id;
             state.isEditingMode = false;
             state.editingAppDocId = null;
+            
+            // Update active menu item
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (view === 'home') {
+                document.querySelectorAll('.menu-item')[0].classList.add('active');
+            } else if (view === 'upload-app') {
+                document.querySelectorAll('.menu-item')[1].classList.add('active');
+            } else if (view === 'profile') {
+                document.querySelectorAll('.menu-item')[2].classList.add('active');
+            }
+            
             window.scrollTo(0, 0);
             render();
         }
@@ -623,236 +678,120 @@
             }
         }
 
-        // Render functions would go here (similar to previous implementation but with translations)
-        // For brevity, I'm including a simplified version of the render functions
-
+        // Render Header with Search and Categories
         function renderHeader() {
             const categories = [t('all'), t('tools'), t('games'), t('social'), t('video'), t('music'), t('others')];
             
             return `
-                <header class="glass-effect sticky top-0 z-50 rounded-3xl mb-6 py-4 shadow-lg">
-                    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <!-- Logo and App Name -->
-                        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('home')">
-                            <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center">
-                                <i class="fas fa-mobile-alt text-white"></i>
-                            </div>
-                            <h1 class="text-2xl font-bold gradient-text">${t('appName')}</h1>
+                <header class="mb-6 slide-in">
+                    <!-- App Name -->
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="w-12 h-12 rounded-2xl gradient-bg flex items-center justify-center mr-3">
+                            <i class="fas fa-mobile-alt text-white text-xl"></i>
                         </div>
-                        
-                        <!-- Search Bar -->
-                        <div class="flex-1 max-w-2xl mx-4">
-                            <div class="relative">
-                                <input
-                                    type="text"
-                                    id="search-input"
-                                    placeholder="${t('searchPlaceholder')}"
-                                    value="${state.searchTerm}"
-                                    oninput="handleSearch(this.value)"
-                                    class="w-full py-3 px-4 pl-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 shadow-sm"
-                                >
-                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                    <i class="fas fa-search"></i>
-                                </div>
+                        <h1 class="text-2xl font-bold gradient-text">${t('appName')}</h1>
+                    </div>
+                    
+                    <!-- Search Box -->
+                    <div class="mb-4">
+                        <div class="relative">
+                            <input
+                                type="text"
+                                id="search-input"
+                                placeholder="${t('searchPlaceholder')}"
+                                value="${state.searchTerm}"
+                                oninput="handleSearch(this.value)"
+                                class="w-full py-3 px-4 pl-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 shadow-sm"
+                            >
+                            <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <i class="fas fa-search"></i>
                             </div>
-                        </div>
-                        
-                        <!-- User Actions -->
-                        <div class="flex items-center space-x-4">
-                            ${state.currentUser ? `
-                                <!-- User Menu -->
-                                <div class="relative group">
-                                    <button class="flex items-center space-x-2 bg-white dark:bg-slate-800 py-2 px-4 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                                        <img src="${state.userProfile.photoURL}" alt="Profile" class="w-8 h-8 rounded-full">
-                                        <span class="font-medium hidden sm:block">${state.userProfile.displayName}</span>
-                                        <i class="fas fa-chevron-down text-gray-400"></i>
-                                    </button>
-                                    
-                                    <!-- Dropdown Menu -->
-                                    <div class="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                                        <div class="p-4 border-b border-gray-100 dark:border-slate-700">
-                                            <p class="font-semibold">${state.userProfile.displayName}</p>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">${state.userProfile.email}</p>
-                                        </div>
-                                        <div class="p-2">
-                                            <button onclick="navigate('profile')" class="flex items-center space-x-3 w-full text-left py-2 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200">
-                                                <i class="fas fa-user text-purple-500 w-5"></i>
-                                                <span>${t('profile')}</span>
-                                            </button>
-                                            <button onclick="navigate('my-apps')" class="flex items-center space-x-3 w-full text-left py-2 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200">
-                                                <i class="fas fa-box text-blue-500 w-5"></i>
-                                                <span>${t('myApps')}</span>
-                                            </button>
-                                            ${state.isAdmin ? `
-                                                <button onclick="navigate('admin')" class="flex items-center space-x-3 w-full text-left py-2 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200">
-                                                    <i class="fas fa-shield-alt text-red-500 w-5"></i>
-                                                    <span>${t('adminPanel')}</span>
-                                                </button>
-                                            ` : ''}
-                                            <button onclick="handleLogout()" class="flex items-center space-x-3 w-full text-left py-2 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200 text-red-500">
-                                                <i class="fas fa-sign-out-alt w-5"></i>
-                                                <span>${t('logout')}</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ` : `
-                                <!-- Login/Signup Buttons -->
-                                <div class="flex space-x-3">
-                                    <button onclick="navigate('login')" class="py-2 px-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl font-medium hover:shadow-md transition-all duration-300">
-                                        ${t('login')}
-                                    </button>
-                                    <button onclick="navigate('register')" class="py-2 px-4 gradient-bg text-white rounded-2xl font-medium hover:shadow-lg transition-all duration-300">
-                                        ${t('signUp')}
-                                    </button>
-                                </div>
-                            `}
-                            
-                            <!-- Dark Mode Toggle -->
-                            <button onclick="toggleDarkMode()" class="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
-                                ${state.isDarkMode ? 
-                                    '<i class="fas fa-sun text-yellow-500"></i>' : 
-                                    '<i class="fas fa-moon text-purple-500"></i>'
-                                }
-                            </button>
                         </div>
                     </div>
                     
                     <!-- Categories -->
-                    ${state.currentView === 'home' ? `
-                        <div class="max-w-7xl mx-auto px-4 mt-6">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                ${categories.map((cat, index) => `
-                                    <button
-                                        onclick="handleCategoryFilter('${index === 0 ? 'all' : cat.toLowerCase()}')"
-                                        class="px-4 py-2 rounded-2xl font-medium transition-all duration-300 ${state.selectedCategory === (index === 0 ? 'all' : cat.toLowerCase()) ?
-                                            'gradient-bg text-white shadow-lg transform scale-105' :
-                                            'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:shadow-md'
-                                        }"
-                                    >
-                                        ${cat}
-                                    </button>
-                                `).join('')}
+                    <div class="flex flex-wrap justify-center mb-2">
+                        ${categories.map((cat, index) => `
+                            <div class="category-chip ${state.selectedCategory === (index === 0 ? 'all' : cat.toLowerCase()) ? 'active' : ''}" 
+                                 onclick="handleCategoryFilter('${index === 0 ? 'all' : cat.toLowerCase()}')">
+                                ${cat}
                             </div>
-                        </div>
-                    ` : ''}
+                        `).join('')}
+                    </div>
                 </header>
             `;
         }
 
+        // Render Home Page
         function renderHomePage() {
             const filteredApps = state.approvedApps
                 .filter(app => state.selectedCategory === 'all' || app.category === state.selectedCategory)
                 .filter(app => app.name.toLowerCase().includes(state.searchTerm.toLowerCase()));
             
             const popularApps = [...state.approvedApps].sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0)).slice(0, 6);
-            const newApps = [...state.approvedApps].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
             
             return `
                 ${renderHeader()}
                 
                 <main class="slide-in">
-                    <!-- Hero Section -->
-                    <section class="mb-12">
-                        <div class="bg-gradient-to-r from-purple-500 to-cyan-500 rounded-3xl p-8 md:p-12 text-white shadow-2xl">
-                            <div class="max-w-3xl">
-                                <h1 class="text-4xl md:text-5xl font-bold mb-4">${t('welcome')} to ShareApp!</h1>
-                                <p class="text-xl mb-8 opacity-90">Discover, share, and download amazing mobile applications from Myanmar developers.</p>
-                                <div class="flex flex-wrap gap-4">
-                                    <button onclick="navigate('explore')" class="py-3 px-6 bg-white text-purple-600 rounded-2xl font-bold hover:shadow-lg transition-all duration-300 transform hover:scale-105">
-                                        <i class="fas fa-rocket mr-2"></i> ${t('explore')}
-                                    </button>
-                                    ${state.currentUser ? `
-                                        <button onclick="navigate('submit-app')" class="py-3 px-6 bg-transparent border-2 border-white text-white rounded-2xl font-bold hover:bg-white hover:text-purple-600 transition-all duration-300">
-                                            <i class="fas fa-plus mr-2"></i> ${t('submitApp')}
-                                        </button>
-                                    ` : `
-                                        <button onclick="navigate('register')" class="py-3 px-6 bg-transparent border-2 border-white text-white rounded-2xl font-bold hover:bg-white hover:text-purple-600 transition-all duration-300">
-                                            <i class="fas fa-user-plus mr-2"></i> ${t('signUp')}
-                                        </button>
-                                    `}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                    
                     <!-- Popular Apps Section -->
-                    <section class="mb-12">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-3xl font-bold gradient-text">${t('popularApps')}</h2>
-                            <button onclick="navigate('explore')" class="text-purple-600 dark:text-purple-400 font-medium hover:underline">
-                                ${t('seeAll')} <i class="fas fa-arrow-right ml-1"></i>
-                            </button>
-                        </div>
+                    <section class="mb-8">
+                        <h2 class="text-xl font-bold mb-4 gradient-text">${t('popularApps')}</h2>
                         
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-2 gap-4">
                             ${popularApps.length > 0 ? popularApps.map(app => `
-                                <div class="app-card bg-white dark:bg-slate-800 rounded-3xl overflow-hidden">
-                                    <div class="p-6">
-                                        <div class="flex items-start space-x-4">
-                                            <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover shadow-md">
-                                            <div class="flex-1">
-                                                <h3 class="font-bold text-lg mb-1">${app.name}</h3>
-                                                <p class="text-sm text-cyan-600 dark:text-cyan-400 mb-2">${app.category}</p>
-                                                <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                                                    <span class="mr-3"><i class="fas fa-download mr-1"></i> ${app.downloadCount || 0}</span>
-                                                    <span><i class="fas fa-star mr-1 text-yellow-500"></i> ${app.rating || 'N/A'}</span>
-                                                </div>
-                                            </div>
+                                <div class="app-card bg-white dark:bg-slate-800 rounded-2xl overflow-hidden p-4">
+                                    <div class="flex flex-col items-center text-center">
+                                        <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover shadow-md mb-3">
+                                        <h3 class="font-bold text-sm mb-1 truncate w-full">${app.name}</h3>
+                                        <p class="text-xs text-cyan-600 dark:text-cyan-400 mb-2">${app.category}</p>
+                                        <div class="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-3">
+                                            <span class="mr-2"><i class="fas fa-download mr-1"></i> ${app.downloadCount || 0}</span>
+                                            <span><i class="fas fa-star mr-1 text-yellow-500"></i> ${app.rating || 'N/A'}</span>
                                         </div>
-                                        <div class="mt-4 flex justify-between items-center">
-                                            <span class="text-sm font-medium">${app.version}</span>
-                                            <button onclick="navigate('details', '${app.id}')" class="py-2 px-4 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-xl font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors duration-200">
-                                                ${t('details')}
-                                            </button>
-                                        </div>
+                                        <button onclick="navigate('details', '${app.id}')" class="w-full py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-xl font-medium text-xs hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors duration-200">
+                                            ${t('download')}
+                                        </button>
                                     </div>
                                 </div>
                             `).join('') : `
-                                <div class="col-span-3 text-center py-12">
-                                    <i class="fas fa-box-open text-4xl text-gray-400 mb-4"></i>
-                                    <p class="text-gray-500 dark:text-gray-400">${t('noAppsFound')}</p>
+                                <div class="col-span-2 text-center py-8">
+                                    <i class="fas fa-box-open text-3xl text-gray-400 mb-3"></i>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">${t('noAppsFound')}</p>
                                 </div>
                             `}
                         </div>
                     </section>
                     
-                    <!-- New Apps Section -->
-                    <section class="mb-12">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-3xl font-bold gradient-text">${t('newApps')}</h2>
-                            <button onclick="navigate('explore')" class="text-purple-600 dark:text-purple-400 font-medium hover:underline">
-                                ${t('seeAll')} <i class="fas fa-arrow-right ml-1"></i>
-                            </button>
-                        </div>
+                    <!-- All Apps Section -->
+                    <section class="mb-8">
+                        <h2 class="text-xl font-bold mb-4 gradient-text">${t('newApps')}</h2>
                         
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            ${newApps.length > 0 ? newApps.map(app => `
-                                <div class="app-card bg-white dark:bg-slate-800 rounded-3xl overflow-hidden">
-                                    <div class="p-6">
-                                        <div class="flex items-start space-x-4">
-                                            <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover shadow-md">
-                                            <div class="flex-1">
-                                                <h3 class="font-bold text-lg mb-1">${app.name}</h3>
-                                                <p class="text-sm text-cyan-600 dark:text-cyan-400 mb-2">${app.category}</p>
-                                                <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                                                    <span class="mr-3"><i class="fas fa-calendar mr-1"></i> ${new Date(app.createdAt).toLocaleDateString()}</span>
-                                                    <span><i class="fas fa-user mr-1"></i> ${app.developer}</span>
-                                                </div>
+                        <div class="space-y-4">
+                            ${filteredApps.length > 0 ? filteredApps.map(app => `
+                                <div class="app-card bg-white dark:bg-slate-800 rounded-2xl overflow-hidden p-4">
+                                    <div class="flex items-center space-x-4">
+                                        <img src="${app.icon}" alt="${app.name}" class="w-14 h-14 rounded-2xl object-cover shadow-md">
+                                        <div class="flex-1">
+                                            <h3 class="font-bold text-base mb-1">${app.name}</h3>
+                                            <p class="text-sm text-cyan-600 dark:text-cyan-400 mb-1">${app.category}</p>
+                                            <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                                                <span class="mr-3">${t('version')}: ${app.version}</span>
+                                                <span>${app.size}</span>
                                             </div>
                                         </div>
-                                        <div class="mt-4 flex justify-between items-center">
-                                            <span class="text-sm font-medium">${app.size}</span>
-                                            <button onclick="navigate('details', '${app.id}')" class="py-2 px-4 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-xl font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors duration-200">
-                                                ${t('download')}
-                                            </button>
-                                        </div>
+                                        <button onclick="navigate('details', '${app.id}')" class="py-2 px-4 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-xl font-medium text-sm hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors duration-200">
+                                            ${t('details')}
+                                        </button>
                                     </div>
                                 </div>
                             `).join('') : `
-                                <div class="col-span-3 text-center py-12">
-                                    <i class="fas fa-box-open text-4xl text-gray-400 mb-4"></i>
+                                <div class="text-center py-8">
+                                    <i class="fas fa-box-open text-3xl text-gray-400 mb-3"></i>
                                     <p class="text-gray-500 dark:text-gray-400">${t('noAppsFound')}</p>
+                                    <button onclick="resetFilters()" class="mt-4 py-2 px-4 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200">
+                                        ${t('resetFilters')}
+                                    </button>
                                 </div>
                             `}
                         </div>
@@ -861,8 +800,245 @@
             `;
         }
 
-        // Additional render functions for other views (profile, login, register, etc.)
-        // Would be implemented similarly with translations and user-specific content
+        // Render Upload App Page
+        function renderUploadAppPage() {
+            if (!state.currentUser) {
+                return `
+                    <div class="text-center py-12">
+                        <i class="fas fa-exclamation-circle text-4xl text-yellow-500 mb-4"></i>
+                        <h2 class="text-xl font-bold mb-2">Login Required</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-6">You need to login to upload apps</p>
+                        <button onclick="navigate('profile')" class="py-3 px-6 gradient-bg text-white rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
+                            ${t('login')}
+                        </button>
+                    </div>
+                `;
+            }
+            
+            return `
+                ${renderHeader()}
+                
+                <main class="slide-in">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg">
+                        <h2 class="text-xl font-bold mb-6 gradient-text text-center">${t('uploadApp')}</h2>
+                        
+                        <form id="upload-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">${t('appName')}</label>
+                                <input type="text" id="app-name" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">${t('appDeveloper')}</label>
+                                <input type="text" id="app-developer" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">${t('appCategory')}</label>
+                                <select id="app-category" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="">${t('selectCategory')}</option>
+                                    <option value="tools">${t('tools')}</option>
+                                    <option value="games">${t('games')}</option>
+                                    <option value="social">${t('social')}</option>
+                                    <option value="video">${t('video')}</option>
+                                    <option value="music">${t('music')}</option>
+                                    <option value="others">${t('others')}</option>
+                                </select>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">${t('appVersion')}</label>
+                                    <input type="text" id="app-version" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="1.0.0">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">${t('appSize')}</label>
+                                    <input type="text" id="app-size" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="15 MB">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">${t('appIcon')} URL</label>
+                                <input type="url" id="app-icon" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="https://example.com/icon.png">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">${t('apkUrl')}</label>
+                                <input type="url" id="app-apk" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="https://example.com/app.apk">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">${t('screenshotUrls')}</label>
+                                <textarea id="app-screenshots" rows="3" class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="https://example.com/screenshot1.jpg, https://example.com/screenshot2.jpg"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">${t('description')}</label>
+                                <textarea id="app-description" rows="3" class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="w-full py-3 gradient-bg text-white rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
+                                ${t('submit')}
+                            </button>
+                        </form>
+                    </div>
+                </main>
+                
+                <script>
+                    document.getElementById('upload-form').addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        
+                        const appData = {
+                            name: document.getElementById('app-name').value,
+                            developer: document.getElementById('app-developer').value,
+                            category: document.getElementById('app-category').value,
+                            version: document.getElementById('app-version').value,
+                            size: document.getElementById('app-size').value,
+                            icon: document.getElementById('app-icon').value,
+                            apk: document.getElementById('app-apk').value,
+                            screenshots: document.getElementById('app-screenshots').value.split(',').map(s => s.trim()).filter(s => s),
+                            description: document.getElementById('app-description').value
+                        };
+                        
+                        const result = await handleAppSubmission(appData);
+                        if (result.success) {
+                            alert(result.message);
+                            navigate('home');
+                        } else {
+                            alert(result.message);
+                        }
+                    });
+                </script>
+            `;
+        }
+
+        // Render Profile Page
+        function renderProfilePage() {
+            if (!state.currentUser) {
+                return `
+                    <div class="text-center py-12">
+                        <div class="w-20 h-20 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user text-gray-400 text-2xl"></i>
+                        </div>
+                        <h2 class="text-xl font-bold mb-2">${t('welcome')}</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-6">${t('loginToContinue')}</p>
+                        <div class="space-y-4">
+                            <button onclick="showLoginForm()" class="w-full py-3 gradient-bg text-white rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
+                                ${t('login')}
+                            </button>
+                            <button onclick="showRegisterForm()" class="w-full py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
+                                ${t('signUp')}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return `
+                ${renderHeader()}
+                
+                <main class="slide-in">
+                    <!-- User Profile -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg mb-6">
+                        <div class="flex flex-col items-center text-center mb-6">
+                            <img src="${state.userProfile.photoURL}" alt="Profile" class="profile-avatar mb-4">
+                            <h2 class="text-xl font-bold">${state.userProfile.displayName}</h2>
+                            <p class="text-gray-500 dark:text-gray-400">${state.userProfile.email}</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-4 text-center">
+                                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">${state.userApps.length}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${t('myApps')}</p>
+                            </div>
+                            <div class="bg-cyan-50 dark:bg-cyan-900/20 rounded-2xl p-4 text-center">
+                                <p class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">${state.approvedApps.filter(app => app.submitterId === state.currentUser.uid).length}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${t('approved')}</p>
+                            </div>
+                        </div>
+                        
+                        <button onclick="handleLogout()" class="w-full py-3 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl font-bold hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors duration-200">
+                            <i class="fas fa-sign-out-alt mr-2"></i> ${t('logout')}
+                        </button>
+                    </div>
+                    
+                    <!-- Settings -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg">
+                        <h2 class="text-xl font-bold mb-6 gradient-text">${t('settings')}</h2>
+                        
+                        <!-- Dark Mode Toggle -->
+                        <div class="setting-item">
+                            <div>
+                                <p class="font-medium">${t('darkMode')}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${state.isDarkMode ? t('on') : t('off')}</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" ${state.isDarkMode ? 'checked' : ''} onchange="toggleDarkMode()" class="sr-only peer">
+                                <div class="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                            </label>
+                        </div>
+                        
+                        <!-- Language Selection -->
+                        <div class="setting-item">
+                            <div>
+                                <p class="font-medium">${t('language')}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${t(state.language)}</p>
+                            </div>
+                            <button onclick="showLanguageModal()" class="py-2 px-4 bg-gray-100 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors duration-200">
+                                ${t('change')}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Us -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg mt-6 text-center">
+                        <h3 class="text-lg font-bold mb-2">${t('contactUs')}</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">${t('contactDescription')}</p>
+                        <a href="https://t.me/appcreator24myanmar" target="_blank" class="inline-flex items-center py-2 px-4 bg-telegram-blue text-white rounded-xl font-medium hover:bg-blue-600 transition-colors duration-200">
+                            <i class="fab fa-telegram mr-2"></i> Telegram
+                        </a>
+                    </div>
+                </main>
+                
+                <!-- Language Modal -->
+                <div id="language-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-11/12 max-w-md">
+                        <h3 class="text-xl font-bold mb-4">${t('selectLanguage')}</h3>
+                        <div class="space-y-2">
+                            ${['myanmar', 'english', 'thai', 'india', 'china', 'korea', 'japan'].map(lang => `
+                                <div class="language-option ${state.language === lang ? 'active' : ''}" onclick="changeLanguage('${lang}'); document.getElementById('language-modal').classList.add('hidden')">
+                                    <img src="https://flagcdn.com/w40/${getCountryCode(lang)}.png" class="flag-icon">
+                                    <span>${t(lang)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="document.getElementById('language-modal').classList.add('hidden')" class="w-full mt-4 py-3 bg-gray-100 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors duration-200">
+                            ${t('cancel')}
+                        </button>
+                    </div>
+                </div>
+                
+                <script>
+                    function showLanguageModal() {
+                        document.getElementById('language-modal').classList.remove('hidden');
+                    }
+                    
+                    function getCountryCode(lang) {
+                        const codes = {
+                            myanmar: 'mm',
+                            english: 'us',
+                            thai: 'th',
+                            india: 'in',
+                            china: 'cn',
+                            korea: 'kr',
+                            japan: 'jp'
+                        };
+                        return codes[lang] || 'us';
+                    }
+                </script>
+            `;
+        }
 
         // Main render function
         function render() {
@@ -872,57 +1048,17 @@
                 case 'home':
                     content = renderHomePage();
                     break;
-                case 'login':
-                    content = renderLoginPage();
-                    break;
-                case 'register':
-                    content = renderRegisterPage();
+                case 'upload-app':
+                    content = renderUploadAppPage();
                     break;
                 case 'profile':
                     content = renderProfilePage();
-                    break;
-                case 'my-apps':
-                    content = renderMyAppsPage();
-                    break;
-                case 'submit-app':
-                    content = renderSubmitAppPage();
-                    break;
-                case 'explore':
-                    content = renderExplorePage();
-                    break;
-                case 'details':
-                    content = renderAppDetailsPage();
-                    break;
-                case 'admin':
-                    content = renderAdminPage();
                     break;
                 default:
                     content = renderHomePage();
             }
             
             APP_CONTAINER.innerHTML = content;
-            
-            // Update FAB action based on current view
-            updateFAB();
-        }
-
-        // Update Floating Action Button
-        function updateFAB() {
-            if (state.currentView === 'home' && state.currentUser) {
-                FAB.innerHTML = '<i class="fas fa-plus"></i>';
-                FAB.onclick = () => navigate('submit-app');
-                FAB.classList.remove('hidden');
-            } else if (state.currentView === 'explore' && state.currentUser) {
-                FAB.innerHTML = '<i class="fas fa-plus"></i>';
-                FAB.onclick = () => navigate('submit-app');
-                FAB.classList.remove('hidden');
-            } else if (state.currentView === 'my-apps') {
-                FAB.innerHTML = '<i class="fas fa-plus"></i>';
-                FAB.onclick = () => navigate('submit-app');
-                FAB.classList.remove('hidden');
-            } else {
-                FAB.classList.add('hidden');
-            }
         }
 
         // Initialize the app when DOM is loaded
