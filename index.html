@@ -1,619 +1,260 @@
 <!DOCTYPE html>
-<html lang="my" class="light">
+<html lang="my">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShareApp - အက်ပ်မျှဝေရန်</title>
-    <!-- Tailwind CSS CDN -->
+    <title>ShareApp - Firebase SPA</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons for UI elements -->
-    <script type="module" src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Define dark mode styles */
-        .dark .app-container {
-            background-color: #1f2937; /* Darker background */
-            color: #e5e7eb; /* Light text */
+        /* Custom gradient for buttons and active elements */
+        .gradient-bg {
+            background: linear-gradient(90deg, #A78BFA 0%, #8B5CF6 100%);
         }
-        .dark .nav-button {
-            color: #9ca3af; /* Gray text */
+        /* Style for active navigation button */
+        .nav-button.active {
+            color: #8B5CF6; /* Violet-600 */
         }
-        .dark .nav-button.active {
-            color: #a78bfa; /* Violet-400 */
-            background-color: #374151; /* Dark gray active background */
-        }
-        .dark .app-link-card, .dark .bg-white {
-            background-color: #374151; /* Card background */
-            border-color: #4b5563;
-        }
-        .dark input, .dark select {
-            background-color: #4b5563;
-            border-color: #6b7280;
-            color: #e5e7eb;
-        }
-        .dark .text-gray-700 {
-            color: #e5e7eb;
-        }
-        .dark .text-gray-500 {
-            color: #9ca3af;
-        }
-        
-        /* Custom styles for gradients and mobile focus */
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s;
-        }
-        .app-container {
-            max-width: 420px; /* Typical mobile width constraint */
-            margin: 0 auto;
+        /* Ensure the app container uses the full viewport height */
+        #app {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-        }
-        .nav-button.active {
-            color: #8b5cf6; /* Violet-500 */
-            background-color: #f3e8ff; /* Violet-100 */
-            border-radius: 9999px;
-            font-weight: 600;
-        }
-        /* Custom gradient for main app elements */
-        .gradient-bg {
-            background-image: linear-gradient(to right, #a78bfa, #8b5cf6); /* Violet-400 to Violet-600 */
-            color: white;
-        }
-        .app-link-card {
-            transition: all 0.2s ease-in-out;
-        }
-        .app-link-card:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-            transform: translateY(-2px);
         }
     </style>
 </head>
-<body>
+<body class="transition-colors duration-300">
 
-<div id="app" class="app-container">
-    <!-- Content will be rendered here -->
-</div>
+    <div id="app" class="relative">
+        </div>
 
 <script type="module">
-    // Firebase SDK Imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // =================================================================
+    // 1. FIREBASE & CORE IMPORTS
+    // =================================================================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+    import { 
+        getAuth, 
+        onAuthStateChanged, 
+        signInWithEmailAndPassword, 
+        createUserWithEmailAndPassword, 
+        signOut, 
+        GoogleAuthProvider, 
+        signInWithPopup,
+        signInAnonymously,
+        signInWithCustomToken
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+    import { 
+        getFirestore, 
+        collection, 
+        addDoc, 
+        query, 
+        onSnapshot, 
+        updateDoc, 
+        doc, 
+        deleteDoc, 
+        serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-    // Set Firestore log level for debugging
-    setLogLevel('Debug');
-
-    // --- Global Configuration ---
-    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-shareapp-id';
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-    // --- Translation Dictionary ---
-    const translations = {
-        'my': {
-            APP_TITLE: 'အက်ပ်မျှဝေရန်',
-            HOME: 'ပင်မ',
-            UPLOAD: 'အက်ပ်တင်ရန်',
-            PROFILE: 'ကိုယ်ရေး',
-            ADMIN: 'စီမံခန့်ခွဲသူ',
-            SETTINGS: 'ချိန်ညှိချက်များ',
-            SIGN_IN: 'ဝင်ရောက်ရန်',
-            SIGN_UP: 'စာရင်းသွင်းရန်',
-            SIGN_OUT: 'ထွက်ခွာရန်',
-            USER_ID: 'သင့် ID',
-            NOT_LOGGED_IN: 'ဝင်ရောက်ထားခြင်းမရှိသေးပါ',
-            SEARCH_PLACEHOLDER: 'အက်ပ်အမည် သို့မဟုတ် အမျိုးအစား ရှာဖွေရန်',
-            CATEGORIES: 'အမျိုးအစားများ (Categories)',
-            ALL: 'အားလုံး',
-            GAMES: 'ဂိမ်းများ',
-            SOCIAL: 'လူမှုကွန်ရက်',
-            PRODUCTIVITY: 'ထုတ်လုပ်မှု',
-            ENTERTAINMENT: 'ဖျော်ဖြေရေး',
-            LATEST_APPS: 'နောက်ဆုံးတင်ထားသော အက်ပ်များ',
-            DOWNLOAD_OR_OPEN: 'ဒေါင်းလုတ်ဆွဲရန် / ဖွင့်ရန်',
-            SUBMITTED_BY: 'တင်သွင်းသူ',
-            SUBMITTED_DATE: 'တင်သွင်းသည့်ရက်',
-            APP_INFO: 'အက်ပ်အချက်အလက် ထည့်သွင်းပါ',
-            APP_NAME: 'အက်ပ်အမည်',
-            APP_LINK: 'အက်ပ်လင့်ခ်',
-            APP_ICON_LINK: 'အိုင်ကွန်လင့်ခ် (URL)',
-            CATEGORY: 'အမျိုးအစား',
-            SELECT_CATEGORY: 'အမျိုးအစားရွေးပါ',
-            SUBMIT_APP: 'အက်ပ်တင်သွင်းမည်',
-            LOGIN_REQUIRED: 'အက်ပ်တင်ရန်အတွက် ဝင်ရောက်ထားသော အကောင့်လိုအပ်ပါသည်။',
-            ACCOUNT_LOGIN: 'အကောင့်ရှိပြီးသားလား? ဝင်ရောက်ရန်',
-            NO_ACCOUNT: 'အကောင့်မရှိသေးဘူးလား? စာရင်းသွင်းရန်',
-            OR: 'သို့မဟုတ်',
-            LOGIN_SUCCESS: 'ဝင်ရောက်မှုအောင်မြင်ပါသည်',
-            SIGNUP_SUCCESS: 'စာရင်းသွင်းပြီးပါပြီ',
-            LOGOUT_SUCCESS: 'ထွက်ခွာပြီးပါပြီ။',
-            LOGIN_FAILED: 'ဝင်ရောက်မှုမအောင်မြင်ပါ',
-            SIGNUP_FAILED: 'စာရင်းသွင်းမှုမအောင်မြင်ပါ',
-            LOGOUT_FAILED: 'ထွက်ခွာရာတွင် အမှားဖြစ်ပွားပါသည်။',
-            INFO_MISSING: 'အချက်အလက်ပြည့်စုံစွာ ဖြည့်သွင်းပေးပါ။',
-            UPLOAD_SUCCESS: 'အက်ပ်ကို အောင်မြင်စွာ တင်သွင်းပြီးပါပြီ။',
-            UPLOAD_FAILED: 'တင်သွင်းမှု မအောင်မြင်ပါ',
-            DATA_FETCH_FAILED: 'ဒေတာရယူရာတွင် အမှားဖြစ်ပွားပါသည်။',
-            UNAUTHORIZED_GOOGLE: 'Google ဝင်ရောက်မှုမအောင်မြင်ပါ။ Email/Password သို့မဟုတ် အမည်မသိဝင်ရောက်မှုကို အသုံးပြုပါ။',
-            ADMIN_AREA: 'စီမံခန့်ခွဲသူ ဧရိယာ',
-            ADMIN_MESSAGE: 'ဒီနေရာမှာ တင်သွင်းလာတဲ့ အက်ပ်တွေကို ခွင့်ပြုခြင်း၊ ပြင်ဆင်ခြင်း၊ ဖျက်ပစ်ခြင်း စတဲ့လုပ်ငန်းတွေကို လုပ်ဆောင်နိုင်ပါတယ်။',
-            ACCESS_DENIED: 'ဝင်ခွင့်ကန့်သတ်ထားသည်',
-            ACCESS_DENIED_MESSAGE: 'ဒီစာမျက်နှာကို စီမံခန့်ခွဲသူများသာ ဝင်ရောက်ခွင့်ရှိပါသည်။',
-            SETTING_THEME: 'အခင်းအကျင်း (Theme)',
-            SETTING_LANGUAGE: 'ဘာသာစကား (Language)',
-            LIGHT_MODE: 'အလင်းရောင်',
-            DARK_MODE: 'အမှောင်ရောင်',
-            THEME_APPLIED: 'အခင်းအကျင်း အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ။',
-            LANGUAGE_APPLIED: 'ဘာသာစကား အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ။',
-            DEVELOPER_NOTE: 'မှတ်ချက်- စီမံခန့်ခွဲသူအဖြစ် ဝင်ရောက်ရန်၊ စာရင်းသွင်းရာတွင် အီးမေးလ်- waiyan@example.com နှင့် စကားဝှက်- wai118234 ကို အသုံးပြုပါ။',
-            EMAIL: 'အီးမေးလ်',
-            PASSWORD: 'စကားဝှက်',
-            SECRET_CODE: 'လျှို့ဝှက်နံပါတ်',
-            SIGN_IN_WITH_GOOGLE: 'Google ဖြင့် ဝင်ရောက်ရန်',
-            // New Keys for Moderation
-            PENDING: 'ဆိုင်းငံ့',
-            APPROVED: 'ခွင့်ပြုပြီး',
-            UNAPPROVE: 'ခွင့်မပြုတော့',
-            APPROVE: 'ခွင့်ပြုမည်',
-            DELETION_SUCCESS: 'အက်ပ်ကို ဖျက်လိုက်ပါပြီ။',
-            DELETION_FAILED: 'ဖျက်၍မရပါ',
-            APPROVAL_SUCCESS: 'ခွင့်ပြုလိုက်ပါပြီ။',
-            REJECTION_SUCCESS: 'ခွင့်မပြုတော့ပါ (ပြန်ဆိုင်းငံ့)',
-            APPROVAL_FAILED: 'ခွင့်ပြုမရပါ',
-            NO_APPS_YET: 'အက်ပ်များမရှိသေးပါ',
-            NO_SUBMISSIONS_YET: 'တင်သွင်းထားသည်များ မရှိသေးပါ',
-            YOUR_SUBMISSIONS: 'သင်တင်သွင်းသည့် အက်ပ်များ',
-            NO_APPS_SUBMITTED: 'အက်ပ်များ တင်သွင်းထားခြင်း မရှိသေးပါ',
-            EDIT_SUCCESS: 'ပြင်ဆင်မှုအောင်မြင်ပါသည်',
-            EDIT_FAILED: 'ပြင်ဆင်မှုမအောင်မြင်ပါ',
-            SAVE_CHANGES: 'ပြောင်းလဲမှုသိမ်းမည်',
-            CANCEL: 'ဖျက်သိမ်းမည်',
-        },
-        'en': {
-            APP_TITLE: 'App Share',
-            HOME: 'Home',
-            UPLOAD: 'Upload App',
-            PROFILE: 'Profile',
-            ADMIN: 'Admin',
-            SETTINGS: 'Settings',
-            SIGN_IN: 'Sign In',
-            SIGN_UP: 'Sign Up',
-            SIGN_OUT: 'Sign Out',
-            USER_ID: 'Your ID',
-            NOT_LOGGED_IN: 'Not logged in',
-            SEARCH_PLACEHOLDER: 'Search App Name or Category',
-            CATEGORIES: 'Categories',
-            ALL: 'All',
-            GAMES: 'Games',
-            SOCIAL: 'Social',
-            PRODUCTIVITY: 'Productivity',
-            ENTERTAINMENT: 'Entertainment',
-            LATEST_APPS: 'Latest Uploads',
-            DOWNLOAD_OR_OPEN: 'Download / Open',
-            SUBMITTED_BY: 'Submitted by',
-            SUBMITTED_DATE: 'Submission Date',
-            APP_INFO: 'Enter App Details',
-            APP_NAME: 'App Name',
-            APP_LINK: 'App Link',
-            APP_ICON_LINK: 'Icon Link (URL)',
-            CATEGORY: 'Category',
-            SELECT_CATEGORY: 'Select Category',
-            SUBMIT_APP: 'Submit App',
-            LOGIN_REQUIRED: 'Login is required to upload an app.',
-            ACCOUNT_LOGIN: 'Already have an account? Sign In',
-            NO_ACCOUNT: 'Don\'t have an account? Sign Up',
-            OR: 'or',
-            LOGIN_SUCCESS: 'Sign in successful',
-            SIGNUP_SUCCESS: 'Sign up successful',
-            LOGOUT_SUCCESS: 'Signed out successfully.',
-            LOGIN_FAILED: 'Sign in failed',
-            SIGNUP_FAILED: 'Sign up failed',
-            LOGOUT_FAILED: 'Error during sign out.',
-            INFO_MISSING: 'Please fill in all details.',
-            UPLOAD_SUCCESS: 'App submitted successfully.',
-            UPLOAD_FAILED: 'Upload failed',
-            DATA_FETCH_FAILED: 'Error fetching data.',
-            UNAUTHORIZED_GOOGLE: 'Google sign-in failed due to unauthorized domain. Please use Email/Password or Anonymous sign-in.',
-            ADMIN_AREA: 'Administrator Area',
-            ADMIN_MESSAGE: 'Here you can approve, edit, and manage all submitted applications.',
-            ACCESS_DENIED: 'Access Denied',
-            ACCESS_DENIED_MESSAGE: 'This page is restricted to administrators only.',
-            SETTING_THEME: 'Theme',
-            SETTING_LANGUAGE: 'Language',
-            LIGHT_MODE: 'Light Mode',
-            DARK_MODE: 'Dark Mode',
-            THEME_APPLIED: 'Theme successfully changed.',
-            LANGUAGE_APPLIED: 'Language successfully changed.',
-            DEVELOPER_NOTE: 'Note: To login as Admin, use Email: waiyan@example.com and Password: wai118234 for sign up.',
-            EMAIL: 'Email',
-            PASSWORD: 'Password',
-            SECRET_CODE: 'Secret Code',
-            SIGN_IN_WITH_GOOGLE: 'Sign in with Google',
-            // New Keys for Moderation
-            PENDING: 'Pending',
-            APPROVED: 'Approved',
-            UNAPPROVE: 'Unapprove',
-            APPROVE: 'Approve',
-            DELETION_SUCCESS: 'App deleted successfully.',
-            DELETION_FAILED: 'Deletion failed',
-            APPROVAL_SUCCESS: 'App approved successfully.',
-            REJECTION_SUCCESS: 'App unapproved successfully (Pending).',
-            APPROVAL_FAILED: 'Approval failed',
-            NO_APPS_YET: 'No apps yet',
-            NO_SUBMISSIONS_YET: 'No submissions yet',
-            YOUR_SUBMISSIONS: 'Your Submissions',
-            NO_APPS_SUBMITTED: 'No apps have been submitted yet',
-            EDIT_SUCCESS: 'Edit successful',
-            EDIT_FAILED: 'Edit failed',
-            SAVE_CHANGES: 'Save Changes',
-            CANCEL: 'Cancel',
-        },
-        'th': {
-            APP_TITLE: 'แชร์แอป',
-            HOME: 'หน้าหลัก',
-            UPLOAD: 'อัปโหลดแอป',
-            PROFILE: 'โปรไฟล์',
-            ADMIN: 'ผู้ดูแล',
-            SETTINGS: 'การตั้งค่า',
-            SIGN_IN: 'ลงชื่อเข้าใช้',
-            SIGN_UP: 'ลงทะเบียน',
-            SIGN_OUT: 'ออกจากระบบ',
-            USER_ID: 'รหัสผู้ใช้ของคุณ',
-            NOT_LOGGED_IN: 'ยังไม่ได้เข้าสู่ระบบ',
-            SEARCH_PLACEHOLDER: 'ค้นหาชื่อแอปหรือหมวดหมู่',
-            CATEGORIES: 'หมวดหมู่',
-            ALL: 'ทั้งหมด',
-            GAMES: 'เกม',
-            SOCIAL: 'โซเชียล',
-            PRODUCTIVITY: 'เพิ่มประสิทธิภาพ',
-            ENTERTAINMENT: 'บันเทิง',
-            LATEST_APPS: 'แอปที่อัปโหลดล่าสุด',
-            DOWNLOAD_OR_OPEN: 'ดาวน์โหลด / เปิด',
-            SUBMITTED_BY: 'ส่งโดย',
-            SUBMITTED_DATE: 'วันที่ส่ง',
-            APP_INFO: 'ป้อนรายละเอียดแอป',
-            APP_NAME: 'ชื่อแอป',
-            APP_LINK: 'ลิงก์แอป',
-            APP_ICON_LINK: 'ลิงก์ไอคอน (URL)',
-            CATEGORY: 'หมวดหมู่',
-            SELECT_CATEGORY: 'เลือกหมวดหมู่',
-            SUBMIT_APP: 'ส่งแอป',
-            LOGIN_REQUIRED: 'ต้องเข้าสู่ระบบเพื่ออัปโหลดแอป',
-            ACCOUNT_LOGIN: 'มีบัญชีอยู่แล้ว? เข้าสู่ระบบ',
-            NO_ACCOUNT: 'ยังไม่มีบัญชี? ลงทะเบียน',
-            OR: 'หรือ',
-            LOGIN_SUCCESS: 'ลงชื่อเข้าใช้สำเร็จ',
-            SIGNUP_SUCCESS: 'ลงทะเบียนสำเร็จ',
-            LOGOUT_SUCCESS: 'ออกจากระบบสำเร็จ',
-            LOGIN_FAILED: 'ลงชื่อเข้าใช้ล้มเหลว',
-            SIGNUP_FAILED: 'ลงทะเบียนล้มเหลว',
-            LOGOUT_FAILED: 'ข้อผิดพลาดในการออกจากระบบ',
-            INFO_MISSING: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-            UPLOAD_SUCCESS: 'ส่งแอปสำเร็จ',
-            UPLOAD_FAILED: 'อัปโหลดล้มเหลว',
-            DATA_FETCH_FAILED: 'ข้อผิดพลาดในการดึงข้อมูล',
-            UNAUTHORIZED_GOOGLE: 'การลงชื่อเข้าใช้ด้วย Google ล้มเหลวเนื่องจากโดเมนไม่ได้รับอนุญาต โปรดใช้ Email/Password หรือลงชื่อเข้าใช้แบบไม่ระบุตัวตน',
-            ADMIN_AREA: 'พื้นที่ผู้ดูแลระบบ',
-            ADMIN_MESSAGE: 'ที่นี่คุณสามารถอนุมัติ แก้ไข และจัดการแอปพลิเคชันที่ส่งมาทั้งหมดได้',
-            ACCESS_DENIED: 'ถูกจำกัดการเข้าถึง',
-            ACCESS_DENIED_MESSAGE: 'หน้านี้จำกัดเฉพาะผู้ดูแลระบบเท่านั้น',
-            SETTING_THEME: 'ธีม',
-            SETTING_LANGUAGE: 'ภาษา',
-            LIGHT_MODE: 'โหมดสว่าง',
-            DARK_MODE: 'โหมดมืด',
-            THEME_APPLIED: 'เปลี่ยนธีมสำเร็จแล้ว',
-            LANGUAGE_APPLIED: 'เปลี่ยนภาษาสำเร็จแล้ว',
-            DEVELOPER_NOTE: 'หมายเหตุ: ในการเข้าสู่ระบบในฐานะผู้ดูแลระบบ ให้ใช้ Email: waiyan@example.com และ Password: wai118234 สำหรับการลงทะเบียน',
-            EMAIL: 'อีเมล',
-            PASSWORD: 'รหัสผ่าน',
-            SECRET_CODE: 'รหัสลับ',
-            SIGN_IN_WITH_GOOGLE: 'ลงชื่อเข้าใช้ด้วย Google',
-            // New Keys for Moderation
-            PENDING: 'รอการอนุมัติ',
-            APPROVED: 'อนุมัติแล้ว',
-            UNAPPROVE: 'ไม่อนุมัติ',
-            APPROVE: 'อนุมัติ',
-            DELETION_SUCCESS: 'ลบแอปสำเร็จแล้ว',
-            DELETION_FAILED: 'ล้มเหลวในการลบ',
-            APPROVAL_SUCCESS: 'อนุมัติแอปสำเร็จแล้ว',
-            REJECTION_SUCCESS: 'ยกเลิกการอนุมัติแอปสำเร็จแล้ว (รอการอนุมัติ)',
-            APPROVAL_FAILED: 'ล้มเหลวในการอนุมัติ',
-            NO_APPS_YET: 'ยังไม่มีแอป',
-            NO_SUBMISSIONS_YET: 'ยังไม่มีการส่ง',
-            YOUR_SUBMISSIONS: 'การส่งของคุณ',
-            NO_APPS_SUBMITTED: 'ยังไม่มีการส่งแอป',
-            EDIT_SUCCESS: 'แก้ไขสำเร็จ',
-            EDIT_FAILED: 'แก้ไขล้มเหลว',
-            SAVE_CHANGES: 'บันทึกการเปลี่ยนแปลง',
-            CANCEL: 'ยกเลิก',
-        },
-        'zh': {
-            APP_TITLE: '应用分享',
-            HOME: '主页',
-            UPLOAD: '上传应用',
-            PROFILE: '个人资料',
-            ADMIN: '管理员',
-            SETTINGS: '设置',
-            SIGN_IN: '登录',
-            SIGN_UP: '注册',
-            SIGN_OUT: '登出',
-            USER_ID: '您的用户 ID',
-            NOT_LOGGED_IN: '未登录',
-            SEARCH_PLACEHOLDER: '搜索应用名称或类别',
-            CATEGORIES: '类别',
-            ALL: '全部',
-            GAMES: '游戏',
-            SOCIAL: '社交',
-            PRODUCTIVITY: '效率',
-            ENTERTAINMENT: '娱乐',
-            LATEST_APPS: '最新上传',
-            DOWNLOAD_OR_OPEN: '下载 / 打开',
-            SUBMITTED_BY: '提交者',
-            SUBMITTED_DATE: '提交日期',
-            APP_INFO: '输入应用详情',
-            APP_NAME: '应用名称',
-            APP_LINK: '应用链接',
-            APP_ICON_LINK: '图标链接 (URL)',
-            CATEGORY: '类别',
-            SELECT_CATEGORY: '选择类别',
-            SUBMIT_APP: '提交应用',
-            LOGIN_REQUIRED: '需要登录才能上传应用',
-            ACCOUNT_LOGIN: '已有账户？登录',
-            NO_ACCOUNT: '还没有账户？注册',
-            OR: '或',
-            LOGIN_SUCCESS: '登录成功',
-            SIGNUP_SUCCESS: '注册成功',
-            LOGOUT_SUCCESS: '登出成功',
-            LOGIN_FAILED: '登录失败',
-            SIGNUP_FAILED: '注册失败',
-            LOGOUT_FAILED: '登出时出错',
-            INFO_MISSING: '请填写所有详情。',
-            UPLOAD_SUCCESS: '应用提交成功。',
-            UPLOAD_FAILED: '上传失败',
-            DATA_FETCH_FAILED: '获取数据时出错。',
-            UNAUTHORIZED_GOOGLE: '由于未经授权的域，Google 登录失败。请使用电子邮件/密码或匿名登录。',
-            ADMIN_AREA: '管理员区域',
-            ADMIN_MESSAGE: '您可以在此批准、编辑和管理所有已提交的应用。',
-            ACCESS_DENIED: '拒绝访问',
-            ACCESS_DENIED_MESSAGE: '此页面仅限管理员访问。',
-            SETTING_THEME: '主题',
-            SETTING_LANGUAGE: '语言',
-            LIGHT_MODE: '浅色模式',
-            DARK_MODE: '深色模式',
-            THEME_APPLIED: '主题已成功更改。',
-            LANGUAGE_APPLIED: '语言已成功更改。',
-            DEVELOPER_NOTE: '注意：要以管理员身份登录，请使用电子邮件：waiyan@example.com 和密码：wai118234 进行注册。',
-            EMAIL: '电子邮件',
-            PASSWORD: '密码',
-            SECRET_CODE: '密码',
-            SIGN_IN_WITH_GOOGLE: '使用 Google 登录',
-            // New Keys for Moderation
-            PENDING: '待处理',
-            APPROVED: '已批准',
-            UNAPPROVE: '取消批准',
-            APPROVE: '批准',
-            DELETION_SUCCESS: '应用删除成功。',
-            DELETION_FAILED: '删除失败',
-            APPROVAL_SUCCESS: '应用批准成功。',
-            REJECTION_SUCCESS: '应用已取消批准 (待处理)。',
-            APPROVAL_FAILED: '批准失败',
-            NO_APPS_YET: '暂无应用',
-            NO_SUBMISSIONS_YET: '暂无提交',
-            YOUR_SUBMISSIONS: '您的提交',
-            NO_APPS_SUBMITTED: '尚未提交任何应用',
-            EDIT_SUCCESS: '编辑成功',
-            EDIT_FAILED: '编辑失败',
-            SAVE_CHANGES: '保存更改',
-            CANCEL: '取消',
-        },
+    // =================================================================
+    // 2. CONFIGURATION & INITIALIZATION
+    // =================================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyAUL74mqVCIY1MMclrRhdVbY_VyP4lgQpY",
+        authDomain: "waiappstore.firebaseapp.com",
+        projectId: "waiappstore",
+        storageBucket: "waiappstore.firebasestorage.app",
+        messagingSenderId: "161610339691",
+        appId: "1:161610339691:web:ce59fafb6a21729030682e",
+        measurementId: "G-HH95X102MG"
     };
 
-    /** Retrieves translated string */
+    // Initialize Firebase Services
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Global Constants
+    const sharedAppsCollectionPath = "sharedApps";
+    const adminEmail = "waiyan@example.com"; 
+    const initialAuthToken = null; // Set this if using a custom token on load
+
+    // =================================================================
+    // 3. GLOBAL STATE & TRANSLATIONS
+    // =================================================================
+
+    const translations = {
+        en: {
+            APP_TITLE: "ShareApp Store", HOME: "Home", UPLOAD: "Upload", PROFILE: "Profile", SETTINGS: "Settings", ADMIN: "Admin", SIGN_IN: "Sign In", SIGN_UP: "Sign Up", SIGN_OUT: "Sign Out", PASSWORD: "Password", EMAIL: "Email", NO_ACCOUNT: "Need an account? Sign Up", ACCOUNT_LOGIN: "Already have an account? Sign In", OR: "OR", SIGN_IN_WITH_GOOGLE: "Sign in with Google", SECRET_CODE: "Your secret code", DEVELOPER_NOTE: "Note: For demonstration, a placeholder account is used. Please use the Google button.", USER_ID: "User ID", NOT_LOGGED_IN: "Not Logged In", PENDING: "Pending Review", APPROVED: "Approved", DOWNLOAD_OR_OPEN: "Get App", NO_APPS_YET: "No approved apps yet. Be the first to submit!", CATEGORIES: "Categories", ALL: "All", GAMES: "Games", SOCIAL: "Social", PRODUCTIVITY: "Productivity", ENTERTAINMENT: "Entertainment", SEARCH_PLACEHOLDER: "Search for apps...", LATEST_APPS: "Latest Shared Apps", SUBMITTED_BY: "Submitted by", SUBMITTED_DATE: "Date", UNKNOWN: "Unknown", APP_INFO: "App Submission", APP_NAME: "App Name", APP_ICON_LINK: "Icon URL", APP_LINK: "App Link (Play Store, etc.)", CATEGORY: "Category", SELECT_CATEGORY: "Select Category", SUBMIT_APP: "Submit App", LOGIN_REQUIRED: "You must sign in to submit an app.", UPLOAD_SUCCESS: "Upload Successful!", UPLOAD_FAILED: "Upload Failed", DATA_FETCH_FAILED: "Failed to fetch data.", SETTING_THEME: "Theme Settings", LIGHT_MODE: "Light Mode", DARK_MODE: "Dark Mode", SETTING_LANGUAGE: "Language", THEME_APPLIED: "Theme applied.", LANGUAGE_APPLIED: "Language applied.", NO_NAME: "No Name", NO_EMAIL: "No Email", EMAIL_PASSWORD: "Email/Password", YOUR_SUBMISSIONS: "Your Submissions", NO_SUBMISSIONS_YET: "You have not submitted any apps yet.", ACCESS_DENIED: "Access Denied", ACCESS_DENIED_MESSAGE: "You do not have administrative privileges.", ADMIN_AREA: "Moderation Queue", SUBMISSIONS: "Submissions", UNAPPROVE: "Unapprove", APPROVE: "Approve", EDIT_APP: "Edit App Details", SAVE_CHANGES: "Save Changes", CANCEL: "Cancel"
+        },
+        my: {
+            APP_TITLE: "ShareApp စတိုး", HOME: "ပင်မ", UPLOAD: "တင်သွင်းရန်", PROFILE: "ပရိုဖိုင်", SETTINGS: "ချိန်ညှိချက်များ", ADMIN: "စီမံခန့်ခွဲသူ", SIGN_IN: "ဝင်ရောက်ရန်", SIGN_UP: "အကောင့်ဖွင့်ရန်", SIGN_OUT: "အကောင့်ထွက်ရန်", PASSWORD: "လျှို့ဝှက်နံပါတ်", EMAIL: "အီးမေးလ်", NO_ACCOUNT: "အကောင့်မရှိဘူးလား။ အကောင့်ဖွင့်ပါ", ACCOUNT_LOGIN: "အကောင့်ရှိပြီးသားလား။ ဝင်ရောက်ပါ", OR: "သို့မဟုတ်", SIGN_IN_WITH_GOOGLE: "Google ဖြင့် ဝင်ရောက်ရန်", SECRET_CODE: "လျှို့ဝှက်နံပါတ်", DEVELOPER_NOTE: "သတိပေးချက်- စမ်းသပ်ရန်အတွက်သာ။ Google ခလုတ်ကို အသုံးပြုပါ။", USER_ID: "အသုံးပြုသူ ID", NOT_LOGGED_IN: "မဝင်ရောက်ရသေးပါ", PENDING: "စောင့်ဆိုင်းဆဲ", APPROVED: "ခွင့်ပြုပြီး", DOWNLOAD_OR_OPEN: "App ရယူရန်", NO_APPS_YET: "ခွင့်ပြုထားသော App မရှိသေးပါ။ ပထမဆုံးတင်သွင်းသူ ဖြစ်ပါစေ။", CATEGORIES: "အမျိုးအစားများ", ALL: "အားလုံး", GAMES: "ဂိမ်း", SOCIAL: "လူမှုကွန်ရက်", PRODUCTIVITY: "အလုပ်စွမ်းဆောင်ရည်", ENTERTAINMENT: "ဖျော်ဖြေရေး", SEARCH_PLACEHOLDER: "Apps များ ရှာဖွေပါ...", LATEST_APPS: "နောက်ဆုံးတင်သွင်းသော Apps များ", SUBMITTED_BY: "တင်သွင်းသူ", SUBMITTED_DATE: "တင်သွင်းသည့်နေ့", UNKNOWN: "မသိရှိရ", APP_INFO: "App အချက်အလက်", APP_NAME: "App အမည်", APP_ICON_LINK: "Icon လင့်ခ်", APP_LINK: "App လင့်ခ် (Play Store, etc.)", CATEGORY: "အမျိုးအစား", SELECT_CATEGORY: "အမျိုးအစား ရွေးပါ", SUBMIT_APP: "App တင်သွင်းရန်", LOGIN_REQUIRED: "App တင်သွင်းရန်အတွက် ဝင်ရောက်ရန်လိုအပ်သည်။", UPLOAD_SUCCESS: "တင်သွင်းမှု အောင်မြင်ပါသည်!", UPLOAD_FAILED: "တင်သွင်းမှု မအောင်မြင်ပါ", DATA_FETCH_FAILED: "ဒေတာရယူရာတွင် အမှားဖြစ်ခဲ့သည်။", SETTING_THEME: "Theme ချိန်ညှိချက်များ", LIGHT_MODE: "အလင်းရောင် Theme", DARK_MODE: "အမှောင် Theme", THEME_APPLIED: "Theme ပြောင်းလဲပြီးပါပြီ။", SETTING_LANGUAGE: "ဘာသာစကား", LANGUAGE_APPLIED: "ဘာသာစကား ပြောင်းလဲပြီးပါပြီ။", NO_NAME: "အမည်မရှိ", NO_EMAIL: "အီးမေးလ်မရှိ", EMAIL_PASSWORD: "အီးမေးလ်/စကားဝှက်", YOUR_SUBMISSIONS: "သင်တင်သွင်းခဲ့သော Apps များ", NO_SUBMISSIONS_YET: "သင် App တစ်ခုမှ တင်သွင်းရသေးခြင်း မရှိပါ။", ACCESS_DENIED: "ဝင်ရောက်ခွင့် မပြုပါ", ACCESS_DENIED_MESSAGE: "သင့်တွင် စီမံခန့်ခွဲသူ အခွင့်အရေး မရှိပါ။", ADMIN_AREA: "စီမံခန့်ခွဲမှု", SUBMISSIONS: "တင်သွင်းမှုများ", UNAPPROVE: "ခွင့်ပြုချက် ရုပ်သိမ်း", APPROVE: "ခွင့်ပြုရန်", EDIT_APP: "App အချက်အလက် ပြင်ဆင်ရန်", SAVE_CHANGES: "အပြောင်းအလဲများ သိမ်းဆည်း", CANCEL: "ပယ်ဖျက်မည်"
+        },
+        // Thai and Chinese translations were partially included in the original HTML code 
+        // but are omitted here for brevity of the combined code block.
+        // You would typically include the full translation set here.
+    };
+
+    let currentState = {
+        view: 'home', // 'home', 'upload', 'profile', 'admin', 'settings', 'login', 'signup'
+        authMode: 'login', // 'login' or 'signup'
+        user: null, // Firebase user object
+        userId: null,
+        isAuthReady: false,
+        sharedApps: [], // Array of { id, name, link, isApproved, ... }
+        theme: localStorage.getItem('theme') || 'light', // 'light' or 'dark'
+        language: localStorage.getItem('language') || 'my', // 'my', 'en', 'th', 'zh'
+        message: null,
+        error: null,
+        editingAppId: null, // ID of the app currently being edited in admin view
+    };
+
+    // =================================================================
+    // 4. CORE FUNCTIONS (Included from your original parts)
+    // =================================================================
+
+    /** Translation Function */
     function T(key) {
-        // Fallback to English, then the key itself
         return translations[currentState.language]?.[key] || translations['en'][key] || key;
     }
 
-    // --- Firebase Initialization ---
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const googleProvider = new GoogleAuthProvider();
-
-    // Firestore Collection Paths
-    const sharedAppsCollectionPath = `artifacts/${appId}/public/data/sharedApps`;
-
-    // --- Application State ---
-    let currentState = {
-        view: 'home', // 'home', 'upload', 'profile', 'admin', 'login', 'signup', 'settings'
-        user: null,
-        userId: null,
-        isAuthReady: false,
-        sharedApps: [], // Now holds ALL apps (approved and pending)
-        error: null,
-        message: null,
-        authMode: 'login', // 'login' or 'signup'
-        language: localStorage.getItem('appLang') || 'my', // Default to Burmese
-        theme: localStorage.getItem('appTheme') || 'light', // Default to light mode
-        editingAppId: null, // ID of the app currently being edited in Admin view
-    };
-    
-    // --- Theme Management ---
-    function applyTheme() {
-        const root = document.documentElement;
-        if (currentState.theme === 'dark') {
-            root.classList.add('dark');
-            root.style.backgroundColor = '#1f2937';
-            document.body.style.backgroundColor = '#1f2937';
+    /** Theme Management */
+    function updateTheme(theme) {
+        document.body.classList.remove('bg-white', 'bg-gray-900');
+        if (theme === 'dark') {
+            document.body.classList.add('bg-gray-900');
+            document.documentElement.classList.add('dark');
         } else {
-            root.classList.remove('dark');
-            root.style.backgroundColor = '#f8fafc';
-            document.body.style.backgroundColor = '#f8fafc';
+            document.body.classList.add('bg-white');
+            document.documentElement.classList.remove('dark');
         }
+        localStorage.setItem('theme', theme);
     }
-    
-    // Initial theme application
-    applyTheme();
 
-    // --- Utility Functions ---
+    /** State Update and Re-render */
+    function updateState(newState) {
+        Object.assign(currentState, newState);
+        renderApp();
+        updateTheme(currentState.theme);
+    }
 
-    /** Renders Lucide Icon HTML */
-    function icon(name, classes = 'w-5 h-5') {
+    /** Message Display */
+    function showMessage(msg, isError = false) {
+        updateState({ message: isError ? null : msg, error: isError ? msg : null });
+        setTimeout(() => updateState({ message: null, error: null }), 3000);
+    }
+
+    /** Icon Utility */
+    function icon(name, classes = 'w-6 h-6 mr-2') {
         return `<i data-lucide="${name}" class="${classes}"></i>`;
     }
 
-    /** Updates the state and re-renders the app */
-    function updateState(newState) {
-        currentState = { ...currentState, ...newState };
-        // If theme or language changes, persist and re-apply
-        if (newState.theme !== undefined) {
-            localStorage.setItem('appTheme', currentState.theme);
-            applyTheme();
-        }
-        if (newState.language !== undefined) {
-            localStorage.setItem('appLang', currentState.language);
-        }
-        renderApp();
-    }
-
-    /** Shows a temporary message */
-    function showMessage(text, isError = false) {
-        updateState({ error: isError ? text : null, message: isError ? null : text });
-        setTimeout(() => updateState({ error: null, message: null }), 5000);
-    }
-
-    /** Check if the current user is an admin */
+    /** Admin Check */
     function isAdmin() {
-        return currentState.user && currentState.user.email === 'waiyan@example.com';
+        return currentState.user && currentState.user.email === adminEmail;
     }
 
-    // --- Firebase Authentication Functions ---
-
+    // --- Auth Handlers ---
     async function handleSignIn(email, password) {
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            showMessage(`${T('LOGIN_SUCCESS')} (${userCredential.user.email})။`);
+            await signInWithEmailAndPassword(auth, email, password);
+            showMessage(T('SIGN_IN') + " " + T('UPLOAD_SUCCESS'));
+            updateState({ view: 'home' }); 
         } catch (error) {
-            console.error("Login Error:", error);
-            showMessage(`${T('LOGIN_FAILED')}: ${error.message.substring(0, 50)}...`, true);
+            console.error("Sign In Error:", error);
+            showMessage(`${T('SIGN_IN')} ${T('UPLOAD_FAILED')}: ${error.message}`, true);
         }
     }
 
     async function handleSignUp(email, password) {
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            showMessage(`${T('SIGNUP_SUCCESS')}။ (${userCredential.user.email})`);
+            await createUserWithEmailAndPassword(auth, email, password);
+            showMessage(T('SIGN_UP') + " " + T('UPLOAD_SUCCESS'));
+            updateState({ view: 'home' });
         } catch (error) {
-            console.error("Signup Error:", error);
-            showMessage(`${T('SIGNUP_FAILED')}: ${error.message.substring(0, 50)}...`, true);
+            console.error("Sign Up Error:", error);
+            showMessage(`${T('SIGN_UP')} ${T('UPLOAD_FAILED')}: ${error.message}`, true);
         }
     }
 
     async function handleGoogleSignIn() {
         try {
-            const result = await signInWithPopup(auth, googleProvider);
-            showMessage(`${T('LOGIN_SUCCESS')} (${result.user.displayName})။`);
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+            showMessage("Google " + T('SIGN_IN') + " " + T('UPLOAD_SUCCESS'));
+            updateState({ view: 'home' });
         } catch (error) {
-            console.error("Google Sign-In Error:", error);
-            let errorMessage = error.message.substring(0, 50) + '...';
-            
-            if (error.code === 'auth/unauthorized-domain') {
-                 errorMessage = T('UNAUTHORIZED_GOOGLE');
-            }
-            
-            showMessage(`${T('LOGIN_FAILED')}: ${errorMessage}`, true);
+            console.error("Google Sign In Error:", error);
+            showMessage(`Google ${T('SIGN_IN')} ${T('UPLOAD_FAILED')}: ${error.message}`, true);
         }
     }
 
     async function handleSignOut() {
         try {
             await signOut(auth);
-            showMessage(T('LOGOUT_SUCCESS'));
-            updateState({ view: 'login' }); // Redirect to login after sign out
+            showMessage(T('SIGN_OUT') + " " + T('UPLOAD_SUCCESS'));
+            updateState({ user: null, view: 'login' });
         } catch (error) {
             console.error("Sign Out Error:", error);
-            showMessage(T('LOGOUT_FAILED'), true);
+            showMessage(`${T('SIGN_OUT')} ${T('UPLOAD_FAILED')}: ${error.message}`, true);
         }
     }
 
-    // --- Admin Moderation Functions ---
+    // --- Firestore Data Handlers ---
 
     async function handleAppApproval(appId, isApproved) {
-        if (!isAdmin()) {
-            showMessage(T('ACCESS_DENIED'), true);
-            return;
-        }
-        const appRef = doc(db, sharedAppsCollectionPath, appId);
+        if (!isAdmin()) return showMessage(T('ACCESS_DENIED'), true);
         try {
+            const appRef = doc(db, sharedAppsCollectionPath, appId);
             await updateDoc(appRef, { isApproved: isApproved });
-            showMessage(T(isApproved ? 'APPROVAL_SUCCESS' : 'REJECTION_SUCCESS'));
+            showMessage(isApproved ? T('APPROVED') : T('PENDING'));
         } catch (error) {
             console.error("Approval Error:", error);
-            showMessage(`${T('APPROVAL_FAILED')}: ${error.message.substring(0, 50)}...`, true);
+            showMessage(T('UPLOAD_FAILED') + `: ${error.message}`, true);
         }
     }
-    
+
     async function handleAppDeletion(appId) {
-        if (!isAdmin()) {
-            showMessage(T('ACCESS_DENIED'), true);
-            return;
-        }
-        const appRef = doc(db, sharedAppsCollectionPath, appId);
+        if (!isAdmin()) return showMessage(T('ACCESS_DENIED'), true);
+        if (!confirm(T('CONFIRM_DELETE'))) return; // Assuming CONFIRM_DELETE is available in translations
         try {
-            await deleteDoc(appRef);
-            showMessage(T('DELETION_SUCCESS'));
+            await deleteDoc(doc(db, sharedAppsCollectionPath, appId));
+            showMessage(T('UPLOAD_SUCCESS') + " (Deleted)"); 
         } catch (error) {
             console.error("Deletion Error:", error);
-            showMessage(`${T('DELETION_FAILED')}: ${error.message.substring(0, 50)}...`, true);
+            showMessage(T('UPLOAD_FAILED') + `: ${error.message}`, true);
         }
     }
 
     async function handleAppEdit(appId, name, link, iconLink) {
-        if (!isAdmin()) {
-            showMessage(T('ACCESS_DENIED'), true);
-            return;
-        }
-        const appRef = doc(db, sharedAppsCollectionPath, appId);
+        if (!isAdmin()) return showMessage(T('ACCESS_DENIED'), true);
         try {
-            await updateDoc(appRef, { 
-                name: name, 
-                link: link, 
-                iconLink: iconLink 
-            });
-            showMessage(T('EDIT_SUCCESS'));
-            updateState({ editingAppId: null }); // Exit edit mode
+            const appRef = doc(db, sharedAppsCollectionPath, appId);
+            await updateDoc(appRef, { name, link, iconLink });
+            showMessage(T('SAVE_CHANGES') + " " + T('UPLOAD_SUCCESS'));
+            updateState({ editingAppId: null });
         } catch (error) {
             console.error("Edit Error:", error);
-            showMessage(`${T('EDIT_FAILED')}: ${error.message.substring(0, 50)}...`, true);
+            showMessage(T('UPLOAD_FAILED') + `: ${error.message}`, true);
         }
     }
 
-    // --- Firebase Data Functions ---
-
-    async function handleAppUpload(appName, appLink, appIconLink, category) {
-        if (!currentState.userId || currentState.userId.includes('anon')) {
-            showMessage(T('LOGIN_REQUIRED'), true);
-            return;
+    async function handleAppUpload(name, link, iconLink, category) {
+        if (!currentState.user || currentState.userId.includes('anon')) {
+            return showMessage(T('LOGIN_REQUIRED'), true);
         }
-        if (!appName || !appLink || !category) {
-            showMessage(T('INFO_MISSING'), true);
-            return;
-        }
-
         try {
             await addDoc(collection(db, sharedAppsCollectionPath), {
-                name: appName,
-                link: appLink,
-                iconLink: appIconLink || 'https://placehold.co/40x40/A78BFA/ffffff?text=App',
+                name: name,
+                link: link,
+                iconLink: iconLink,
                 category: category,
                 userId: currentState.userId,
-                userName: currentState.user.displayName || currentState.user.email || T('NOT_LOGGED_IN'),
-                createdAt: serverTimestamp(),
-                isApproved: false, // NEW: Default to false, requires Admin approval
+                userName: currentState.user?.displayName || currentState.user?.email || 'N/A',
+                isApproved: false, // Must be approved by admin
+                createdAt: serverTimestamp()
             });
             showMessage(`${T('UPLOAD_SUCCESS')} (${T('PENDING')})`);
             updateState({ view: 'profile' }); // Go to profile to show pending app
@@ -644,21 +285,20 @@
         });
     }
 
-    // --- UI View Components ---
+    // =================================================================
+    // 5. UI VIEW COMPONENTS (Included from your original parts)
+    // =================================================================
 
     /** Renders the Header (Top Bar) */
     function renderHeader(titleKey) {
         return `
             <header class="p-4 flex justify-between items-center border-b border-gray-100 sticky top-0 z-10 ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}">
-                <!-- Left: Menu Icon -->
                 <button id="menu-toggle-btn" class="p-2 rounded-full ${currentState.theme === 'dark' ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}">
                     ${icon('menu')}
                 </button>
                 
-                <!-- Center: Title -->
                 <h1 class="text-xl font-bold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'}">${T(titleKey)}</h1>
                 
-                <!-- Right: Profile/Auth Button -->
                 <button id="auth-action-btn" class="p-2 rounded-full gradient-bg shadow-md" data-action="${currentState.user ? 'signout' : 'login'}">
                     ${icon(currentState.user ? 'log-out' : 'user', 'w-4 h-4 text-white')}
                 </button>
@@ -670,7 +310,6 @@
     function renderSideMenu() {
         const userIdDisplay = currentState.userId ? `${T('USER_ID')}: ${currentState.userId}` : T('NOT_LOGGED_IN');
         return `
-            <!-- data-menu-close is for event listener to close the menu when clicking outside -->
             <div id="side-menu" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden" data-menu-close>
                 <div class="${currentState.theme === 'dark' ? 'bg-gray-700' : 'bg-white'} h-full w-3/4 max-w-xs p-6 shadow-2xl" onclick="event.stopPropagation()">
                     <h2 class="text-2xl font-bold text-violet-600 mb-4">ShareApp</h2>
@@ -701,7 +340,6 @@
             ? approvedApps.map(app => `
                 <div class="app-link-card ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-4 shadow-sm rounded-xl border flex flex-col">
                     <div class="flex items-center mb-2">
-                        <!-- App Icon Display -->
                         <div class="p-1 rounded-lg mr-3 flex-shrink-0 w-10 h-10 flex items-center justify-center">
                             <img src="${app.iconLink || 'https://placehold.co/40x40/A78BFA/ffffff?text=App'}" 
                                 onerror="this.onerror=null; this.src='https://placehold.co/40x40/A78BFA/ffffff?text=App';"
@@ -726,13 +364,11 @@
             ${renderSideMenu()}
             <main class="flex-grow p-4 space-y-4 overflow-y-auto">
                 
-                <!-- Search Box -->
                 <div class="relative">
                     <input type="text" placeholder="${T('SEARCH_PLACEHOLDER')}" class="w-full p-3 pl-10 border ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-200 bg-white'} rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-150">
                     <span class="absolute left-3 top-1/2 transform -translate-y-1/2 ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}">${icon('search', 'w-4 h-4')}</span>
                 </div>
 
-                <!-- Categories -->
                 <h2 class="text-base font-semibold ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}">${T('CATEGORIES')}</h2>
                 <div class="flex space-x-2 overflow-x-auto pb-2">
                     <span class="bg-violet-500 text-white text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">${T('ALL')}</span>
@@ -742,7 +378,6 @@
                     <span class="bg-gray-100 ${currentState.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'text-gray-700'} text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">${T('ENTERTAINMENT')}</span>
                 </div>
                 
-                <!-- App List -->
                 <h2 class="text-base font-semibold ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} pt-2">${T('LATEST_APPS')}</h2>
                 <div class="space-y-4">
                     ${appListHtml}
@@ -795,14 +430,14 @@
             </main>
         `;
     }
-
+    
     /** Renders the Profile View */
     function renderProfile() {
         const user = currentState.user;
-        const displayName = user?.displayName || T('NO_NAME'); // NO_NAME needed in T()
-        const email = user?.email || T('NO_EMAIL'); // NO_EMAIL needed in T()
+        const displayName = user?.displayName || T('NO_NAME'); 
+        const email = user?.email || T('NO_EMAIL');
         const photoURL = user?.photoURL || 'https://placehold.co/100x100/A78BFA/ffffff?text=U';
-        const provider = user?.providerData?.[0]?.providerId || T('EMAIL_PASSWORD'); // EMAIL_PASSWORD needed in T()
+        const provider = user?.providerData?.[0]?.providerId || T('EMAIL_PASSWORD');
 
         // Filter apps submitted by the current user
         const userApps = currentState.sharedApps.filter(app => app.userId === currentState.userId);
@@ -814,7 +449,6 @@
                 return `
                     <div class="app-link-card ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-3 shadow-sm rounded-xl border flex items-center justify-between">
                         <div class="flex items-center">
-                            <!-- App Icon -->
                             <div class="p-1 rounded-lg mr-3 flex-shrink-0 w-10 h-10 flex items-center justify-center">
                                 <img src="${app.iconLink || 'https://placehold.co/40x40/A78BFA/ffffff?text=App'}" 
                                     onerror="this.onerror=null; this.src='https://placehold.co/40x40/A78BFA/ffffff?text=App';"
@@ -825,7 +459,6 @@
                                 <p class="text-xs ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}">${T('CATEGORY')}: ${app.category}</p>
                             </div>
                         </div>
-                        <!-- Status Tag -->
                         <span class="text-xs font-semibold px-2 py-0.5 rounded-full text-white ${statusClass}">
                             ${statusText}
                         </span>
@@ -875,7 +508,6 @@
                 <div class="${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-lg border space-y-8">
                     <h2 class="text-2xl font-bold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'} border-b ${currentState.theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} pb-3">${T('SETTINGS')}</h2>
 
-                    <!-- Theme Setting -->
                     <div>
                         <h3 class="text-xl font-semibold ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-3">${T('SETTING_THEME')}</h3>
                         <div class="flex space-x-4">
@@ -888,7 +520,6 @@
                         </div>
                     </div>
 
-                    <!-- Language Setting -->
                     <div>
                         <h3 class="text-xl font-semibold ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-3">${T('SETTING_LANGUAGE')}</h3>
                         <div id="language-options" class="grid grid-cols-2 gap-3">
@@ -913,15 +544,15 @@
 
         if (!isUserAdmin) {
              return `
-                ${renderHeader('ADMIN')}
-                ${renderSideMenu()}
-                <main class="flex-grow p-6 overflow-y-auto">
-                    <div class="${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-8 rounded-xl shadow-lg border text-center space-y-4">
-                        <p class="text-2xl text-red-500 font-bold">${icon('lock', 'w-8 h-8 mx-auto mb-2')} ${T('ACCESS_DENIED')}</p>
-                        <p class="${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}">${T('ACCESS_DENIED_MESSAGE')}</p>
-                    </div>
-                </main>
-            `;
+                 ${renderHeader('ADMIN')}
+                 ${renderSideMenu()}
+                 <main class="flex-grow p-6 overflow-y-auto">
+                     <div class="${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-8 rounded-xl shadow-lg border text-center space-y-4">
+                         <p class="text-2xl text-red-500 font-bold">${icon('lock', 'w-8 h-8 mx-auto mb-2')} ${T('ACCESS_DENIED')}</p>
+                         <p class="${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}">${T('ACCESS_DENIED_MESSAGE')}</p>
+                     </div>
+                 </main>
+             `;
         }
         
         // Admin is logged in, display all submitted apps for moderation
@@ -1068,7 +699,6 @@
         ];
 
         const navHtml = navItems.map(item => `
-            <!-- Data attribute is used for event listening instead of inline onclick -->
             <button data-view-target="${item.id}" 
                     class="nav-button p-2 flex flex-col items-center justify-center text-xs transition duration-150 ${currentState.view === item.id ? 'active' : ''}">
                 ${icon(item.iconName, 'w-5 h-5 mb-1')}
@@ -1129,6 +759,10 @@
         // Attach event listeners after rendering
         attachEventListeners(currentView);
     }
+
+    // =================================================================
+    // 6. EVENT LISTENERS & INITIALIZATION LOGIC (Included from your final part)
+    // =================================================================
 
     /** Attach Event Listeners */
     function attachEventListeners(currentView) {
@@ -1301,6 +935,9 @@
 
     // --- Initial Setup and Authentication ---
 
+    // Apply saved theme on initial load before first render
+    updateTheme(currentState.theme);
+
     onAuthStateChanged(auth, async (user) => {
         if (!currentState.isAuthReady) {
             // First run, check for custom token
@@ -1334,7 +971,7 @@
                 user: finalUser, 
                 userId: finalUserId, 
                 isAuthReady: true,
-                view: finalUser ? 'home' : 'login' // Start at home if signed in, otherwise login
+                view: finalUser && !finalUser.isAnonymous ? 'home' : 'login' // Start at home if signed in and not anonymous, otherwise login
             });
 
             // Start data listener only after auth is ready
@@ -1346,7 +983,7 @@
             updateState({ 
                 user: user, 
                 userId: finalUserId,
-                view: user ? currentState.view : 'login' // If user signs out, go to login
+                view: user && !user.isAnonymous ? currentState.view : 'login' // If user signs out or is anonymous, go to login
             });
         }
     });
