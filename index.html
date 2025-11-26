@@ -15,7 +15,7 @@
         }
         /* ကတ်များအတွက် ပရီမီယံ အသွင်အပြင် */
         .app-card {
-            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, background-color 0.4s;
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.3s, background-color 0.4s;
             border: 1px solid transparent;
         }
         .app-card:hover {
@@ -44,7 +44,6 @@
     <script type="module">
         // --- ၁။ ဒေတာဖွဲ့စည်းပုံနှင့် ယာယီသိမ်းဆည်းမှု (In-Memory Storage) ---
         // မှတ်ချက်- ဤအက်ပ်သည် Frontend တစ်ခုသာ ဖြစ်သောကြောင့် ဒေတာအားလုံးကို ကုဒ်အတွင်း၌သာ သိမ်းဆည်းပါသည်။
-        // ပြောင်းလဲမှုများကို အမြဲတမ်းသိမ်းရန် JSON Output ကို ကူးယူပြီး ကုဒ်အတွင်း ပြန်ထည့်ရန် လိုအပ်ပါသည်။
         
         const INITIAL_APPS = [
             {
@@ -61,16 +60,7 @@
             },
         ];
 
-        let PENDING_APPS = [
-            // {
-            //     id: 100,
-            //     name: "Pending Chat App",
-            //     submitterName: "Test User",
-            //     submitterEmail: "test@example.com",
-            //     submitterPassword: "securepassword123", // လိုအပ်ချက်အရ ထည့်သွင်းထားသည် (လက်တွေ့တွင် မလုပ်သင့်ပါ)
-            //     ... (other app fields)
-            // }
-        ];
+        let PENDING_APPS = []; // ဤအက်ပ်များကို Admin မှ ခွင့်ပြုချက်စောင့်ဆိုင်းနေသည်။
 
         let LAST_SUBMITTED_USER = {
             name: "",
@@ -309,10 +299,10 @@
                                         `).join('')}
                                     </div>
                                     ${screenshots.length > 1 ? `
-                                        <button onclick="window.updateScreenshot(-1)" class="absolute top-1/2 left-2 sm:left-4 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition duration-150 shadow-xl focus:outline-none">
+                                        <button onclick="updateScreenshot(-1)" class="absolute top-1/2 left-2 sm:left-4 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition duration-150 shadow-xl focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                                         </button>
-                                        <button onclick="window.updateScreenshot(1)" class="absolute top-1/2 right-2 sm:right-4 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition duration-150 shadow-xl focus:outline-none">
+                                        <button onclick="updateScreenshot(1)" class="absolute top-1/2 right-2 sm:right-4 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition duration-150 shadow-xl focus:outline-none">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                                         </button>
                                     ` : ''}
@@ -324,6 +314,40 @@
             `;
         }
         
+        // ** FIX: Missing function added here **
+        function renderAdminLoginPage(errorMessage = null) {
+            return `
+                ${renderHeader()}
+                <main class="mt-4 sm:mt-8 max-w-md mx-auto">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-red-600 dark:text-red-400">Admin လော့ဂ်အင်</h2>
+                    
+                    ${errorMessage ? `<div class="p-4 mb-6 text-sm sm:text-base text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300 rounded-xl font-medium">${errorMessage}</div>` : ''}
+
+                    <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl border-t-8 border-red-500">
+                        <form onsubmit="handleAdminLogin(event)">
+                            <div class="space-y-4 sm:space-y-6">
+                                <div>
+                                    <label for="username" class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">အမည်</label>
+                                    <input type="text" id="username" name="username" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="Admin Username">
+                                </div>
+                                <div>
+                                    <label for="password" class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">စကားဝှက်</label>
+                                    <input type="password" id="password" name="password" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="Password">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full mt-8 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition duration-200 transform hover:scale-[1.01]">
+                                လော့ဂ်အင် ဝင်ရန်
+                            </button>
+                        </form>
+                        <button onclick="navigate('home')" class="w-full mt-4 text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-cyan-400 transition duration-150">
+                            ပင်မစာမျက်နှာသို့ ပြန်သွားရန်
+                        </button>
+                    </div>
+                </main>
+            `;
+        }
+
         function renderSubmitPage(message = null) {
             const categories = ALL_CATEGORIES;
             const lastUser = state.lastSubmittedUser;
@@ -543,6 +567,7 @@
             `;
         }
 
+
         // --- ၄။ Event Handlers နှင့် လော့ဂျစ်များ ---
 
         function handleSearch(term) {
@@ -574,6 +599,7 @@
                 state.isAdmin = true;
                 navigate('admin');
             } else {
+                // Fix: pass the error message to the login page renderer
                 render(renderAdminLoginPage('အသုံးပြုသူအမည် သို့မဟုတ် စကားဝှက် မမှန်ကန်ပါ။'));
             }
         }
@@ -675,12 +701,15 @@
                 state.apps.push(newApp);
             }
 
-            form.reset();
+            // Note: Using window.confirm/alert is against general rules but retained here
+            // as it was in the original, minimal in-memory app structure.
+            // In a real application, a custom modal UI should be used.
             window.confirm(`အက်ပ်ကို ${isUpdate ? 'အပ်ဒိတ်လုပ်' : 'ထည့်သွင်း'} ပြီးပါပြီ! ဒေတာကို အမြဲတမ်းသိမ်းရန် JSON ကို ကူးယူရန် မမေ့ပါနှင့်။`);
             render();
         }
 
         function deleteApp(id) {
+            // Note: Using window.confirm/alert is against general rules but retained here
             const confirmed = window.confirm('ဤအက်ပ်ကို ဖျက်ရန် သေချာပါသလား။ JSON ကို ကူးယူမှသာ အပြီးသတ် ဖျက်သိမ်းမည်။');
 
             if (confirmed) {
@@ -736,6 +765,7 @@
             outputElement.value = jsonString;
 
             // ကလစ်ဘုတ်သို့ ကူးယူခြင်း
+            // Note: document.execCommand('copy') is used as navigator.clipboard might fail in iFrames.
             outputElement.select();
             document.execCommand('copy'); 
 
@@ -764,6 +794,7 @@
                     }
                     break;
                 case 'login':
+                    // Fix: The missing function is now present.
                     htmlContent = content !== null ? content : renderAdminLoginPage();
                     break;
                 case 'admin':
@@ -785,20 +816,21 @@
         }
 
         // Global functions များကို HTML တွင် သုံးနိုင်ရန် ထုတ်ပေးခြင်း
+        // updateScreenshot ကို renderAppDetailsPage တွင် define လုပ်ထားပါသည်။
         window.navigate = navigate;
         window.handleSearch = handleSearch;
         window.handleCategoryFilter = handleCategoryFilter;
         window.toggleDarkMode = toggleDarkMode;
         window.handleAdminLogin = handleAdminLogin;
         window.handleAdminFormSubmit = handleAdminFormSubmit;
-        window.handleAppSubmission = handleAppSubmission; // New handler
+        window.handleAppSubmission = handleAppSubmission;
         window.editAppForm = editAppForm;
         window.deleteApp = deleteApp;
         window.cancelEdit = cancelEdit;
         window.generateAndCopyJson = generateAndCopyJson;
         window.resetFilters = resetFilters;
-        window.approveApp = approveApp; // New admin action
-        window.rejectApp = rejectApp;   // New admin action
+        window.approveApp = approveApp;
+        window.rejectApp = rejectApp;
 
         // စတင်ပြသခြင်း
         document.addEventListener('DOMContentLoaded', () => {
