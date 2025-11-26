@@ -3,44 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ဝေယံ၏ အက်ပ်စတိုး (Firestore အသုံးပြုထားသည်)</title>
-    <!-- Tailwind CSS CDN for styling -->
+    <title>ShareApp (Myanmar) - Your App Sharing Platform</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter စာလုံးပုံစံကို အသုံးပြုခြင်း -->
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
+        :root {
+            --primary-color: #8b5cf6;
+            --secondary-color: #06b6d4;
+            --accent-color: #10b981;
+        }
+        
+        * {
             font-family: 'Inter', sans-serif;
-            transition: background-color 0.4s, color 0.4s;
         }
+        
+        body {
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+        }
+        
+        .dark body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass-effect {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
         .app-card {
-            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.3s, background-color 0.4s;
-            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
+        
         .app-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-            border-color: #06b6d4;
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px -10px rgba(139, 92, 246, 0.3);
         }
-        #screenshot-carousel {
-            scroll-behavior: smooth;
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         }
-        /* Dark Mode Overrides for deeper contrast */
-        .dark .bg-gray-50 { background-color: #0f172a; } 
-        .dark .bg-white { background-color: #1e293b; } 
-        .dark .app-card { background-color: #334155; }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .language-flag {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 8px;
+        }
+        
+        .floating-action-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            z-index: 100;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .floating-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.6);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .skeleton-loader {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        .dark .skeleton-loader {
+            background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+            background-size: 200% 100%;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
-    
+</head>
+<body class="bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-50 flex flex-col items-center justify-center">
+        <div class="relative">
+            <div class="w-20 h-20 rounded-2xl gradient-bg flex items-center justify-center pulse-animation">
+                <i class="fas fa-mobile-alt text-white text-2xl"></i>
+            </div>
+            <div class="mt-4 text-center">
+                <h2 class="text-2xl font-bold gradient-text">ShareApp</h2>
+                <p class="text-gray-500 dark:text-gray-400 mt-2">Loading your experience...</p>
+            </div>
+        </div>
+        <div class="w-64 h-2 bg-gray-200 dark:bg-slate-700 rounded-full mt-8 overflow-hidden">
+            <div class="h-full gradient-bg rounded-full loading-bar"></div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app-container" class="max-w-7xl mx-auto px-4 py-6 hidden">
+        <!-- Dynamic content will be loaded here -->
+    </div>
+
+    <!-- Floating Action Button -->
+    <div id="fab" class="floating-action-btn hidden">
+        <i class="fas fa-plus"></i>
+    </div>
+
     <!-- Firebase Configuration -->
     <script type="module">
         // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDocs, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyAUL74mqVCIY1MMclrRhdVbY_VyP4lgQpY",
             authDomain: "waiappstore.firebaseapp.com",
@@ -54,883 +212,733 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
         
-        // Global variables
-        window.firebaseApp = app;
-        window.firebaseAnalytics = analytics;
-    </script>
-</head>
-<body class="bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-50 min-h-screen">
-
-    <div id="app-container" class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
-        <!-- ဒိုင်းနမစ် အကြောင်းအရာများ ဒီနေရာတွင် ပေါ်လာမည် -->
-    </div>
-
-    <!-- JavaScript လော့ဂျစ်နှင့် Firebase ပေါင်းစပ်မှု -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global variables provided by the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'waiappstore';
-        const firebaseConfig = {
-            apiKey: "AIzaSyAUL74mqVCIY1MMclrRhdVbY_VyP4lgQpY",
-            authDomain: "waiappstore.firebaseapp.com",
-            projectId: "waiappstore",
-            storageBucket: "waiappstore.firebasestorage.app",
-            messagingSenderId: "161610339691",
-            appId: "1:161610339691:web:ce59fafb6a21729030682e",
-            measurementId: "G-HH95X102MG"
-        };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        // --- ၁။ Firebase ကမ္ဘာလုံးဆိုင်ရာ အခြေအနေ ---
-        let db;
-        let auth;
-        let userId = null;
-        let listenersInitialized = false; // New flag to ensure listeners are set up only once
-        
-        // --- ၂။ လျှောက်လွှာ ကမ္ဘာလုံးဆိုင်ရာ အခြေအနေ ---
-        let state = {
-            approvedApps: [], // ဒေတာဘေ့စ်မှ approved အက်ပ်များ
-            pendingApps: [], // ဒေတာဘေ့စ်မှ pending အက်ပ်များ
-            currentView: 'home', // 'home', 'details', 'login', 'admin', 'submit'
+        // Global State
+        const state = {
+            currentUser: null,
+            userProfile: null,
+            approvedApps: [],
+            pendingApps: [],
+            userApps: [],
+            currentView: 'home',
             selectedAppId: null,
             searchTerm: '',
-            selectedCategory: 'အားလုံး',
+            selectedCategory: 'all',
             isAdmin: false,
             isEditingMode: false,
             editingAppDocId: null,
             isDarkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-            lastSubmittedUser: { name: "", email: "", password: "" },
-            isAuthReady: false // Use state variable for general readiness
+            language: localStorage.getItem('language') || 'myanmar',
+            isLoading: true
         };
 
+        // Language translations
+        const translations = {
+            myanmar: {
+                appName: "ShareApp (Myanmar)",
+                home: "ပင်မစာမျက်နှာ",
+                explore: "အက်ပ်များရှာဖွေရန်",
+                profile: "ကိုယ်ရေးအချက်အလက်",
+                myApps: "ကျွန်ုပ်၏အက်ပ်များ",
+                submitApp: "အက်ပ်တင်သွင်းရန်",
+                login: "ဝင်ရောက်ရန်",
+                logout: "ထွက်ရန်",
+                welcome: "မင်္ဂလာပါ",
+                searchPlaceholder: "အက်ပ်များကို ရှာဖွေပါ...",
+                categories: "အမျိုးအစားများ",
+                all: "အားလုံး",
+                tools: "ကိရိယာများ",
+                games: "ဂိမ်းများ",
+                social: "လူမှုကွန်ရက်",
+                video: "ဗီဒီယို",
+                music: "ဂီတ",
+                others: "အခြား",
+                popularApps: "လူကြိုက်များသော အက်ပ်များ",
+                newApps: "အက်ပ်အသစ်များ",
+                version: "ဗားရှင်း",
+                download: "ဒေါင်းလုတ်ဆွဲရန်",
+                developer: "တီထွင်သူ",
+                appDetails: "အက်ပ်အသေးစိတ်",
+                screenshots: "စခရင်ရှော့များ",
+                noAppsFound: "အက်ပ်များ မတွေ့ပါ",
+                resetFilters: "စစ်ထုတ်မှုများ ပြန်လည်သတ်မှတ်ရန်",
+                adminPanel: "Admin Panel",
+                pendingApproval: "ခွင့်ပြုချက်စောင့်ဆိုင်းနေသည်",
+                approve: "ခွင့်ပြုရန်",
+                reject: "ပယ်ချရန်",
+                edit: "ပြင်ဆင်ရန်",
+                delete: "ဖျက်ရန်",
+                name: "အမည်",
+                email: "အီးမေးလ်",
+                password: "စကားဝှက်",
+                confirmPassword: "စကားဝှက်အတည်ပြုရန်",
+                createAccount: "အကောင့်အသစ်ဖွင့်ရန်",
+                alreadyHaveAccount: "အကောင့်ရှိပြီးသားလား?",
+                dontHaveAccount: "အကောင့်မရှိသေးဘူးလား?",
+                signUp: "အကောင့်ဖွင့်ရန်",
+                settings: "ဆက်တင်များ",
+                darkMode: "အမှောင်မျက်နှာပြင်",
+                language: "ဘာသာစကား",
+                myanmar: "မြန်မာ",
+                english: "အင်္ဂလိပ်",
+                thai: "ထိုင်း",
+                india: "အိန္ဒိယ",
+                china: "တရုတ်",
+                korea: "ကိုရီးယား",
+                japan: "ဂျပန်",
+                save: "သိမ်းဆည်းရန်",
+                cancel: "မလုပ်တော့ပါ",
+                submit: "တင်သွင်းရန်",
+                appName: "အက်ပ်အမည်",
+                appIcon: "အက်ပ်အိုင်ကွန်",
+                appCategory: "အက်ပ်အမျိုးအစား",
+                appVersion: "အက်ပ်ဗားရှင်း",
+                appSize: "အက်ပ်အရွယ်အစား",
+                appDeveloper: "အက်ပ်တီထွင်သူ",
+                apkUrl: "APK လင့်ခ်",
+                screenshotUrls: "စခရင်ရှော့လင့်ခ်များ",
+                description: "ဖော်ပြချက်",
+                submitSuccess: "အက်ပ်အောင်မြင်စွာတင်သွင်းပြီးပါပြီ",
+                submitError: "အက်ပ်တင်သွင်းရာတွင်အမှားတစ်ခုရှိနေပါသည်",
+                loginSuccess: "အောင်မြင်စွာဝင်ရောက်ပြီးပါပြီ",
+                loginError: "ဝင်ရောက်ရာတွင်အမှားတစ်ခုရှိနေပါသည်",
+                registerSuccess: "အကောင့်အောင်မြင်စွာဖွင့်ပြီးပါပြီ",
+                registerError: "အကောင့်ဖွင့်ရာတွင်အမှားတစ်ခုရှိနေပါသည်"
+            },
+            english: {
+                appName: "ShareApp (Myanmar)",
+                home: "Home",
+                explore: "Explore Apps",
+                profile: "Profile",
+                myApps: "My Apps",
+                submitApp: "Submit App",
+                login: "Login",
+                logout: "Logout",
+                welcome: "Welcome",
+                searchPlaceholder: "Search for apps...",
+                categories: "Categories",
+                all: "All",
+                tools: "Tools",
+                games: "Games",
+                social: "Social",
+                video: "Video",
+                music: "Music",
+                others: "Others",
+                popularApps: "Popular Apps",
+                newApps: "New Apps",
+                version: "Version",
+                download: "Download",
+                developer: "Developer",
+                appDetails: "App Details",
+                screenshots: "Screenshots",
+                noAppsFound: "No apps found",
+                resetFilters: "Reset Filters",
+                adminPanel: "Admin Panel",
+                pendingApproval: "Pending Approval",
+                approve: "Approve",
+                reject: "Reject",
+                edit: "Edit",
+                delete: "Delete",
+                name: "Name",
+                email: "Email",
+                password: "Password",
+                confirmPassword: "Confirm Password",
+                createAccount: "Create Account",
+                alreadyHaveAccount: "Already have an account?",
+                dontHaveAccount: "Don't have an account?",
+                signUp: "Sign Up",
+                settings: "Settings",
+                darkMode: "Dark Mode",
+                language: "Language",
+                myanmar: "Myanmar",
+                english: "English",
+                thai: "Thai",
+                india: "India",
+                china: "China",
+                korea: "Korea",
+                japan: "Japan",
+                save: "Save",
+                cancel: "Cancel",
+                submit: "Submit",
+                appName: "App Name",
+                appIcon: "App Icon",
+                appCategory: "App Category",
+                appVersion: "App Version",
+                appSize: "App Size",
+                appDeveloper: "App Developer",
+                apkUrl: "APK URL",
+                screenshotUrls: "Screenshot URLs",
+                description: "Description",
+                submitSuccess: "App submitted successfully",
+                submitError: "Error submitting app",
+                loginSuccess: "Login successful",
+                loginError: "Error logging in",
+                registerSuccess: "Registration successful",
+                registerError: "Error registering"
+            }
+            // Other languages would follow the same pattern
+        };
+
+        // DOM Elements
         const APP_CONTAINER = document.getElementById('app-container');
-        const ADMIN_CREDENTIALS = { username: "WaiYan", password: "wai118234" };
-        const ALL_CATEGORIES = ['ကိရိယာများ', 'ဂိမ်းများ', 'လူမှုကွန်ရက်', 'ဗီဒီယို', 'ဂီတ', 'အခြား'];
-        const APPS_COLLECTION_PATH = `artifacts/${appId}/public/data/apps`;
-        
-        // Firestore logs ကို debug level ဖြင့် ဖွင့်ထားခြင်း
-        setLogLevel('debug');
+        const LOADING_SCREEN = document.getElementById('loading-screen');
+        const FAB = document.getElementById('fab');
 
-        // --- ၃။ Firebase Initialization and Listeners ---
-        
-        function toggleDarkMode() {
-            state.isDarkMode = !state.isDarkMode;
-            if (state.isDarkMode) {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            }
-            render();
-        }
-
-        function initializeTheme() {
-            if (state.isDarkMode) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        }
-        initializeTheme();
-
-        const initializeFirebase = async () => {
-            try {
-                if (Object.keys(firebaseConfig).length === 0) {
-                    console.error("Firebase configuration is missing. Running in limited mode.");
-                    state.isAuthReady = true;
+        // Initialize the app
+        function initApp() {
+            // Set up auth state listener
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    state.currentUser = user;
+                    // Get user profile from Firestore
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        state.userProfile = userDoc.data();
+                    } else {
+                        // Create a new user profile
+                        state.userProfile = {
+                            uid: user.uid,
+                            displayName: user.displayName || 'User',
+                            email: user.email,
+                            photoURL: user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User') + '&background=8b5cf6&color=fff',
+                            language: state.language,
+                            darkMode: state.isDarkMode,
+                            createdAt: new Date().toISOString()
+                        };
+                        await setDoc(doc(db, 'users', user.uid), state.userProfile);
+                    }
+                    
+                    // Update state with user preferences
+                    state.language = state.userProfile.language || state.language;
+                    state.isDarkMode = state.userProfile.darkMode !== undefined ? state.userProfile.darkMode : state.isDarkMode;
+                    
+                    // Apply user preferences
+                    applyUserPreferences();
+                    
+                    // Check if user is admin
+                    state.isAdmin = state.userProfile.role === 'admin';
+                    
+                    // Load user's apps
+                    loadUserApps();
+                } else {
+                    state.currentUser = null;
+                    state.userProfile = null;
+                    state.userApps = [];
+                    state.isAdmin = false;
+                }
+                
+                // Load all apps
+                loadAllApps();
+                
+                // Show main app content
+                setTimeout(() => {
+                    LOADING_SCREEN.classList.add('hidden');
+                    APP_CONTAINER.classList.remove('hidden');
+                    FAB.classList.remove('hidden');
                     render();
-                    return;
-                }
+                }, 1000);
+            });
+        }
 
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                
-                // --- အဆင့် ၁: Authentication ကို ဦးစွာလုပ်ဆောင်ရန် စောင့်ဆိုင်းခြင်း (Error များကို ဖြေရှင်းရန်) ---
-                try {
-                    if (initialAuthToken) {
-                        console.log("Signing in with custom token...");
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        // Custom Token မရှိပါက သို့မဟုတ် ပျက်ကွက်ပါက Anonymous ဖြင့် ဝင်ရောက်ခြင်း
-                        if (!auth.currentUser) {
-                            console.log("Signing in anonymously...");
-                            await signInAnonymously(auth);
-                        }
-                    }
-                } catch (e) {
-                    // Custom token ပျက်ကွက်ပါက Anonymous ဖြင့် ပြန်လည်ကြိုးစားခြင်း
-                    console.warn("Custom token sign in failed. Attempting anonymous sign-in...", e);
-                    await signInAnonymously(auth);
-                }
-                
-                // --- အဆင့် ၂: Auth State Listener ကို သတ်မှတ်ခြင်း ---
-                // onAuthStateChanged သည် အပေါ်မှ sign-in လုပ်ဆောင်ပြီးနောက် ၎င်း၏လက်ရှိ user object ဖြင့် ချက်ချင်းခေါ်ဆိုလိမ့်မည်။
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        if (!listenersInitialized) {
-                            console.log("Auth ready. Setting up Firestore listeners.");
-                            listenersInitialized = true;
-                            state.isAuthReady = true;
-                            setupFirestoreListeners();
-                        }
-                    } else {
-                        console.log("User signed out or failed to sign in.");
-                        userId = null;
-                        state.isAuthReady = true; // Auth flow finished, even if not signed in
-                    }
-                    render(); // Render once auth state is finalized
-                });
-
-            } catch (error) {
-                console.error("Firebase initialization or authentication failed:", error);
-                state.isAuthReady = true;
-                render();
+        // Apply user preferences (theme and language)
+        function applyUserPreferences() {
+            // Apply theme
+            if (state.isDarkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
             }
-        };
+            
+            // Apply language
+            document.documentElement.lang = state.language === 'myanmar' ? 'my' : 'en';
+        }
 
-        const setupFirestoreListeners = () => {
-            // This function runs only after listenersInitialized is true AND userId is set
-            if (!db || !userId) {
-                console.error("Cannot set up listeners: DB or User ID is missing.");
-                return;
-            }
-
-            const appsColRef = collection(db, APPS_COLLECTION_PATH);
-
-            // ၁။ Approved Apps Listener
+        // Load all apps from Firestore
+        function loadAllApps() {
+            const appsColRef = collection(db, 'apps');
+            
+            // Approved apps listener
             const approvedQuery = query(appsColRef, where("status", "==", "approved"));
             onSnapshot(approvedQuery, (snapshot) => {
                 state.approvedApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 render();
-            }, (error) => {
-                console.error("Error fetching approved apps:", error);
-                // Security error in the log should no longer occur if auth flow is correct
             });
+            
+            // Pending apps listener (for admins)
+            if (state.isAdmin) {
+                const pendingQuery = query(appsColRef, where("status", "==", "pending"));
+                onSnapshot(pendingQuery, (snapshot) => {
+                    state.pendingApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    render();
+                });
+            }
+        }
 
-            // ၂။ Pending Apps Listener
-            const pendingQuery = query(appsColRef, where("status", "==", "pending"));
-            onSnapshot(pendingQuery, (snapshot) => {
-                state.pendingApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Load user's apps
+        function loadUserApps() {
+            if (!state.currentUser) return;
+            
+            const userAppsQuery = query(collection(db, 'apps'), where("submitterId", "==", state.currentUser.uid));
+            onSnapshot(userAppsQuery, (snapshot) => {
+                state.userApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 render();
-            }, (error) => {
-                console.error("Error fetching pending apps:", error);
-                // Security error in the log should no longer occur if auth flow is correct
             });
         }
 
-        // --- ၄။ UI Utility Functions (unchanged from previous) ---
+        // Translate function
+        function t(key) {
+            return translations[state.language][key] || key;
+        }
 
+        // Navigation function
         function navigate(view, id = null) {
             state.currentView = view;
             state.selectedAppId = id;
-            state.isEditingMode = false; // Reset edit mode on navigation
+            state.isEditingMode = false;
             state.editingAppDocId = null;
-            window.scrollTo(0, 0); 
+            window.scrollTo(0, 0);
             render();
         }
 
-        // --- ၅။ Render Component Functions (Minor changes to use state.approvedApps) ---
+        // Toggle dark mode
+        function toggleDarkMode() {
+            state.isDarkMode = !state.isDarkMode;
+            applyUserPreferences();
+            
+            // Save to user profile if logged in
+            if (state.currentUser) {
+                updateDoc(doc(db, 'users', state.currentUser.uid), {
+                    darkMode: state.isDarkMode
+                });
+            } else {
+                localStorage.setItem('theme', state.isDarkMode ? 'dark' : 'light');
+            }
+            
+            render();
+        }
+
+        // Change language
+        function changeLanguage(lang) {
+            state.language = lang;
+            applyUserPreferences();
+            
+            // Save to user profile if logged in
+            if (state.currentUser) {
+                updateDoc(doc(db, 'users', state.currentUser.uid), {
+                    language: state.language
+                });
+            } else {
+                localStorage.setItem('language', state.language);
+            }
+            
+            render();
+        }
+
+        // Handle search
+        function handleSearch(term) {
+            state.searchTerm = term;
+            state.selectedCategory = 'all';
+            render();
+        }
+
+        // Handle category filter
+        function handleCategoryFilter(category) {
+            state.selectedCategory = category;
+            state.searchTerm = '';
+            render();
+        }
+
+        // Reset filters
+        function resetFilters() {
+            state.searchTerm = '';
+            state.selectedCategory = 'all';
+            render();
+        }
+
+        // Handle user registration
+        async function handleRegister(email, password, displayName) {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, {
+                    displayName: displayName
+                });
+                
+                // Create user profile in Firestore
+                await setDoc(doc(db, 'users', userCredential.user.uid), {
+                    uid: userCredential.user.uid,
+                    displayName: displayName,
+                    email: email,
+                    photoURL: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayName) + '&background=8b5cf6&color=fff',
+                    language: state.language,
+                    darkMode: state.isDarkMode,
+                    createdAt: new Date().toISOString()
+                });
+                
+                return { success: true, message: t('registerSuccess') };
+            } catch (error) {
+                return { success: false, message: t('registerError') + ': ' + error.message };
+            }
+        }
+
+        // Handle user login
+        async function handleLogin(email, password) {
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                return { success: true, message: t('loginSuccess') };
+            } catch (error) {
+                return { success: false, message: t('loginError') + ': ' + error.message };
+            }
+        }
+
+        // Handle user logout
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                navigate('home');
+                return { success: true };
+            } catch (error) {
+                return { success: false, message: error.message };
+            }
+        }
+
+        // Handle app submission
+        async function handleAppSubmission(appData) {
+            try {
+                const appWithUserInfo = {
+                    ...appData,
+                    status: 'pending',
+                    submitterId: state.currentUser.uid,
+                    submitterName: state.userProfile.displayName,
+                    submitterEmail: state.userProfile.email,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                await addDoc(collection(db, 'apps'), appWithUserInfo);
+                return { success: true, message: t('submitSuccess') };
+            } catch (error) {
+                return { success: false, message: t('submitError') + ': ' + error.message };
+            }
+        }
+
+        // Render functions would go here (similar to previous implementation but with translations)
+        // For brevity, I'm including a simplified version of the render functions
 
         function renderHeader() {
-            // ... (Same as previous, using state.approvedApps for category list)
-            const allApps = [...state.approvedApps, ...state.pendingApps];
-            const categories = ['အားလုံး', ...new Set(allApps.map(app => app.category))];
-
+            const categories = [t('all'), t('tools'), t('games'), t('social'), t('video'), t('music'), t('others')];
+            
             return `
-                <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg rounded-b-3xl mb-4 sm:mb-6 py-3 sm:py-4 border-b border-indigo-200/50 dark:border-slate-700/50">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-between items-center space-y-3">
-                        <!-- အပေါ်ဆုံး ခေါင်းစဉ်နှင့် Actions -->
-                        <div class="flex justify-between w-full items-center">
-                            <!-- လိုဂိုနှင့် ခေါင်းစဉ် -->
-                            <div class="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onclick="navigate('home')">
-                                <svg class="w-7 h-7 sm:w-9 sm:h-9 text-indigo-600 dark:text-cyan-400 transform rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4M17 3v4M3 17h4M18 18h3m-3 0h-3m3 0v3m0-3v-3M18 6h3m-3 0h-3m3 0v3m0-3v-3" /></svg>
-                                <h1 class="text-xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50">ဝေယံ၏ အက်ပ်စတိုး</h1>
+                <header class="glass-effect sticky top-0 z-50 rounded-3xl mb-6 py-4 shadow-lg">
+                    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                        <!-- Logo and App Name -->
+                        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('home')">
+                            <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center">
+                                <i class="fas fa-mobile-alt text-white"></i>
                             </div>
-
-                            <!-- လုပ်ဆောင်ချက်များ (Theme, Admin, Submit) -->
-                            <div class="flex items-center space-x-3">
-                                <!-- App တင်ရန် Link -->
-                                <button onclick="navigate('submit')" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-green-500 text-white text-xs sm:text-sm font-semibold rounded-full shadow-md hover:bg-green-600 transition duration-150">
-                                    အက်ပ်တင်ရန်
-                                </button>
-                                <!-- Admin Link -->
-                                <button onclick="navigate('login')" class="p-2 sm:p-2.5 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition duration-150 rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                                </button>
-                                <!-- Dark Mode Toggle -->
-                                <button onclick="toggleDarkMode()" class="p-2 sm:p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition duration-150">
-                                    ${state.isDarkMode ?
-                                        '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>' :
-                                        '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>'
-                                    }
-                                </button>
+                            <h1 class="text-2xl font-bold gradient-text">${t('appName')}</h1>
+                        </div>
+                        
+                        <!-- Search Bar -->
+                        <div class="flex-1 max-w-2xl mx-4">
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    id="search-input"
+                                    placeholder="${t('searchPlaceholder')}"
+                                    value="${state.searchTerm}"
+                                    oninput="handleSearch(this.value)"
+                                    class="w-full py-3 px-4 pl-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 shadow-sm"
+                                >
+                                <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </div>
                             </div>
                         </div>
-
-                        <!-- ရှာဖွေရေးဘား (အောက်တွင်) -->
-                        <div class="w-full">
-                            <input
-                                type="text"
-                                id="search-input"
-                                placeholder="အက်ပ်များကို ရှာဖွေပါ..."
-                                value="${state.searchTerm}"
-                                oninput="handleSearch(this.value)"
-                                class="w-full p-2 sm:p-2.5 border-2 border-indigo-200 dark:border-slate-600 rounded-xl focus:ring-cyan-500 focus:border-cyan-500 bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-gray-50 transition duration-300 shadow-inner"
-                            >
+                        
+                        <!-- User Actions -->
+                        <div class="flex items-center space-x-4">
+                            ${state.currentUser ? `
+                                <!-- User Menu -->
+                                <div class="relative group">
+                                    <button class="flex items-center space-x-2 bg-white dark:bg-slate-800 py-2 px-4 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+                                        <img src="${state.userProfile.photoURL}" alt="Profile" class="w-8 h-8 rounded-full">
+                                        <span class="font-medium hidden sm:block">${state.userProfile.displayName}</span>
+                                        <i class="fas fa-chevron-down text-gray-400"></i>
+                                    </button>
+                                    
+                                    <!-- Dropdown Menu -->
+                                    <div class="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                        <div class="p-4 border-b border-gray-100 dark:border-slate-700">
+                                            <p class="font-semibold">${state.userProfile.displayName}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">${state.userProfile.email}</p>
+                                        </div>
+                                        <div class="p-2">
+                                            <button onclick="navigate('profile')" class="flex items-center space-x-3 w-full text-left py-2 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200">
+                                                <i class="fas fa-user text-purple-500 w-5"></i>
+                                                <span>${t('profile')}</span>
+                                            </button>
+                                            <button onclick="navigate('my-apps')" class="flex items-center space-x-3 w-full text-left py-2 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200">
+                                                <i class="fas fa-box text-blue-500 w-5"></i>
+                                                <span>${t('myApps')}</span>
+                                            </button>
+                                            ${state.isAdmin ? `
+                                                <button onclick="navigate('admin')" class="flex items-center space-x-3 w-full text-left py-2 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200">
+                                                    <i class="fas fa-shield-alt text-red-500 w-5"></i>
+                                                    <span>${t('adminPanel')}</span>
+                                                </button>
+                                            ` : ''}
+                                            <button onclick="handleLogout()" class="flex items-center space-x-3 w-full text-left py-2 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors duration-200 text-red-500">
+                                                <i class="fas fa-sign-out-alt w-5"></i>
+                                                <span>${t('logout')}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : `
+                                <!-- Login/Signup Buttons -->
+                                <div class="flex space-x-3">
+                                    <button onclick="navigate('login')" class="py-2 px-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl font-medium hover:shadow-md transition-all duration-300">
+                                        ${t('login')}
+                                    </button>
+                                    <button onclick="navigate('register')" class="py-2 px-4 gradient-bg text-white rounded-2xl font-medium hover:shadow-lg transition-all duration-300">
+                                        ${t('signUp')}
+                                    </button>
+                                </div>
+                            `}
+                            
+                            <!-- Dark Mode Toggle -->
+                            <button onclick="toggleDarkMode()" class="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+                                ${state.isDarkMode ? 
+                                    '<i class="fas fa-sun text-yellow-500"></i>' : 
+                                    '<i class="fas fa-moon text-purple-500"></i>'
+                                }
+                            </button>
                         </div>
                     </div>
-
-                    <!-- အမျိုးအစား စစ်ထုတ်မှု -->
+                    
+                    <!-- Categories -->
                     ${state.currentView === 'home' ? `
-                        <div class="pt-4 pb-2 flex flex-wrap gap-1 justify-center px-2 sm:px-6 lg:px-8 border-t border-indigo-200/50 dark:border-slate-700/50 mt-3">
-                            ${categories.map(cat => `
-                                <button
-                                    onclick="handleCategoryFilter('${cat}')"
-                                    class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition duration-200 shadow-md ${state.selectedCategory === cat
-                                        ? 'bg-indigo-600 text-white transform scale-105 ring-4 ring-indigo-300 dark:ring-cyan-500/50'
-                                        : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-slate-600'
-                                    }"
-                                >
-                                    ${cat}
-                                </button>
-                            `).join('')}
+                        <div class="max-w-7xl mx-auto px-4 mt-6">
+                            <div class="flex flex-wrap gap-2 justify-center">
+                                ${categories.map((cat, index) => `
+                                    <button
+                                        onclick="handleCategoryFilter('${index === 0 ? 'all' : cat.toLowerCase()}')"
+                                        class="px-4 py-2 rounded-2xl font-medium transition-all duration-300 ${state.selectedCategory === (index === 0 ? 'all' : cat.toLowerCase()) ?
+                                            'gradient-bg text-white shadow-lg transform scale-105' :
+                                            'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:shadow-md'
+                                        }"
+                                    >
+                                        ${cat}
+                                    </button>
+                                `).join('')}
+                            </div>
                         </div>
                     ` : ''}
                 </header>
             `;
         }
 
-        function renderAppCard(app) {
-            return `
-                <div onclick="navigate('details', '${app.id}')" class="app-card cursor-pointer p-4 sm:p-5 bg-white dark:bg-slate-800 rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
-                    <div class="flex flex-col items-center text-center space-y-2 sm:space-y-3">
-                        <img src="${app.icon}" onerror="this.onerror=null;this.src='https://placehold.co/128x128/cccccc/333333?text=App';" alt="${app.name} Icon" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shadow-2xl ring-4 ring-indigo-100 dark:ring-slate-700 flex-shrink-0">
-                        <div class="min-w-0 flex-1 pt-1 sm:pt-2">
-                            <p class="text-lg sm:text-xl font-bold truncate text-gray-900 dark:text-gray-50">${app.name}</p>
-                            <p class="text-sm font-medium text-cyan-600 dark:text-cyan-400">${app.category}</p>
-                            <div class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-semibold">
-                                ဗားရှင်း: ${app.version}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
         function renderHomePage() {
             const filteredApps = state.approvedApps
-                .filter(app => state.selectedCategory === 'အားလုံး' || app.category === state.selectedCategory)
+                .filter(app => state.selectedCategory === 'all' || app.category === state.selectedCategory)
                 .filter(app => app.name.toLowerCase().includes(state.searchTerm.toLowerCase()));
-
-            return `
-                ${renderHeader()}
-                <main class="mt-4 sm:mt-8">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-indigo-600 dark:text-cyan-400">ထင်ရှားသော အက်ပလီကေးရှင်းများ</h2>
-                    ${!state.isAuthReady ? '<div class="text-center py-12 text-xl text-indigo-600 dark:text-cyan-400">ဒေတာဘေ့စ် ချိတ်ဆက်နေပါသည်...</div>' : ''}
-
-                    ${filteredApps.length === 0 && state.isAuthReady ? `
-                        <div class="text-center py-12 sm:py-16 bg-white dark:bg-slate-800 rounded-2xl shadow-xl mx-4 sm:mx-0">
-                            <p class="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mb-4">လက်ရှိ ရှာဖွေမှု သို့မဟုတ် စစ်ထုတ်မှုအတွက် အက်ပ်များ မတွေ့ပါ။</p>
-                            <button onclick="resetFilters()" class="mt-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition duration-200 shadow-lg">စစ်ထုတ်မှုများ ပြန်လည်သတ်မှတ်ရန်</button>
-                        </div>
-                    ` : `
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-                            ${filteredApps.map(renderAppCard).join('')}
-                        </div>
-                    `}
-                </main>
-            `;
-        }
-
-        function renderAppDetailsPage(app) {
-            const screenshots = app.screenshots || [];
             
-            window.updateScreenshot = (direction) => {
-                const carousel = document.getElementById('screenshot-carousel');
-                if (!carousel) return;
-                const scrollAmount = carousel.offsetWidth + 16;
-                carousel.scrollLeft += direction * scrollAmount;
-            };
-
-            return `
-                ${renderHeader()}
-                <main class="mt-4 sm:mt-8">
-                    <button onclick="navigate('home')" class="mb-6 sm:mb-8 inline-flex items-center text-indigo-600 dark:text-cyan-400 hover:text-indigo-800 dark:hover:text-cyan-200 transition duration-150 font-medium text-sm sm:text-base">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        ပင်မစာမျက်နှာသို့ ပြန်သွားရန်
-                    </button>
-
-                    <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-700/50">
-                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 sm:pb-8 border-b border-gray-200 dark:border-slate-700">
-                            <div class="flex items-center space-x-4 sm:space-x-6 mb-4 md:mb-0">
-                                <img src="${app.icon}" onerror="this.onerror=null;this.src='https://placehold.co/128x128/cccccc/333333?text=App';" alt="${app.name} Icon" class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover shadow-xl flex-shrink-0 ring-4 ring-cyan-500/30">
-                                <div>
-                                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-50">${app.name}</h2>
-                                    <p class="text-base sm:text-lg text-gray-500 dark:text-gray-400 mt-1">တီထွင်သူ: <span class="font-semibold text-indigo-600 dark:text-cyan-400">${app.developer}</span></p>
-                            </div>
-                            </div>
-                            <a href="${app.apk}" download="${app.name.replace(/\s/g, '_')}.apk" class="w-full md:w-auto px-6 py-3 sm:px-8 sm:py-4 text-lg sm:text-xl font-bold text-white bg-green-600 rounded-full shadow-lg hover:bg-green-700 transition duration-200 text-center transform hover:scale-[1.02] active:scale-[0.98] mt-4 md:mt-0">
-                                APK ဒေါင်းလုတ်ဆွဲရန်
-                            </a>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 mt-6 sm:mt-8">
-                            <div class="bg-gray-50 dark:bg-slate-700 p-5 sm:p-6 rounded-2xl shadow-inner border border-gray-200 dark:border-slate-600 order-2 lg:order-1 h-fit">
-                                <h3 class="text-xl sm:text-2xl font-bold mb-5 text-center text-indigo-600 dark:text-cyan-400">အက်ပ်အသေးစိတ်</h3>
-                                <div class="space-y-4 text-sm sm:text-base">
-                                    <div class="flex justify-between items-center border-b pb-2 border-gray-200 dark:border-slate-600">
-                                        <span class="font-medium text-gray-500 dark:text-gray-400">အမျိုးအစား:</span>
-                                        <span class="font-semibold text-gray-900 dark:text-gray-50">${app.category}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center border-b pb-2 border-gray-200 dark:border-slate-600">
-                                        <span class="font-medium text-gray-500 dark:text-gray-400">ဗားရှင်း:</span>
-                                        <span class="font-semibold">${app.version}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium text-gray-500 dark:text-gray-400">ဖိုင်အရွယ်အစား:</span>
-                                        <span class="font-semibold">${app.size}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center border-t pt-4 border-gray-200 dark:border-slate-600">
-                                        <span class="font-medium text-gray-500 dark:text-gray-400">တီထွင်သူ:</span>
-                                        <span class="font-semibold text-indigo-600 dark:text-cyan-400">${app.developer}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Screenshots Carousel -->
-                            <div class="order-1 lg:order-2">
-                                <h3 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 border-b pb-2 border-indigo-300 dark:border-cyan-700">စခရင်ရှော့များ</h3>
-                                <div class="relative">
-                                    <div id="screenshot-carousel" class="flex overflow-x-scroll snap-x snap-mandatory rounded-2xl shadow-3xl space-x-4 aspect-[16/9] border-4 border-gray-200 dark:border-slate-700">
-                                        ${screenshots.map((url, index) => `
-                                            <img src="${url}" onerror="this.onerror=null;this.src='https://placehold.co/800x450/e5e7eb/4b5563?text=ပုံမရှိပါ';" alt="Screenshot ${index + 1}" class="w-full flex-shrink-0 snap-center object-contain rounded-xl">
-                                        `).join('')}
-                                    </div>
-                                    ${screenshots.length > 1 ? `
-                                        <button onclick="updateScreenshot(-1)" class="absolute top-1/2 left-2 sm:left-4 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition duration-150 shadow-xl focus:outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                                        </button>
-                                        <button onclick="updateScreenshot(1)" class="absolute top-1/2 right-2 sm:right-4 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition duration-150 shadow-xl focus:outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-            `;
-        }
-        
-        function renderAdminLoginPage(errorMessage = null) {
-            return `
-                ${renderHeader()}
-                <main class="mt-4 sm:mt-8 max-w-md mx-auto">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-red-600 dark:text-red-400">Admin လော့ဂ်အင်</h2>
-                    
-                    ${errorMessage ? `<div class="p-4 mb-6 text-sm sm:text-base text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300 rounded-xl font-medium">${errorMessage}</div>` : ''}
-
-                    <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl border-t-8 border-red-500">
-                        <form onsubmit="handleAdminLogin(event)">
-                            <div class="space-y-4 sm:space-y-6">
-                                <div>
-                                    <label for="username" class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">အမည်</label>
-                                    <input type="text" id="username" name="username" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="Admin Username">
-                                </div>
-                                <div>
-                                    <label for="password" class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">စကားဝှက်</label>
-                                    <input type="password" id="password" name="password" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="Password">
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="w-full mt-8 py-3 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition duration-200 transform hover:scale-[1.01]">
-                                လော့ဂ်အင် ဝင်ရန်
-                            </button>
-                        </form>
-                        <button onclick="navigate('home')" class="w-full mt-4 text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-cyan-400 transition duration-150">
-                            ပင်မစာမျက်နှာသို့ ပြန်သွားရန်
-                        </button>
-                    </div>
-                </main>
-            `;
-        }
-
-        function renderSubmitPage(message = null) {
-            const categories = ALL_CATEGORIES;
-            const lastUser = state.lastSubmittedUser;
+            const popularApps = [...state.approvedApps].sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0)).slice(0, 6);
+            const newApps = [...state.approvedApps].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
             
             return `
                 ${renderHeader()}
-                <main class="mt-4 sm:mt-8 max-w-4xl mx-auto">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-green-600 dark:text-green-400">အက်ပ်အသစ် တင်သွင်းရန်</h2>
-                    <p class="text-center text-gray-600 dark:text-gray-400 mb-8 text-sm sm:text-base">
-                        ကျေးဇူးပြု၍ သင့်အက်ပ်၏ အချက်အလက်နှင့် တင်သွင်းသူအချက်အလက်ကို ဖြည့်သွင်းပါ။ (ဤဒေတာများကို ဒေတာဘေ့စ်တွင် အလိုအလျောက် သိမ်းဆည်းသွားမည်ဖြစ်ပါသည်။)
-                    </p>
-
-                    ${message ? `<div class="p-4 mb-6 text-sm sm:text-base ${message.type === 'error' ? 'text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300' : 'text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300'} rounded-xl font-medium">${message.text}</div>` : ''}
-
-                    <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl border-t-8 border-green-500">
-                        <form id="submit-app-form" onsubmit="handleAppSubmission(event)">
-                            
-                            <h3 class="text-xl sm:text-2xl font-bold mb-4 text-indigo-600 dark:text-cyan-400">၁။ တင်သွင်းသူ အချက်အလက် (မရှိမဖြစ်လိုအပ်)</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 border p-4 rounded-xl dark:border-slate-700 bg-gray-50 dark:bg-slate-700/50">
-                                <div>
-                                    <label for="submitterName" class="block text-sm font-medium mb-1">အမည်*</label>
-                                    <input type="text" id="submitterName" name="submitterName" value="${lastUser.name || ''}" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="အသုံးပြုသူအမည်">
-                                </div>
-                                <div>
-                                    <label for="submitterEmail" class="block text-sm font-medium mb-1">အီးမေးလ်*</label>
-                                    <input type="email" id="submitterEmail" name="submitterEmail" value="${lastUser.email || ''}" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="example@gmail.com">
-                                </div>
-                                <div>
-                                    <label for="submitterPassword" class="block text-sm font-medium mb-1">စကားဝှက်* (Admin မြင်နိုင်သည်)</label>
-                                    <input type="password" id="submitterPassword" name="submitterPassword" value="${lastUser.password || ''}" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="လျှို့ဝှက်စကားဝှက်">
-                                </div>
-                            </div>
-                            
-                            <h3 class="text-xl sm:text-2xl font-bold mb-4 text-indigo-600 dark:text-cyan-400">၂။ အက်ပ် အချက်အလက်</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                                <div>
-                                    <label for="name" class="block text-sm font-medium mb-1">အက်ပ်အမည်*</label>
-                                    <input type="text" id="name" name="name" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="App Name">
-                                </div>
-                                <div>
-                                    <label for="developer" class="block text-sm font-medium mb-1">တီထွင်သူ*</label>
-                                    <input type="text" id="developer" name="developer" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="Developer Name">
-                                </div>
-                                <div>
-                                    <label for="category" class="block text-sm font-medium mb-1">အမျိုးအစား*</label>
-                                    <select id="category" name="category" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm">
-                                        <option value="" disabled selected>ရွေးချယ်ပါ</option>
-                                        ${categories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="version" class="block text-sm font-medium mb-1">ဗားရှင်း*</label>
-                                    <input type="text" id="version" name="version" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="1.0.0">
-                                </div>
-                                <div>
-                                    <label for="size" class="block text-sm font-medium mb-1">ဖိုင်အရွယ်အစား (ဥပမာ- 50 MB)*</label>
-                                    <input type="text" id="size" name="size" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="12 MB">
-                                </div>
-                                <div>
-                                    <label for="icon" class="block text-sm font-medium mb-1">အိုင်ကွန် URL (ပြင်ပလင့်ခ်)*</label>
-                                    <input type="url" id="icon" name="icon" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="https://example.com/icon.png">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label for="apk" class="block text-sm font-medium mb-1">APK ဒေါင်းလုတ် URL (ပြင်ပလင့်ခ်)*</label>
-                                    <input type="url" id="apk" name="apk" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="https://example.com/app.apk">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label for="screenshots" class="block text-sm font-medium mb-1">စခရင်ရှော့ URL များ (ကော်မာခြားပြီး ထည့်ပါ)*</label>
-                                    <textarea id="screenshots" name="screenshots" rows="3" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="https://example.com/sc1.jpg, https://example.com/sc2.jpg"></textarea>
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="w-full mt-8 py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg hover:bg-green-700 transition duration-200 transform hover:scale-[1.01]">
-                                အက်ပ်ကို တင်သွင်းရန်
-                            </button>
-                        </form>
-                    </div>
-                </main>
-            `;
-        }
-
-        function renderAdminPanel() {
-            const allAppsHtml = state.approvedApps.map(app => `
-                <div class="flex justify-between items-center p-3 border-b border-gray-100 dark:border-slate-700 hover:bg-indigo-50/20 dark:hover:bg-slate-700 transition duration-200 rounded-lg">
-                    <div class="flex items-center space-x-3 min-w-0 flex-1">
-                        <img src="${app.icon}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/cccccc/333333?text=A';" class="w-8 h-8 rounded-lg flex-shrink-0 shadow-md">
-                        <div class="min-w-0">
-                            <span class="font-medium truncate block text-sm">${app.name}</span>
-                            <span class="text-xs text-cyan-600 dark:text-cyan-400">${app.category}</span>
-                        </div>
-                    </div>
-                    <div class="space-x-3 flex flex-shrink-0">
-                        <button onclick="editAppForm('${app.id}')" class="p-1 text-indigo-600 hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-200 transition duration-150 rounded-full hover:bg-gray-200/50 dark:hover:bg-slate-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
-                        </button>
-                        <button onclick="deleteApp('${app.id}')" class="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition duration-150 rounded-full hover:bg-gray-200/50 dark:hover:bg-slate-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-
-            const pendingAppsHtml = state.pendingApps.map(app => `
-                <div class="p-4 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-800 rounded-xl mb-4 shadow-md">
-                    <p class="font-bold text-lg mb-2 text-yellow-800 dark:text-yellow-200">${app.name} (v${app.version})</p>
-                    <div class="text-sm space-y-1 mb-3 text-yellow-700 dark:text-yellow-300">
-                        <p><strong>တင်သွင်းသူ-</strong> ${app.submitterName || 'N/A'}</p>
-                        <p><strong>အီးမေးလ်-</strong> ${app.submitterEmail || 'N/A'}</p>
-                        <p><strong>စကားဝှက်-</strong> <span class="font-mono text-xs bg-yellow-200 dark:bg-yellow-800 p-1 rounded">${app.submitterPassword || 'N/A'}</span></p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="approveApp('${app.id}')" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition duration-150 shadow">ခွင့်ပြုရန်</button>
-                        <button onclick="deleteApp('${app.id}')" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition duration-150 shadow">ပယ်ချရန် (ဖျက်ရန်)</button>
-                        <button onclick="navigate('details', '${app.id}')" class="px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-lg hover:bg-indigo-600 transition duration-150 shadow">အသေးစိတ်ကြည့်ရန်</button>
-                    </div>
-                </div>
-            `).join('');
-
-            const editApp = state.approvedApps.find(a => a.id === state.editingAppDocId) || {};
-            const formTitle = state.isEditingMode ? `အက်ပ်ပြင်ဆင်ရန်: ${editApp.name || 'N/A'}` : 'အက်ပ်အသစ်ထည့်ရန် (Admin)';
-            const buttonText = state.isEditingMode ? 'အက်ပ်အပ်ဒိတ်လုပ်ရန်' : 'အက်ပ်ထည့်ရန်';
-
-            return `
-                ${renderHeader()}
-                <main class="mt-4 sm:mt-8">
-                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 sm:mb-8 text-center text-indigo-600 dark:text-cyan-400">အက်မင် ထိန်းချုပ်မှု</h2>
-                    <div class="p-4 mb-8 bg-indigo-50 dark:bg-slate-700/50 rounded-xl border border-indigo-200 dark:border-slate-700">
-                        <p class="text-base font-semibold text-indigo-700 dark:text-cyan-400">🔥 အရေးကြီးသည်။: အချက်အလက်အားလုံးကို Firestore တွင် အလိုအလျောက် သိမ်းဆည်းပြီးဖြစ်သည်။ JSON ကို ကိုယ်တိုင် ကူးယူရန် မလိုအပ်တော့ပါ။</p>
-                    </div>
-
-                    <!-- ခွင့်ပြုချက်စောင့်ဆိုင်းနေသော အက်ပ်များ စာရင်း -->
-                    <div class="bg-yellow-100 dark:bg-slate-700/50 p-6 sm:p-8 rounded-3xl shadow-xl mb-8 border border-yellow-400 dark:border-yellow-700">
-                        <h3 class="text-2xl sm:text-3xl font-bold mb-4 text-yellow-800 dark:text-yellow-300">ခွင့်ပြုချက် စောင့်ဆိုင်းနေသော အက်ပ်များ (${state.pendingApps.length})</h3>
-                        ${state.pendingApps.length === 0 ? 
-                            '<p class="text-yellow-700 dark:text-yellow-400">စောင့်ဆိုင်းနေသော အက်ပ်များ မရှိပါ။</p>' : 
-                            `<div class="max-h-96 overflow-y-auto space-y-2 pr-2">${pendingAppsHtml}</div>`
-                        }
-                    </div>
-
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-                        
-                        <!-- အက်ပ်ထည့်ရန်/ပြင်ဆင်ရန် ဖောင် -->
-                        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl border-t-4 border-indigo-500 order-2 lg:order-1">
-                            <h3 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 border-b pb-2 text-gray-900 dark:text-gray-50">${formTitle}</h3>
-                            <form id="app-form" onsubmit="handleAdminFormSubmit(event)">
-                                <input type="hidden" name="id" value="${editApp.id || ''}">
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                                    ${['name', 'developer', 'version', 'size', 'icon', 'apk', 'screenshots'].map(field => {
-                                        let type = (field === 'icon' || field === 'apk') ? 'url' : 'text';
-                                        let label = '';
-                                        let placeholder = '';
-                                        let value = editApp[field] || '';
-
-                                        if (field === 'name') { label = 'အက်ပ်အမည်'; placeholder = 'App Name'; }
-                                        else if (field === 'developer') { label = 'တီထွင်သူ'; placeholder = 'Developer Name'; }
-                                        else if (field === 'version') { label = 'ဗားရှင်း'; placeholder = '1.0.0'; }
-                                        else if (field === 'size') { label = 'ဖိုင်အရွယ်အစား (ဥပမာ- 50 MB)'; placeholder = '12 MB'; }
-                                        else if (field === 'icon') { label = 'အိုင်ကွန် URL'; placeholder = 'https://example.com/icon.png'; }
-                                        else if (field === 'apk') { label = 'APK ဒေါင်းလုတ် URL'; placeholder = 'https://example.com/app.apk'; }
-                                        else if (field === 'screenshots') { 
-                                            label = 'စခရင်ရှော့ URL များ (ကော်မာခြားပြီး ထည့်ပါ)'; 
-                                            placeholder = 'https://example.com/sc1.jpg, https://example.com/sc2.jpg'; 
-                                            value = Array.isArray(value) ? value.join(', ') : value;
-                                            return `<div class="md:col-span-2">
-                                                <label for="${field}" class="block text-sm font-medium">${label}</label>
-                                                <textarea id="${field}" name="${field}" rows="4" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="${placeholder}">${value}</textarea>
-                                            </div>`;
-                                        }
-
-                                        return `
-                                            <div>
-                                                <label for="${field}" class="block text-sm font-medium">${label}</label>
-                                                <input type="${type}" id="${field}" name="${field}" value="${value}" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="${placeholder}">
-                                            </div>
-                                        `;
-                                    }).join('')}
-                                    
-                                    <div>
-                                        <label for="category" class="block text-sm font-medium">အမျိုးအစား</label>
-                                        <select id="category" name="category" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm">
-                                            ${ALL_CATEGORIES.map(cat => `<option value="${cat}" ${editApp.category === cat ? 'selected' : ''}>${cat}</option>`).join('')}
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-col sm:flex-row justify-between items-center mt-6 sm:mt-8 space-y-3 sm:space-y-0">
-                                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition duration-200 transform hover:scale-[1.01]">
-                                        ${buttonText}
+                
+                <main class="slide-in">
+                    <!-- Hero Section -->
+                    <section class="mb-12">
+                        <div class="bg-gradient-to-r from-purple-500 to-cyan-500 rounded-3xl p-8 md:p-12 text-white shadow-2xl">
+                            <div class="max-w-3xl">
+                                <h1 class="text-4xl md:text-5xl font-bold mb-4">${t('welcome')} to ShareApp!</h1>
+                                <p class="text-xl mb-8 opacity-90">Discover, share, and download amazing mobile applications from Myanmar developers.</p>
+                                <div class="flex flex-wrap gap-4">
+                                    <button onclick="navigate('explore')" class="py-3 px-6 bg-white text-purple-600 rounded-2xl font-bold hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                                        <i class="fas fa-rocket mr-2"></i> ${t('explore')}
                                     </button>
-                                    ${state.isEditingMode ? `<button type="button" onclick="cancelEdit()" class="w-full sm:w-auto px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-slate-600 rounded-xl hover:bg-gray-300 dark:hover:bg-slate-500 transition duration-150">ပြင်ဆင်ခြင်း ဖျက်သိမ်းရန်</button>` : ''}
+                                    ${state.currentUser ? `
+                                        <button onclick="navigate('submit-app')" class="py-3 px-6 bg-transparent border-2 border-white text-white rounded-2xl font-bold hover:bg-white hover:text-purple-600 transition-all duration-300">
+                                            <i class="fas fa-plus mr-2"></i> ${t('submitApp')}
+                                        </button>
+                                    ` : `
+                                        <button onclick="navigate('register')" class="py-3 px-6 bg-transparent border-2 border-white text-white rounded-2xl font-bold hover:bg-white hover:text-purple-600 transition-all duration-300">
+                                            <i class="fas fa-user-plus mr-2"></i> ${t('signUp')}
+                                        </button>
+                                    `}
                                 </div>
-                            </form>
-                        </div>
-
-                        <!-- အတည်ပြုထားသော အက်ပ်စာရင်း -->
-                        <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-xl h-fit border border-gray-100 dark:border-slate-700 order-1 lg:order-2">
-                            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 text-indigo-600 dark:text-cyan-400">အတည်ပြုထားသော အက်ပ်များ (${state.approvedApps.length})</h3>
-                            <div class="max-h-96 overflow-y-auto space-y-2 pr-2">
-                                ${state.approvedApps.length === 0 ? '<p class="text-gray-500">လက်ရှိ အက်ပ်များ မရှိပါ။</p>' : allAppsHtml}
                             </div>
                         </div>
-                    </div>
+                    </section>
+                    
+                    <!-- Popular Apps Section -->
+                    <section class="mb-12">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-3xl font-bold gradient-text">${t('popularApps')}</h2>
+                            <button onclick="navigate('explore')" class="text-purple-600 dark:text-purple-400 font-medium hover:underline">
+                                ${t('seeAll')} <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${popularApps.length > 0 ? popularApps.map(app => `
+                                <div class="app-card bg-white dark:bg-slate-800 rounded-3xl overflow-hidden">
+                                    <div class="p-6">
+                                        <div class="flex items-start space-x-4">
+                                            <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover shadow-md">
+                                            <div class="flex-1">
+                                                <h3 class="font-bold text-lg mb-1">${app.name}</h3>
+                                                <p class="text-sm text-cyan-600 dark:text-cyan-400 mb-2">${app.category}</p>
+                                                <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                                                    <span class="mr-3"><i class="fas fa-download mr-1"></i> ${app.downloadCount || 0}</span>
+                                                    <span><i class="fas fa-star mr-1 text-yellow-500"></i> ${app.rating || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex justify-between items-center">
+                                            <span class="text-sm font-medium">${app.version}</span>
+                                            <button onclick="navigate('details', '${app.id}')" class="py-2 px-4 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-xl font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors duration-200">
+                                                ${t('details')}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('') : `
+                                <div class="col-span-3 text-center py-12">
+                                    <i class="fas fa-box-open text-4xl text-gray-400 mb-4"></i>
+                                    <p class="text-gray-500 dark:text-gray-400">${t('noAppsFound')}</p>
+                                </div>
+                            `}
+                        </div>
+                    </section>
+                    
+                    <!-- New Apps Section -->
+                    <section class="mb-12">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-3xl font-bold gradient-text">${t('newApps')}</h2>
+                            <button onclick="navigate('explore')" class="text-purple-600 dark:text-purple-400 font-medium hover:underline">
+                                ${t('seeAll')} <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${newApps.length > 0 ? newApps.map(app => `
+                                <div class="app-card bg-white dark:bg-slate-800 rounded-3xl overflow-hidden">
+                                    <div class="p-6">
+                                        <div class="flex items-start space-x-4">
+                                            <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover shadow-md">
+                                            <div class="flex-1">
+                                                <h3 class="font-bold text-lg mb-1">${app.name}</h3>
+                                                <p class="text-sm text-cyan-600 dark:text-cyan-400 mb-2">${app.category}</p>
+                                                <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                                                    <span class="mr-3"><i class="fas fa-calendar mr-1"></i> ${new Date(app.createdAt).toLocaleDateString()}</span>
+                                                    <span><i class="fas fa-user mr-1"></i> ${app.developer}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 flex justify-between items-center">
+                                            <span class="text-sm font-medium">${app.size}</span>
+                                            <button onclick="navigate('details', '${app.id}')" class="py-2 px-4 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-xl font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors duration-200">
+                                                ${t('download')}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('') : `
+                                <div class="col-span-3 text-center py-12">
+                                    <i class="fas fa-box-open text-4xl text-gray-400 mb-4"></i>
+                                    <p class="text-gray-500 dark:text-gray-400">${t('noAppsFound')}</p>
+                                </div>
+                            `}
+                        </div>
+                    </section>
                 </main>
             `;
         }
 
+        // Additional render functions for other views (profile, login, register, etc.)
+        // Would be implemented similarly with translations and user-specific content
 
-        // --- ၆။ Event Handlers (Firestore CRUD Operations) ---
-
-        function handleSearch(term) {
-            state.searchTerm = term;
-            state.selectedCategory = 'အားလုံး';
-            render();
-        }
-
-        function handleCategoryFilter(category) {
-            state.selectedCategory = category;
-            state.searchTerm = '';
-            document.getElementById('search-input').value = '';
-            render();
-        }
-
-        function resetFilters() {
-            state.searchTerm = '';
-            state.selectedCategory = 'အားလုံး';
-            render();
-        }
-
-        function handleAdminLogin(event) {
-            event.preventDefault();
-            const form = event.target;
-            const username = form.username.value;
-            const password = form.password.value;
-
-            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-                state.isAdmin = true;
-                navigate('admin');
-            } else {
-                // Custom modal UI should be used here instead of window.confirm
-                render(renderAdminLoginPage('အသုံးပြုသူအမည် သို့မဟုတ် စကားဝှက် မမှန်ကန်ပါ။'));
-            }
-        }
-        
-        async function handleAppSubmission(event) {
-            event.preventDefault();
-            if (!db) return alert("ဒေတာဘေ့စ် ချိတ်ဆက်မှု မအောင်မြင်ပါ၊ နောက်မှ ထပ်ကြိုးစားပါ။"); 
-
-            const form = event.target;
+        // Main render function
+        function render() {
+            let content = '';
             
-            // ၁။ တင်သွင်းသူ အချက်အလက်
-            const submitterName = form.submitterName.value.trim();
-            const submitterEmail = form.submitterEmail.value.trim();
-            const submitterPassword = form.submitterPassword.value;
-
-            // ၂။ အက်ပ် အချက်အလက်
-            const newApp = {
-                name: form.name.value.trim(),
-                icon: form.icon.value.trim(),
-                screenshots: form.screenshots.value.split(',').map(s => s.trim()).filter(s => s),
-                category: form.category.value,
-                version: form.version.value.trim(),
-                size: form.size.value.trim(),
-                developer: form.developer.value.trim(),
-                apk: form.apk.value.trim(),
-                
-                // Firestore-specific fields
-                status: 'pending', // Pending for admin approval
-                submitterName: submitterName,
-                submitterEmail: submitterEmail,
-                submitterPassword: submitterPassword,
-                createdAt: new Date().toISOString()
-            };
-            
-            // Validation
-            if (!submitterName || !submitterEmail || !submitterPassword || 
-                !newApp.name || !newApp.icon || !newApp.category || !newApp.apk) {
-                render(renderSubmitPage({
-                    type: 'error', 
-                    text: 'ကျေးဇူးပြု၍ လိုအပ်သောအချက်အလက်အားလုံးကို ဖြည့်သွင်းပါ။'
-                }));
-                return;
-            }
-
-            try {
-                // Add to Firestore
-                await addDoc(collection(db, APPS_COLLECTION_PATH), newApp);
-                
-                // Save last submitted user info for auto-fill
-                state.lastSubmittedUser = { name: submitterName, email: submitterEmail, password: submitterPassword };
-
-                // Form ကို ရှင်းလင်းပြီး Message ပြသ
-                form.reset();
-                render(renderSubmitPage({
-                    type: 'success', 
-                    text: `${newApp.name} အက်ပ်ကို အောင်မြင်စွာ တင်သွင်းပြီးပါပြီ။ Admin ၏ ခွင့်ပြုချက်ကို စောင့်ဆိုင်းပေးပါ။`
-                }));
-
-            } catch (error) {
-                console.error("Error submitting app:", error);
-                render(renderSubmitPage({
-                    type: 'error', 
-                    text: `တင်သွင်းမှု မအောင်မြင်ပါ။ Error: ${error.message}`
-                }));
-            }
-        }
-
-        function editAppForm(docId) {
-            state.editingAppDocId = docId;
-            state.isEditingMode = true;
-            render();
-        }
-
-        function cancelEdit() {
-            state.editingAppDocId = null;
-            state.isEditingMode = false;
-            render();
-        }
-
-        async function handleAdminFormSubmit(event) {
-            event.preventDefault();
-            if (!db) return;
-
-            const form = event.target;
-            const docId = form.id.value;
-            const isUpdate = state.isEditingMode && docId;
-
-            const appData = {
-                name: form.name.value.trim(),
-                icon: form.icon.value.trim(),
-                screenshots: form.screenshots.value.split(',').map(s => s.trim()).filter(s => s),
-                category: form.category.value,
-                version: form.version.value.trim(),
-                size: form.size.value.trim(),
-                developer: form.developer.value.trim(),
-                apk: form.apk.value.trim(),
-                status: 'approved', // Always approve from this form
-            };
-
-            try {
-                if (isUpdate) {
-                    await updateDoc(doc(db, APPS_COLLECTION_PATH, docId), appData);
-                } else {
-                    // Add new approved app
-                    appData.createdAt = new Date().toISOString();
-                    await addDoc(collection(db, APPS_COLLECTION_PATH), appData);
-                }
-                
-                // Clear form state
-                state.editingAppDocId = null;
-                state.isEditingMode = false;
-                
-                // Custom modal UI should be used here instead of window.confirm
-                window.confirm(`အက်ပ်ကို ${isUpdate ? 'အပ်ဒိတ်လုပ်' : 'အသစ်ထည့်သွင်း'} ပြီးပါပြီ!`);
-                render();
-
-            } catch (error) {
-                 console.error("Error submitting admin form:", error);
-                 window.confirm(`အက်ပ်အပ်ဒိတ်လုပ်ခြင်း မအောင်မြင်ပါ။ Error: ${error.message}`);
-            }
-        }
-
-        async function deleteApp(docId) {
-            // Custom modal UI should be used here instead of window.confirm
-            const confirmed = window.confirm('ဤအက်ပ်ကို ဒေတာဘေ့စ်မှ အပြီးအပိုင် ဖျက်ရန် သေချာပါသလား။');
-
-            if (confirmed && db) {
-                try {
-                    await deleteDoc(doc(db, APPS_COLLECTION_PATH, docId));
-                    // onSnapshot will handle the UI update
-                } catch (error) {
-                    console.error("Error deleting app:", error);
-                    window.confirm(`ဖျက်သိမ်းခြင်း မအောင်မြင်ပါ။ Error: ${error.message}`);
-                }
-            }
-        }
-        
-        async function approveApp(docId) {
-            if (!db) return;
-            // Custom modal UI should be used here instead of window.confirm
-            const confirmed = window.confirm('ဤအက်ပ်ကို အတည်ပြုရန် သေချာပါသလား။');
-
-            if (confirmed) {
-                try {
-                    // Update the status field
-                    await updateDoc(doc(db, APPS_COLLECTION_PATH, docId), {
-                        status: 'approved',
-                        // submitterName: deleteField(), // Cannot use deleteField with this CDN import
-                        // submitterEmail: deleteField(),
-                        // submitterPassword: deleteField()
-                    });
-                    // onSnapshot will handle the UI update
-                    window.confirm(`အက်ပ်ကို အတည်ပြုပြီးပါပြီ။`);
-                } catch (error) {
-                    console.error("Error approving app:", error);
-                    window.confirm(`အတည်ပြုခြင်း မအောင်မြင်ပါ။ Error: ${error.message}`);
-                }
-            }
-        }
-        
-        // --- ၇။ ပင်မ ပြသမှု လုပ်ဆောင်ချက် ---
-        
-        function render(content = null) {
-            let htmlContent = '';
-            
-            // Loading State
-            if (!state.isAuthReady || (state.isAuthReady && !listenersInitialized)) {
-                APP_CONTAINER.innerHTML = `
-                    ${renderHeader()}
-                    <div class="flex flex-col items-center justify-center h-96">
-                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-                        <p class="mt-4 text-xl text-indigo-600 dark:text-cyan-400">စနစ် စတင်နေပါသည်...</p>
-                    </div>
-                `;
-                return;
-            }
-
-            let app = null;
-
             switch (state.currentView) {
                 case 'home':
-                    htmlContent = renderHomePage();
-                    break;
-                case 'details':
-                    const allApps = [...state.approvedApps, ...state.pendingApps];
-                    app = allApps.find(a => a.id === state.selectedAppId);
-                    if (app) {
-                        htmlContent = renderAppDetailsPage(app);
-                    } else {
-                        navigate('home');
-                    }
+                    content = renderHomePage();
                     break;
                 case 'login':
-                    htmlContent = content !== null ? content : renderAdminLoginPage();
+                    content = renderLoginPage();
+                    break;
+                case 'register':
+                    content = renderRegisterPage();
+                    break;
+                case 'profile':
+                    content = renderProfilePage();
+                    break;
+                case 'my-apps':
+                    content = renderMyAppsPage();
+                    break;
+                case 'submit-app':
+                    content = renderSubmitAppPage();
+                    break;
+                case 'explore':
+                    content = renderExplorePage();
+                    break;
+                case 'details':
+                    content = renderAppDetailsPage();
                     break;
                 case 'admin':
-                    if (state.isAdmin) {
-                        htmlContent = renderAdminPanel();
-                    } else {
-                        navigate('login');
-                    }
-                    break;
-                case 'submit':
-                    htmlContent = content !== null ? content : renderSubmitPage();
+                    content = renderAdminPage();
                     break;
                 default:
-                    htmlContent = renderHomePage();
+                    content = renderHomePage();
             }
-
-            APP_CONTAINER.innerHTML = htmlContent;
+            
+            APP_CONTAINER.innerHTML = content;
+            
+            // Update FAB action based on current view
+            updateFAB();
         }
 
-        // --- ၈။ Global Functions (HTML တွင် သုံးနိုင်ရန်) ---
+        // Update Floating Action Button
+        function updateFAB() {
+            if (state.currentView === 'home' && state.currentUser) {
+                FAB.innerHTML = '<i class="fas fa-plus"></i>';
+                FAB.onclick = () => navigate('submit-app');
+                FAB.classList.remove('hidden');
+            } else if (state.currentView === 'explore' && state.currentUser) {
+                FAB.innerHTML = '<i class="fas fa-plus"></i>';
+                FAB.onclick = () => navigate('submit-app');
+                FAB.classList.remove('hidden');
+            } else if (state.currentView === 'my-apps') {
+                FAB.innerHTML = '<i class="fas fa-plus"></i>';
+                FAB.onclick = () => navigate('submit-app');
+                FAB.classList.remove('hidden');
+            } else {
+                FAB.classList.add('hidden');
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Make functions globally available
         window.navigate = navigate;
+        window.toggleDarkMode = toggleDarkMode;
+        window.changeLanguage = changeLanguage;
         window.handleSearch = handleSearch;
         window.handleCategoryFilter = handleCategoryFilter;
-        window.toggleDarkMode = toggleDarkMode;
-        window.handleAdminLogin = handleAdminLogin;
-        window.handleAdminFormSubmit = handleAdminFormSubmit;
-        window.handleAppSubmission = handleAppSubmission;
-        window.editAppForm = editAppForm;
-        window.deleteApp = deleteApp;
-        window.cancelEdit = cancelEdit;
         window.resetFilters = resetFilters;
-        window.approveApp = approveApp;
-
-        // စတင်ပြသခြင်း
-        document.addEventListener('DOMContentLoaded', initializeFirebase);
-
+        window.handleLogin = handleLogin;
+        window.handleRegister = handleRegister;
+        window.handleLogout = handleLogout;
+        window.handleAppSubmission = handleAppSubmission;
     </script>
 </body>
 </html>
