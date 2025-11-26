@@ -124,41 +124,6 @@
             color: white;
         }
         
-        .skeleton-loader {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-        
-        .dark .skeleton-loader {
-            background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
-            background-size: 200% 100%;
-        }
-        
-        @keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.5s ease forwards;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
         .profile-avatar {
             width: 80px;
             height: 80px;
@@ -205,6 +170,125 @@
             margin-right: 12px;
             object-fit: cover;
         }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .dark .modal-content {
+            background: #1e293b;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background: #f9fafb;
+            transition: all 0.3s;
+        }
+        
+        .dark .form-input {
+            background: #374151;
+            border-color: #4b5563;
+            color: white;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .dark .btn-secondary {
+            background: #4b5563;
+            color: white;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        .notification.success {
+            background: #10b981;
+        }
+        
+        .notification.error {
+            background: #ef4444;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300">
@@ -232,7 +316,7 @@
     <!-- Bottom Menu Bar -->
     <div class="bottom-menu">
         <div class="max-w-lg mx-auto px-4">
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-4 gap-2">
                 <div class="menu-item active" onclick="navigate('home')">
                     <i class="fas fa-home"></i>
                     <span>Home</span>
@@ -244,6 +328,10 @@
                 <div class="menu-item" onclick="navigate('profile')">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
+                </div>
+                <div class="menu-item" onclick="navigate('admin')">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Admin</span>
                 </div>
             </div>
         </div>
@@ -358,7 +446,7 @@
                 appDeveloper: "အက်ပ်တီထွင်သူ",
                 apkUrl: "APK လင့်ခ်",
                 screenshotUrls: "စခရင်ရှော့လင့်ခ်များ",
-                description: "ဖော်ပြချက်",
+                description: "ရည်ရွယ်ချက်",
                 submitSuccess: "အက်ပ်အောင်မြင်စွာတင်သွင်းပြီးပါပြီ",
                 submitError: "အက်ပ်တင်သွင်းရာတွင်အမှားတစ်ခုရှိနေပါသည်",
                 loginSuccess: "အောင်မြင်စွာဝင်ရောက်ပြီးပါပြီ",
@@ -366,7 +454,16 @@
                 registerSuccess: "အကောင့်အောင်မြင်စွာဖွင့်ပြီးပါပြီ",
                 registerError: "အကောင့်ဖွင့်ရာတွင်အမှားတစ်ခုရှိနေပါသည်",
                 contactUs: "ဆက်သွယ်ရန်",
-                uploadApp: "အက်ပ်တင်ရန်"
+                uploadApp: "အက်ပ်တင်ရန်",
+                adminDescription: "Admin အနေနဲ့ အက်ပ်များကို စီမံခန့်ခွဲနိုင်ပါသည်",
+                pendingApps: "စောင့်ဆိုင်းနေသော အက်ပ်များ",
+                approvedApps: "အတည်ပြုပြီးသား အက်ပ်များ",
+                noPendingApps: "စောင့်ဆိုင်းနေသော အက်ပ်များ မရှိပါ",
+                noApprovedApps: "အတည်ပြုပြီးသား အက်ပ်များ မရှိပါ",
+                appDeleted: "အက်ပ်ကို ဖျက်ပြီးပါပြီ",
+                appApproved: "အက်ပ်ကို အတည်ပြုပြီးပါပြီ",
+                loginToUpload: "အက်ပ်တင်ရန် အကောင့်ဝင်ရန်လိုအပ်ပါသည်",
+                downloadLinks: "ဒေါင်းလုတ်လင့်ခ်များ"
             },
             english: {
                 appName: "ShareApp (Myanmar)",
@@ -439,7 +536,16 @@
                 registerSuccess: "Registration successful",
                 registerError: "Error registering",
                 contactUs: "Contact Us",
-                uploadApp: "Upload App"
+                uploadApp: "Upload App",
+                adminDescription: "As an admin, you can manage apps",
+                pendingApps: "Pending Apps",
+                approvedApps: "Approved Apps",
+                noPendingApps: "No pending apps",
+                noApprovedApps: "No approved apps",
+                appDeleted: "App deleted successfully",
+                appApproved: "App approved successfully",
+                loginToUpload: "Login required to upload apps",
+                downloadLinks: "Download Links"
             }
         };
 
@@ -477,7 +583,7 @@
                         state.isDarkMode = state.userProfile.darkMode !== undefined ? state.userProfile.darkMode : state.isDarkMode;
                         
                         // Check if user is admin
-                        state.isAdmin = state.userProfile.role === 'admin';
+                        state.isAdmin = state.userProfile.email === 'admin@shareapp.com';
                     } catch (error) {
                         console.error("Error loading user profile:", error);
                     }
@@ -526,6 +632,15 @@
                 state.approvedApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 render();
             });
+            
+            // Pending apps listener (for admins)
+            if (state.isAdmin) {
+                const pendingQuery = query(appsColRef, where("status", "==", "pending"));
+                onSnapshot(pendingQuery, (snapshot) => {
+                    state.pendingApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    render();
+                });
+            }
         }
 
         // Translate function
@@ -551,6 +666,8 @@
                 document.querySelectorAll('.menu-item')[1].classList.add('active');
             } else if (view === 'profile') {
                 document.querySelectorAll('.menu-item')[2].classList.add('active');
+            } else if (view === 'admin') {
+                document.querySelectorAll('.menu-item')[3].classList.add('active');
             }
             
             window.scrollTo(0, 0);
@@ -612,6 +729,18 @@
             render();
         }
 
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
         // Handle user registration
         async function handleRegister(email, password, displayName) {
             try {
@@ -631,9 +760,11 @@
                     createdAt: new Date().toISOString()
                 });
                 
-                return { success: true, message: t('registerSuccess') };
+                showNotification(t('registerSuccess'), 'success');
+                return { success: true };
             } catch (error) {
-                return { success: false, message: t('registerError') + ': ' + error.message };
+                showNotification(t('registerError') + ': ' + error.message, 'error');
+                return { success: false };
             }
         }
 
@@ -641,9 +772,11 @@
         async function handleLogin(email, password) {
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                return { success: true, message: t('loginSuccess') };
+                showNotification(t('loginSuccess'), 'success');
+                return { success: true };
             } catch (error) {
-                return { success: false, message: t('loginError') + ': ' + error.message };
+                showNotification(t('loginError') + ': ' + error.message, 'error');
+                return { success: false };
             }
         }
 
@@ -651,10 +784,12 @@
         async function handleLogout() {
             try {
                 await signOut(auth);
+                showNotification('Logged out successfully', 'success');
                 navigate('home');
                 return { success: true };
             } catch (error) {
-                return { success: false, message: error.message };
+                showNotification('Error logging out: ' + error.message, 'error');
+                return { success: false };
             }
         }
 
@@ -672,9 +807,39 @@
                 };
                 
                 await addDoc(collection(db, 'apps'), appWithUserInfo);
-                return { success: true, message: t('submitSuccess') };
+                showNotification(t('submitSuccess'), 'success');
+                navigate('home');
+                return { success: true };
             } catch (error) {
-                return { success: false, message: t('submitError') + ': ' + error.message };
+                showNotification(t('submitError') + ': ' + error.message, 'error');
+                return { success: false };
+            }
+        }
+
+        // Handle app approval
+        async function approveApp(appId) {
+            try {
+                await updateDoc(doc(db, 'apps', appId), {
+                    status: 'approved',
+                    approvedAt: new Date().toISOString()
+                });
+                showNotification(t('appApproved'), 'success');
+                return { success: true };
+            } catch (error) {
+                showNotification('Error approving app: ' + error.message, 'error');
+                return { success: false };
+            }
+        }
+
+        // Handle app deletion
+        async function deleteApp(appId) {
+            try {
+                await deleteDoc(doc(db, 'apps', appId));
+                showNotification(t('appDeleted'), 'success');
+                return { success: true };
+            } catch (error) {
+                showNotification('Error deleting app: ' + error.message, 'error');
+                return { success: false };
             }
         }
 
@@ -683,7 +848,7 @@
             const categories = [t('all'), t('tools'), t('games'), t('social'), t('video'), t('music'), t('others')];
             
             return `
-                <header class="mb-6 slide-in">
+                <header class="mb-6">
                     <!-- App Name -->
                     <div class="flex items-center justify-center mb-4">
                         <div class="w-12 h-12 rounded-2xl gradient-bg flex items-center justify-center mr-3">
@@ -733,7 +898,7 @@
             return `
                 ${renderHeader()}
                 
-                <main class="slide-in">
+                <main>
                     <!-- Popular Apps Section -->
                     <section class="mb-8">
                         <h2 class="text-xl font-bold mb-4 gradient-text">${t('popularApps')}</h2>
@@ -742,7 +907,7 @@
                             ${popularApps.length > 0 ? popularApps.map(app => `
                                 <div class="app-card bg-white dark:bg-slate-800 rounded-2xl overflow-hidden p-4">
                                     <div class="flex flex-col items-center text-center">
-                                        <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover shadow-md mb-3">
+                                        <img src="${app.icon}" alt="${app.name}" class="w-16 h-16 rounded-2xl object-cover shadow-md mb-3" onerror="this.src='https://via.placeholder.com/64/8b5cf6/ffffff?text=App'">
                                         <h3 class="font-bold text-sm mb-1 truncate w-full">${app.name}</h3>
                                         <p class="text-xs text-cyan-600 dark:text-cyan-400 mb-2">${app.category}</p>
                                         <div class="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-3">
@@ -771,7 +936,7 @@
                             ${filteredApps.length > 0 ? filteredApps.map(app => `
                                 <div class="app-card bg-white dark:bg-slate-800 rounded-2xl overflow-hidden p-4">
                                     <div class="flex items-center space-x-4">
-                                        <img src="${app.icon}" alt="${app.name}" class="w-14 h-14 rounded-2xl object-cover shadow-md">
+                                        <img src="${app.icon}" alt="${app.name}" class="w-14 h-14 rounded-2xl object-cover shadow-md" onerror="this.src='https://via.placeholder.com/56/8b5cf6/ffffff?text=App'">
                                         <div class="flex-1">
                                             <h3 class="font-bold text-base mb-1">${app.name}</h3>
                                             <p class="text-sm text-cyan-600 dark:text-cyan-400 mb-1">${app.category}</p>
@@ -806,9 +971,9 @@
                 return `
                     <div class="text-center py-12">
                         <i class="fas fa-exclamation-circle text-4xl text-yellow-500 mb-4"></i>
-                        <h2 class="text-xl font-bold mb-2">Login Required</h2>
-                        <p class="text-gray-500 dark:text-gray-400 mb-6">You need to login to upload apps</p>
-                        <button onclick="navigate('profile')" class="py-3 px-6 gradient-bg text-white rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
+                        <h2 class="text-xl font-bold mb-2">${t('loginToUpload')}</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-6">${t('loginToUpload')}</p>
+                        <button onclick="showLoginModal()" class="py-3 px-6 gradient-bg text-white rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
                             ${t('login')}
                         </button>
                     </div>
@@ -818,24 +983,24 @@
             return `
                 ${renderHeader()}
                 
-                <main class="slide-in">
+                <main>
                     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg">
                         <h2 class="text-xl font-bold mb-6 gradient-text text-center">${t('uploadApp')}</h2>
                         
                         <form id="upload-form" class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-2">${t('appName')}</label>
-                                <input type="text" id="app-name" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <div class="form-group">
+                                <label class="form-label">${t('appName')}</label>
+                                <input type="text" id="app-name" required class="form-input" placeholder="My Awesome App">
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium mb-2">${t('appDeveloper')}</label>
-                                <input type="text" id="app-developer" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <div class="form-group">
+                                <label class="form-label">${t('appDeveloper')}</label>
+                                <input type="text" id="app-developer" required class="form-input" placeholder="John Doe">
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium mb-2">${t('appCategory')}</label>
-                                <select id="app-category" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <div class="form-group">
+                                <label class="form-label">${t('appCategory')}</label>
+                                <select id="app-category" required class="form-input">
                                     <option value="">${t('selectCategory')}</option>
                                     <option value="tools">${t('tools')}</option>
                                     <option value="games">${t('games')}</option>
@@ -847,38 +1012,34 @@
                             </div>
                             
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">${t('appVersion')}</label>
-                                    <input type="text" id="app-version" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="1.0.0">
+                                <div class="form-group">
+                                    <label class="form-label">${t('appVersion')}</label>
+                                    <input type="text" id="app-version" required class="form-input" placeholder="1.0.0">
                                 </div>
                                 
-                                <div>
-                                    <label class="block text-sm font-medium mb-2">${t('appSize')}</label>
-                                    <input type="text" id="app-size" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="15 MB">
+                                <div class="form-group">
+                                    <label class="form-label">${t('appSize')}</label>
+                                    <input type="text" id="app-size" required class="form-input" placeholder="15 MB">
                                 </div>
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium mb-2">${t('appIcon')} URL</label>
-                                <input type="url" id="app-icon" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="https://example.com/icon.png">
+                            <div class="form-group">
+                                <label class="form-label">${t('appIcon')} URL</label>
+                                <input type="url" id="app-icon" required class="form-input" placeholder="https://example.com/icon.png">
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium mb-2">${t('apkUrl')}</label>
-                                <input type="url" id="app-apk" required class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="https://example.com/app.apk">
+                            <div class="form-group">
+                                <label class="form-label">${t('description')}</label>
+                                <textarea id="app-description" rows="3" class="form-input" placeholder="${t('description')}"></textarea>
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium mb-2">${t('screenshotUrls')}</label>
-                                <textarea id="app-screenshots" rows="3" class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="https://example.com/screenshot1.jpg, https://example.com/screenshot2.jpg"></textarea>
+                            <div class="form-group">
+                                <label class="form-label">${t('downloadLinks')}</label>
+                                <textarea id="app-download-links" rows="3" class="form-input" placeholder="https://example.com/download1.apk&#10;https://example.com/download2.apk&#10;https://example.com/download3.apk"></textarea>
+                                <p class="text-sm text-gray-500 mt-1">${t('enterOneLinkPerLine')}</p>
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium mb-2">${t('description')}</label>
-                                <textarea id="app-description" rows="3" class="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
-                            </div>
-                            
-                            <button type="submit" class="w-full py-3 gradient-bg text-white rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
+                            <button type="submit" class="btn btn-primary w-full">
                                 ${t('submit')}
                             </button>
                         </form>
@@ -896,18 +1057,11 @@
                             version: document.getElementById('app-version').value,
                             size: document.getElementById('app-size').value,
                             icon: document.getElementById('app-icon').value,
-                            apk: document.getElementById('app-apk').value,
-                            screenshots: document.getElementById('app-screenshots').value.split(',').map(s => s.trim()).filter(s => s),
-                            description: document.getElementById('app-description').value
+                            description: document.getElementById('app-description').value,
+                            downloadLinks: document.getElementById('app-download-links').value.split('\\n').filter(link => link.trim())
                         };
                         
-                        const result = await handleAppSubmission(appData);
-                        if (result.success) {
-                            alert(result.message);
-                            navigate('home');
-                        } else {
-                            alert(result.message);
-                        }
+                        await handleAppSubmission(appData);
                     });
                 </script>
             `;
@@ -915,22 +1069,105 @@
 
         // Render Profile Page
         function renderProfilePage() {
-            if (!state.currentUser) {
+            return `
+                ${renderHeader()}
+                
+                <main>
+                    <!-- User Profile -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg mb-6">
+                        ${state.currentUser ? `
+                            <div class="flex flex-col items-center text-center mb-6">
+                                <img src="${state.userProfile.photoURL}" alt="Profile" class="profile-avatar mb-4">
+                                <h2 class="text-xl font-bold">${state.userProfile.displayName}</h2>
+                                <p class="text-gray-500 dark:text-gray-400">${state.userProfile.email}</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-4 text-center">
+                                    <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">${state.approvedApps.filter(app => app.submitterId === state.currentUser.uid).length}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">${t('approved')}</p>
+                                </div>
+                                <div class="bg-cyan-50 dark:bg-cyan-900/20 rounded-2xl p-4 text-center">
+                                    <p class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">${state.pendingApps.filter(app => app.submitterId === state.currentUser.uid).length}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">${t('pending')}</p>
+                                </div>
+                            </div>
+                            
+                            <button onclick="handleLogout()" class="btn btn-secondary w-full">
+                                <i class="fas fa-sign-out-alt mr-2"></i> ${t('logout')}
+                            </button>
+                        ` : `
+                            <div class="text-center py-8">
+                                <div class="w-20 h-20 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-user text-gray-400 text-2xl"></i>
+                                </div>
+                                <h2 class="text-xl font-bold mb-2">${t('welcome')}</h2>
+                                <p class="text-gray-500 dark:text-gray-400 mb-6">${t('loginToContinue')}</p>
+                                <div class="space-y-4">
+                                    <button onclick="showLoginModal()" class="btn btn-primary w-full">
+                                        ${t('login')}
+                                    </button>
+                                    <button onclick="showRegisterModal()" class="btn btn-secondary w-full">
+                                        ${t('signUp')}
+                                    </button>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+                    
+                    <!-- Settings -->
+                    ${state.currentUser ? `
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg mb-6">
+                            <h2 class="text-xl font-bold mb-6 gradient-text">${t('settings')}</h2>
+                            
+                            <!-- Dark Mode Toggle -->
+                            <div class="setting-item">
+                                <div>
+                                    <p class="font-medium">${t('darkMode')}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">${state.isDarkMode ? t('on') : t('off')}</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" ${state.isDarkMode ? 'checked' : ''} onchange="toggleDarkMode()" class="sr-only peer">
+                                    <div class="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+                            
+                            <!-- Language Selection -->
+                            <div class="setting-item">
+                                <div>
+                                    <p class="font-medium">${t('language')}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">${t(state.language)}</p>
+                                </div>
+                                <button onclick="showLanguageModal()" class="btn btn-secondary">
+                                    ${t('change')}
+                                </button>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Contact Us -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg text-center">
+                        <h3 class="text-lg font-bold mb-2">${t('contactUs')}</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-4">ဆက်သွယ်ရန် Telegram လင့်ခ်</p>
+                        <a href="https://t.me/appcreator24myanmar" target="_blank" class="inline-flex items-center btn btn-primary">
+                            <i class="fab fa-telegram mr-2"></i> Telegram
+                        </a>
+                    </div>
+                </main>
+            `;
+        }
+
+        // Render Admin Page
+        function renderAdminPage() {
+            if (!state.isAdmin) {
                 return `
                     <div class="text-center py-12">
-                        <div class="w-20 h-20 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-user text-gray-400 text-2xl"></i>
-                        </div>
-                        <h2 class="text-xl font-bold mb-2">${t('welcome')}</h2>
-                        <p class="text-gray-500 dark:text-gray-400 mb-6">${t('loginToContinue')}</p>
-                        <div class="space-y-4">
-                            <button onclick="showLoginForm()" class="w-full py-3 gradient-bg text-white rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
-                                ${t('login')}
-                            </button>
-                            <button onclick="showRegisterForm()" class="w-full py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-gray-200 rounded-2xl font-bold hover:shadow-lg transition-all duration-300">
-                                ${t('signUp')}
-                            </button>
-                        </div>
+                        <i class="fas fa-shield-alt text-4xl text-red-500 mb-4"></i>
+                        <h2 class="text-xl font-bold mb-2">Admin Access Required</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-6">You need admin privileges to access this page</p>
+                        <button onclick="navigate('home')" class="btn btn-primary">
+                            ${t('home')}
+                        </button>
                     </div>
                 `;
             }
@@ -938,105 +1175,162 @@
             return `
                 ${renderHeader()}
                 
-                <main class="slide-in">
-                    <!-- User Profile -->
+                <main>
                     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg mb-6">
-                        <div class="flex flex-col items-center text-center mb-6">
-                            <img src="${state.userProfile.photoURL}" alt="Profile" class="profile-avatar mb-4">
-                            <h2 class="text-xl font-bold">${state.userProfile.displayName}</h2>
-                            <p class="text-gray-500 dark:text-gray-400">${state.userProfile.email}</p>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4 mb-6">
-                            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-4 text-center">
-                                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">${state.userApps.length}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">${t('myApps')}</p>
-                            </div>
-                            <div class="bg-cyan-50 dark:bg-cyan-900/20 rounded-2xl p-4 text-center">
-                                <p class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">${state.approvedApps.filter(app => app.submitterId === state.currentUser.uid).length}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">${t('approved')}</p>
-                            </div>
-                        </div>
-                        
-                        <button onclick="handleLogout()" class="w-full py-3 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl font-bold hover:bg-red-200 dark:hover:bg-red-900/30 transition-colors duration-200">
-                            <i class="fas fa-sign-out-alt mr-2"></i> ${t('logout')}
-                        </button>
+                        <h2 class="text-xl font-bold mb-2 gradient-text">${t('adminPanel')}</h2>
+                        <p class="text-gray-500 dark:text-gray-400 mb-6">${t('adminDescription')}</p>
                     </div>
                     
-                    <!-- Settings -->
+                    <!-- Pending Apps -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg mb-6">
+                        <h3 class="text-lg font-bold mb-4">${t('pendingApps')} (${state.pendingApps.length})</h3>
+                        
+                        ${state.pendingApps.length > 0 ? state.pendingApps.map(app => `
+                            <div class="border border-gray-200 dark:border-slate-600 rounded-2xl p-4 mb-4">
+                                <div class="flex items-center space-x-4 mb-3">
+                                    <img src="${app.icon}" alt="${app.name}" class="w-12 h-12 rounded-2xl object-cover" onerror="this.src='https://via.placeholder.com/48/8b5cf6/ffffff?text=App'">
+                                    <div class="flex-1">
+                                        <h4 class="font-bold">${app.name}</h4>
+                                        <p class="text-sm text-gray-500">${t('by')} ${app.submitterName}</p>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="approveApp('${app.id}')" class="btn btn-primary flex-1">
+                                        <i class="fas fa-check mr-2"></i> ${t('approve')}
+                                    </button>
+                                    <button onclick="deleteApp('${app.id}')" class="btn btn-secondary flex-1">
+                                        <i class="fas fa-trash mr-2"></i> ${t('delete')}
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('') : `
+                            <p class="text-gray-500 dark:text-gray-400 text-center py-4">${t('noPendingApps')}</p>
+                        `}
+                    </div>
+                    
+                    <!-- Approved Apps -->
                     <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg">
-                        <h2 class="text-xl font-bold mb-6 gradient-text">${t('settings')}</h2>
+                        <h3 class="text-lg font-bold mb-4">${t('approvedApps')} (${state.approvedApps.length})</h3>
                         
-                        <!-- Dark Mode Toggle -->
-                        <div class="setting-item">
-                            <div>
-                                <p class="font-medium">${t('darkMode')}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">${state.isDarkMode ? t('on') : t('off')}</p>
+                        ${state.approvedApps.length > 0 ? state.approvedApps.map(app => `
+                            <div class="border border-gray-200 dark:border-slate-600 rounded-2xl p-4 mb-4">
+                                <div class="flex items-center space-x-4">
+                                    <img src="${app.icon}" alt="${app.name}" class="w-12 h-12 rounded-2xl object-cover" onerror="this.src='https://via.placeholder.com/48/8b5cf6/ffffff?text=App'">
+                                    <div class="flex-1">
+                                        <h4 class="font-bold">${app.name}</h4>
+                                        <p class="text-sm text-gray-500">${t('by')} ${app.developer}</p>
+                                    </div>
+                                    <button onclick="deleteApp('${app.id}')" class="btn btn-secondary">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" ${state.isDarkMode ? 'checked' : ''} onchange="toggleDarkMode()" class="sr-only peer">
-                                <div class="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-                            </label>
-                        </div>
-                        
-                        <!-- Language Selection -->
-                        <div class="setting-item">
-                            <div>
-                                <p class="font-medium">${t('language')}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">${t(state.language)}</p>
-                            </div>
-                            <button onclick="showLanguageModal()" class="py-2 px-4 bg-gray-100 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors duration-200">
-                                ${t('change')}
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Contact Us -->
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg mt-6 text-center">
-                        <h3 class="text-lg font-bold mb-2">${t('contactUs')}</h3>
-                        <p class="text-gray-500 dark:text-gray-400 mb-4">${t('contactDescription')}</p>
-                        <a href="https://t.me/appcreator24myanmar" target="_blank" class="inline-flex items-center py-2 px-4 bg-telegram-blue text-white rounded-xl font-medium hover:bg-blue-600 transition-colors duration-200">
-                            <i class="fab fa-telegram mr-2"></i> Telegram
-                        </a>
+                        `).join('') : `
+                            <p class="text-gray-500 dark:text-gray-400 text-center py-4">${t('noApprovedApps')}</p>
+                        `}
                     </div>
                 </main>
+            `;
+        }
+
+        // Render Login Modal
+        function renderLoginModal() {
+            return `
+                <div class="modal" id="login-modal">
+                    <div class="modal-content">
+                        <h2 class="text-xl font-bold mb-6 text-center">${t('login')}</h2>
+                        <form id="login-form" class="space-y-4">
+                            <div class="form-group">
+                                <label class="form-label">${t('email')}</label>
+                                <input type="email" id="login-email" required class="form-input" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">${t('password')}</label>
+                                <input type="password" id="login-password" required class="form-input" placeholder="••••••••">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-full">${t('login')}</button>
+                        </form>
+                        <p class="text-center mt-4">
+                            ${t('dontHaveAccount')} 
+                            <a href="javascript:void(0)" onclick="showRegisterModal()" class="text-purple-600 font-medium">${t('signUp')}</a>
+                        </p>
+                        <button onclick="document.getElementById('login-modal').remove()" class="btn btn-secondary w-full mt-4">${t('cancel')}</button>
+                    </div>
+                </div>
                 
-                <!-- Language Modal -->
-                <div id="language-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 w-11/12 max-w-md">
+                <script>
+                    document.getElementById('login-form').addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const email = document.getElementById('login-email').value;
+                        const password = document.getElementById('login-password').value;
+                        
+                        await handleLogin(email, password);
+                        document.getElementById('login-modal').remove();
+                    });
+                </script>
+            `;
+        }
+
+        // Render Register Modal
+        function renderRegisterModal() {
+            return `
+                <div class="modal" id="register-modal">
+                    <div class="modal-content">
+                        <h2 class="text-xl font-bold mb-6 text-center">${t('signUp')}</h2>
+                        <form id="register-form" class="space-y-4">
+                            <div class="form-group">
+                                <label class="form-label">${t('name')}</label>
+                                <input type="text" id="register-name" required class="form-input" placeholder="Your Name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">${t('email')}</label>
+                                <input type="email" id="register-email" required class="form-input" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">${t('password')}</label>
+                                <input type="password" id="register-password" required class="form-input" placeholder="••••••••">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-full">${t('signUp')}</button>
+                        </form>
+                        <p class="text-center mt-4">
+                            ${t('alreadyHaveAccount')} 
+                            <a href="javascript:void(0)" onclick="showLoginModal()" class="text-purple-600 font-medium">${t('login')}</a>
+                        </p>
+                        <button onclick="document.getElementById('register-modal').remove()" class="btn btn-secondary w-full mt-4">${t('cancel')}</button>
+                    </div>
+                </div>
+                
+                <script>
+                    document.getElementById('register-form').addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const name = document.getElementById('register-name').value;
+                        const email = document.getElementById('register-email').value;
+                        const password = document.getElementById('register-password').value;
+                        
+                        await handleRegister(email, password, name);
+                        document.getElementById('register-modal').remove();
+                    });
+                </script>
+            `;
+        }
+
+        // Render Language Modal
+        function renderLanguageModal() {
+            return `
+                <div class="modal" id="language-modal">
+                    <div class="modal-content">
                         <h3 class="text-xl font-bold mb-4">${t('selectLanguage')}</h3>
                         <div class="space-y-2">
                             ${['myanmar', 'english', 'thai', 'india', 'china', 'korea', 'japan'].map(lang => `
-                                <div class="language-option ${state.language === lang ? 'active' : ''}" onclick="changeLanguage('${lang}'); document.getElementById('language-modal').classList.add('hidden')">
+                                <div class="language-option ${state.language === lang ? 'active' : ''}" onclick="changeLanguage('${lang}'); document.getElementById('language-modal').remove()">
                                     <img src="https://flagcdn.com/w40/${getCountryCode(lang)}.png" class="flag-icon">
                                     <span>${t(lang)}</span>
                                 </div>
                             `).join('')}
                         </div>
-                        <button onclick="document.getElementById('language-modal').classList.add('hidden')" class="w-full mt-4 py-3 bg-gray-100 dark:bg-slate-700 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors duration-200">
-                            ${t('cancel')}
-                        </button>
+                        <button onclick="document.getElementById('language-modal').remove()" class="btn btn-secondary w-full mt-4">${t('cancel')}</button>
                     </div>
                 </div>
-                
-                <script>
-                    function showLanguageModal() {
-                        document.getElementById('language-modal').classList.remove('hidden');
-                    }
-                    
-                    function getCountryCode(lang) {
-                        const codes = {
-                            myanmar: 'mm',
-                            english: 'us',
-                            thai: 'th',
-                            india: 'in',
-                            china: 'cn',
-                            korea: 'kr',
-                            japan: 'jp'
-                        };
-                        return codes[lang] || 'us';
-                    }
-                </script>
             `;
         }
 
@@ -1054,11 +1348,40 @@
                 case 'profile':
                     content = renderProfilePage();
                     break;
+                case 'admin':
+                    content = renderAdminPage();
+                    break;
                 default:
                     content = renderHomePage();
             }
             
             APP_CONTAINER.innerHTML = content;
+        }
+
+        // Modal functions
+        function showLoginModal() {
+            document.body.insertAdjacentHTML('beforeend', renderLoginModal());
+        }
+
+        function showRegisterModal() {
+            document.body.insertAdjacentHTML('beforeend', renderRegisterModal());
+        }
+
+        function showLanguageModal() {
+            document.body.insertAdjacentHTML('beforeend', renderLanguageModal());
+        }
+
+        function getCountryCode(lang) {
+            const codes = {
+                myanmar: 'mm',
+                english: 'us',
+                thai: 'th',
+                india: 'in',
+                china: 'cn',
+                korea: 'kr',
+                japan: 'jp'
+            };
+            return codes[lang] || 'us';
         }
 
         // Initialize the app when DOM is loaded
@@ -1075,6 +1398,12 @@
         window.handleRegister = handleRegister;
         window.handleLogout = handleLogout;
         window.handleAppSubmission = handleAppSubmission;
+        window.approveApp = approveApp;
+        window.deleteApp = deleteApp;
+        window.showLoginModal = showLoginModal;
+        window.showRegisterModal = showRegisterModal;
+        window.showLanguageModal = showLanguageModal;
+        window.getCountryCode = getCountryCode;
     </script>
 </body>
 </html>
