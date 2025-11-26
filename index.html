@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ဝေယံ၏ အက်ပ်စတိုး (အက်ပ်တင်သွင်းမှုစနစ်)</title>
+    <!-- Tailwind CSS ကို ထည့်သွင်းခြင်း -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter စာလုံးပုံစံကို အသုံးပြုခြင်း -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.4s, color 0.4s;
+        }
+        /* ကတ်များအတွက် ပရီမီယံ အသွင်အပြင် */
+        .app-card {
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, background-color 0.4s;
+            border: 1px solid transparent;
+        }
+        .app-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            border-color: #06b6d4; /* Cyan 500 */
+        }
+        /* စခရင်ရှော့ ကာရိုဆယ်လ်အတွက် စတိုင် */
+        #screenshot-carousel {
+            scroll-behavior: smooth;
+        }
+        /* Dark Mode Overrides for deeper contrast */
+        .dark .bg-gray-50 { background-color: #0f172a; } /* Slate 900 */
+        .dark .bg-white { background-color: #1e293b; } /* Slate 800 */
+        .dark .app-card { background-color: #334155; } /* Slate 700 */
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-50 min-h-screen">
+
+    <!-- ပင်မအကြောင်းအရာ ကွန်တိန်နာ (မိုဘိုင်းလ်တွင် ဘေးဘောင်ကျဉ်းစေရန် px-2 မှ စသည်) -->
+    <div id="app-container" class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
+        <!-- ဒိုင်းနမစ် အကြောင်းအရာများ ဒီနေရာတွင် ပေါ်လာမည် -->
+    </div>
+
+    <!-- JavaScript လော့ဂျစ်နှင့် ဒေတာများ -->
+    <script type="module">
+        // --- ၁။ ဒေတာဖွဲ့စည်းပုံနှင့် ယာယီသိမ်းဆည်းမှု (In-Memory Storage) ---
+        // မှတ်ချက်- ဤအက်ပ်သည် Frontend တစ်ခုသာ ဖြစ်သောကြောင့် ဒေတာအားလုံးကို ကုဒ်အတွင်း၌သာ သိမ်းဆည်းပါသည်။
+        // ပြောင်းလဲမှုများကို အမြဲတမ်းသိမ်းရန် JSON Output ကို ကူးယူပြီး ကုဒ်အတွင်း ပြန်ထည့်ရန် လိုအပ်ပါသည်။
+        
+        const INITIAL_APPS = [
+            {
+                id: 1, name: "Fusion File Manager", icon: "https://placehold.co/128x128/3b82f6/ffffff?text=FM",
+                screenshots: ["https://placehold.co/800x450/3b82f6/ffffff?text=ဖိုင်+1"], category: "ကိရိယာများ", version: "3.2.1", size: "24.5 MB", developer: "Wai Yan Dev", apk: "https://example.com/fusion-file-manager.apk"
+            },
+            {
+                id: 2, name: "Galaxy Shooter X", icon: "https://placehold.co/128x128/dc2626/ffffff?text=Game",
+                screenshots: ["https://placehold.co/800x450/991b1b/ffffff?text=ဂိမ်း+ရုပ်ပုံ+A"], category: "ဂိမ်းများ", version: "1.9.0", size: "88.1 MB", developer: "Starbound Studios", apk: "https://example.com/galaxy-shooter.apk"
+            },
+            {
+                id: 3, name: "Echo Social", icon: "https://placehold.co/128x128/8b5cf6/ffffff?text=Echo",
+                screenshots: ["https://placehold.co/800x450/a21caf/ffffff?text=ပရိုဖိုင်+မြင်ကွင်း"], category: "လူမှုကွန်ရက်", version: "2.5.0", size: "45.0 MB", developer: "Connective Labs", apk: "https://example.com/echo-social.apk"
+            },
+        ];
+
+        let PENDING_APPS = [
+            // {
+            //     id: 100,
+            //     name: "Pending Chat App",
+            //     submitterName: "Test User",
+            //     submitterEmail: "test@example.com",
+            //     submitterPassword: "securepassword123", // လိုအပ်ချက်အရ ထည့်သွင်းထားသည် (လက်တွေ့တွင် မလုပ်သင့်ပါ)
+            //     ... (other app fields)
+            // }
+        ];
+
+        let LAST_SUBMITTED_USER = {
+            name: "",
+            email: "",
+            password: ""
+        };
+
+        // --- ၂။ ကမ္ဘာလုံးဆိုင်ရာ အခြေအနေနှင့် Utility လုပ်ဆောင်ချက်များ ---
+
+        let state = {
+            apps: [...INITIAL_APPS], // အတည်ပြုထားသော အက်ပ်များ
+            currentView: 'home', // 'home', 'details', 'login', 'admin', 'submit'
+            selectedAppId: null,
+            searchTerm: '',
+            selectedCategory: 'အားလုံး',
+            isAdmin: false,
+            isDarkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+            lastSubmittedUser: LAST_SUBMITTED_USER // နောက်ဆုံးတင်သွင်းသူ၏ အချက်အလက်
+        };
+
+        const APP_CONTAINER = document.getElementById('app-container');
+        const ADMIN_CREDENTIALS = {
+            username: "WaiYan",
+            password: "wai118234"
+        };
+        const ALL_CATEGORIES = ['ကိရိယာများ', 'ဂိမ်းများ', 'လူမှုကွန်ရက်', 'ဗီဒီယို', 'ဂီတ', 'အခြား'];
+
+
+        // အမှောင်စနစ် စတင်သတ်မှတ်ခြင်း
+        function initializeTheme() {
+            if (state.isDarkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        initializeTheme();
+
+        function toggleDarkMode() {
+            state.isDarkMode = !state.isDarkMode;
+            if (state.isDarkMode) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+            render();
+        }
+
+        function navigate(view, id = null) {
+            state.currentView = view;
+            state.selectedAppId = id;
+            window.scrollTo(0, 0); // လမ်းကြောင်းပြောင်းတိုင်း ထိပ်ဆုံးသို့ ရောက်ရှိစေရန်
+            render();
+        }
+
+        // --- ၃။ UI ပြသမှု လုပ်ဆောင်ချက်များ ---
+
+        function renderHeader() {
+            const categories = ['အားလုံး', ...new Set(state.apps.map(app => app.category))];
+
+            return `
+                <header class="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg rounded-b-3xl mb-4 sm:mb-6 py-3 sm:py-4 border-b border-indigo-200/50 dark:border-slate-700/50">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-between items-center space-y-3">
+                        <!-- အပေါ်ဆုံး ခေါင်းစဉ်နှင့် Actions -->
+                        <div class="flex justify-between w-full items-center">
+                            <!-- လိုဂိုနှင့် ခေါင်းစဉ် -->
+                            <div class="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onclick="navigate('home')">
+                                <svg class="w-7 h-7 sm:w-9 sm:h-9 text-indigo-600 dark:text-cyan-400 transform rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4M17 3v4M3 17h4M18 18h3m-3 0h-3m3 0v3m0-3v-3M18 6h3m-3 0h-3m3 0v3m0-3v-3" /></svg>
+                                <h1 class="text-xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-50">ဝေယံ၏ အက်ပ်စတိုး</h1>
+                            </div>
+
+                            <!-- လုပ်ဆောင်ချက်များ (Theme, Admin, Submit) -->
+                            <div class="flex items-center space-x-3">
+                                <!-- App တင်ရန် Link -->
+                                <button onclick="navigate('submit')" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-green-500 text-white text-xs sm:text-sm font-semibold rounded-full shadow-md hover:bg-green-600 transition duration-150">
+                                    အက်ပ်တင်ရန်
+                                </button>
+                                <!-- Admin Link -->
+                                <button onclick="navigate('login')" class="p-2 sm:p-2.5 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-cyan-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition duration-150 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                </button>
+                                <!-- Dark Mode Toggle -->
+                                <button onclick="toggleDarkMode()" class="p-2 sm:p-2.5 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition duration-150">
+                                    ${state.isDarkMode ?
+                                        '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>' :
+                                        '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>'
+                                    }
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ရှာဖွေရေးဘား (အောက်တွင်) -->
+                        <div class="w-full">
+                            <input
+                                type="text"
+                                id="search-input"
+                                placeholder="အက်ပ်များကို ရှာဖွေပါ..."
+                                value="${state.searchTerm}"
+                                oninput="handleSearch(this.value)"
+                                class="w-full p-2 sm:p-2.5 border-2 border-indigo-200 dark:border-slate-600 rounded-xl focus:ring-cyan-500 focus:border-cyan-500 bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-gray-50 transition duration-300 shadow-inner"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- အမျိုးအစား စစ်ထုတ်မှု (ပင်မစာမျက်နှာတွင်သာ - flex-wrap ဖြင့် မိုဘိုင်းလ်တွင် ခေါက်သိမ်းသည်) -->
+                    ${state.currentView === 'home' ? `
+                        <div class="pt-4 pb-2 flex flex-wrap gap-1 justify-center px-2 sm:px-6 lg:px-8 border-t border-indigo-200/50 dark:border-slate-700/50 mt-3">
+                            ${categories.map(cat => `
+                                <button
+                                    onclick="handleCategoryFilter('${cat}')"
+                                    class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition duration-200 shadow-md ${state.selectedCategory === cat
+                                        ? 'bg-indigo-600 text-white transform scale-105 ring-4 ring-indigo-300 dark:ring-cyan-500/50'
+                                        : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-slate-600'
+                                    }"
+                                >
+                                    ${cat}
+                                </button>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </header>
+            `;
+        }
+
+        function renderAppCard(app) {
+            return `
+                <div onclick="navigate('details', ${app.id})" class="app-card cursor-pointer p-4 sm:p-5 bg-white dark:bg-slate-800 rounded-3xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                    <div class="flex flex-col items-center text-center space-y-2 sm:space-y-3">
+                        <img src="${app.icon}" onerror="this.onerror=null;this.src='https://placehold.co/128x128/cccccc/333333?text=App';" alt="${app.name} Icon" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shadow-2xl ring-4 ring-indigo-100 dark:ring-slate-700 flex-shrink-0">
+                        <div class="min-w-0 flex-1 pt-1 sm:pt-2">
+                            <p class="text-lg sm:text-xl font-bold truncate text-gray-900 dark:text-gray-50">${app.name}</p>
+                            <p class="text-sm font-medium text-cyan-600 dark:text-cyan-400">${app.category}</p>
+                            <div class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-semibold">
+                                ဗားရှင်း: ${app.version}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHomePage() {
+            const filteredApps = state.apps
+                .filter(app => state.selectedCategory === 'အားလုံး' || app.category === state.selectedCategory)
+                .filter(app => app.name.toLowerCase().includes(state.searchTerm.toLowerCase()));
+
+            return `
+                ${renderHeader()}
+                <main class="mt-4 sm:mt-8">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-indigo-600 dark:text-cyan-400">ထင်ရှားသော အက်ပလီကေးရှင်းများ</h2>
+
+                    ${filteredApps.length === 0 ? `
+                        <div class="text-center py-12 sm:py-16 bg-white dark:bg-slate-800 rounded-2xl shadow-xl mx-4 sm:mx-0">
+                            <p class="text-lg sm:text-2xl text-gray-500 dark:text-gray-400 mb-4">လက်ရှိ ရှာဖွေမှု သို့မဟုတ် စစ်ထုတ်မှုအတွက် အက်ပ်များ မတွေ့ပါ။</p>
+                            <button onclick="resetFilters()" class="mt-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition duration-200 shadow-lg">စစ်ထုတ်မှုများ ပြန်လည်သတ်မှတ်ရန်</button>
+                        </div>
+                    ` : `
+                        <!-- မိုဘိုင်းလ်တွင် 2 ကော်လံ၊ တက်ဘလက်တွင် 3 ကော်လံ၊ ကွန်ပျူတာတွင် 4 ကော်လံ -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+                            ${filteredApps.map(renderAppCard).join('')}
+                        </div>
+                    `}
+                </main>
+            `;
+        }
+
+        function renderAppDetailsPage(app) {
+            const screenshots = app.screenshots || [];
+            
+            // စခရင်ရှော့ ကာရိုဆယ်လ်ကို ထိန်းချုပ်ရန် လုပ်ဆောင်ချက်ကို ဖန်တီးပါ
+            window.updateScreenshot = (direction) => {
+                const carousel = document.getElementById('screenshot-carousel');
+                if (!carousel) return;
+                const scrollAmount = carousel.offsetWidth + 16; // element width + gap (4 units = 16px)
+                carousel.scrollLeft += direction * scrollAmount;
+            };
+
+            return `
+                ${renderHeader()}
+                <main class="mt-4 sm:mt-8">
+                    <!-- နောက်ပြန်ခလုတ် -->
+                    <button onclick="navigate('home')" class="mb-6 sm:mb-8 inline-flex items-center text-indigo-600 dark:text-cyan-400 hover:text-indigo-800 dark:hover:text-cyan-200 transition duration-150 font-medium text-sm sm:text-base">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        ပင်မစာမျက်နှာသို့ ပြန်သွားရန်
+                    </button>
+
+                    <!-- ဖုန်းတွင် ဘေးဘောင်ကျဉ်းစေရန် p-6 -->
+                    <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-700/50">
+                        <!-- အက်ပ် ခေါင်းစီးနှင့် ဒေါင်းလုတ် -->
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 sm:pb-8 border-b border-gray-200 dark:border-slate-700">
+                            <div class="flex items-center space-x-4 sm:space-x-6 mb-4 md:mb-0">
+                                <img src="${app.icon}" onerror="this.onerror=null;this.src='https://placehold.co/128x128/cccccc/333333?text=App';" alt="${app.name} Icon" class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover shadow-xl flex-shrink-0 ring-4 ring-cyan-500/30">
+                                <div>
+                                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-50">${app.name}</h2>
+                                    <p class="text-base sm:text-lg text-gray-500 dark:text-gray-400 mt-1">တီထွင်သူ: <span class="font-semibold text-indigo-600 dark:text-cyan-400">${app.developer}</span></p>
+                                </div>
+                            </div>
+                            <a href="${app.apk}" download="${app.name.replace(/\s/g, '_')}.apk" class="w-full md:w-auto px-6 py-3 sm:px-8 sm:py-4 text-lg sm:text-xl font-bold text-white bg-green-600 rounded-full shadow-lg hover:bg-green-700 transition duration-200 text-center transform hover:scale-[1.02] active:scale-[0.98] mt-4 md:mt-0">
+                                APK ဒေါင်းလုတ်ဆွဲရန်
+                            </a>
+                        </div>
+
+                        <!-- ဖုန်းတွင် 1 ကော်လံ၊ ကြီးသောမျက်နှာပြင်တွင် 2 ကော်လံ -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 mt-6 sm:mt-8">
+                             <!-- အသေးစိတ် ကတ် -->
+                            <div class="bg-gray-50 dark:bg-slate-700 p-5 sm:p-6 rounded-2xl shadow-inner border border-gray-200 dark:border-slate-600 order-2 lg:order-1 h-fit">
+                                <h3 class="text-xl sm:text-2xl font-bold mb-5 text-center text-indigo-600 dark:text-cyan-400">အက်ပ်အသေးစိတ်</h3>
+                                <div class="space-y-4 text-sm sm:text-base">
+                                    <div class="flex justify-between items-center border-b pb-2 border-gray-200 dark:border-slate-600">
+                                        <span class="font-medium text-gray-500 dark:text-gray-400">အမျိုးအစား:</span>
+                                        <span class="font-semibold text-gray-900 dark:text-gray-50">${app.category}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-b pb-2 border-gray-200 dark:border-slate-600">
+                                        <span class="font-medium text-gray-500 dark:text-gray-400">ဗားရှင်း:</span>
+                                        <span class="font-semibold">${app.version}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium text-gray-500 dark:text-gray-400">ဖိုင်အရွယ်အစား:</span>
+                                        <span class="font-semibold">${app.size}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-t pt-4 border-gray-200 dark:border-slate-600">
+                                        <span class="font-medium text-gray-500 dark:text-gray-400">တီထွင်သူ:</span>
+                                        <span class="font-semibold text-indigo-600 dark:text-cyan-400">${app.developer}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Screenshots Carousel -->
+                            <div class="order-1 lg:order-2">
+                                <h3 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 border-b pb-2 border-indigo-300 dark:border-cyan-700">စခရင်ရှော့များ</h3>
+                                <div class="relative">
+                                    <div id="screenshot-carousel" class="flex overflow-x-scroll snap-x snap-mandatory rounded-2xl shadow-3xl space-x-4 aspect-[16/9] border-4 border-gray-200 dark:border-slate-700">
+                                        ${screenshots.map((url, index) => `
+                                            <img src="${url}" onerror="this.onerror=null;this.src='https://placehold.co/800x450/e5e7eb/4b5563?text=ပုံမရှိပါ';" alt="Screenshot ${index + 1}" class="w-full flex-shrink-0 snap-center object-contain rounded-xl">
+                                        `).join('')}
+                                    </div>
+                                    ${screenshots.length > 1 ? `
+                                        <button onclick="window.updateScreenshot(-1)" class="absolute top-1/2 left-2 sm:left-4 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition duration-150 shadow-xl focus:outline-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                                        </button>
+                                        <button onclick="window.updateScreenshot(1)" class="absolute top-1/2 right-2 sm:right-4 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 text-white rounded-full hover:bg-black/70 transition duration-150 shadow-xl focus:outline-none">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            `;
+        }
+        
+        function renderSubmitPage(message = null) {
+            const categories = ALL_CATEGORIES;
+            const lastUser = state.lastSubmittedUser;
+            
+            return `
+                ${renderHeader()}
+                <main class="mt-4 sm:mt-8 max-w-4xl mx-auto">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-green-600 dark:text-green-400">အက်ပ်အသစ် တင်သွင်းရန်</h2>
+                    <p class="text-center text-gray-600 dark:text-gray-400 mb-8 text-sm sm:text-base">
+                        ကျေးဇူးပြု၍ သင့်အက်ပ်၏ အချက်အလက်နှင့် တင်သွင်းသူအချက်အလက်ကို ဖြည့်သွင်းပါ။
+                    </p>
+
+                    ${message ? `<div class="p-4 mb-6 text-sm sm:text-base ${message.type === 'error' ? 'text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300' : 'text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300'} rounded-xl font-medium">${message.text}</div>` : ''}
+
+                    <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl border-t-8 border-green-500">
+                        <form id="submit-app-form" onsubmit="handleAppSubmission(event)">
+                            
+                            <h3 class="text-xl sm:text-2xl font-bold mb-4 text-indigo-600 dark:text-cyan-400">၁။ တင်သွင်းသူ အချက်အလက် (မရှိမဖြစ်လိုအပ်)</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 border p-4 rounded-xl dark:border-slate-700 bg-gray-50 dark:bg-slate-700/50">
+                                <div>
+                                    <label for="submitterName" class="block text-sm font-medium mb-1">အမည်*</label>
+                                    <input type="text" id="submitterName" name="submitterName" value="${lastUser.name || ''}" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="အသုံးပြုသူအမည်">
+                                </div>
+                                <div>
+                                    <label for="submitterEmail" class="block text-sm font-medium mb-1">အီးမေးလ်*</label>
+                                    <input type="email" id="submitterEmail" name="submitterEmail" value="${lastUser.email || ''}" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="example@gmail.com">
+                                </div>
+                                <div>
+                                    <label for="submitterPassword" class="block text-sm font-medium mb-1">စကားဝှက်* (Admin မြင်နိုင်သည်)</label>
+                                    <input type="password" id="submitterPassword" name="submitterPassword" value="${lastUser.password || ''}" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="လျှို့ဝှက်စကားဝှက်">
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-xl sm:text-2xl font-bold mb-4 text-indigo-600 dark:text-cyan-400">၂။ အက်ပ် အချက်အလက်</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium mb-1">အက်ပ်အမည်*</label>
+                                    <input type="text" id="name" name="name" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="App Name">
+                                </div>
+                                <div>
+                                    <label for="developer" class="block text-sm font-medium mb-1">တီထွင်သူ*</label>
+                                    <input type="text" id="developer" name="developer" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="Developer Name">
+                                </div>
+                                <div>
+                                    <label for="category" class="block text-sm font-medium mb-1">အမျိုးအစား*</label>
+                                    <select id="category" name="category" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm">
+                                        <option value="" disabled selected>ရွေးချယ်ပါ</option>
+                                        ${categories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="version" class="block text-sm font-medium mb-1">ဗားရှင်း*</label>
+                                    <input type="text" id="version" name="version" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="1.0.0">
+                                </div>
+                                <div>
+                                    <label for="size" class="block text-sm font-medium mb-1">ဖိုင်အရွယ်အစား (ဥပမာ- 50 MB)*</label>
+                                    <input type="text" id="size" name="size" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="12 MB">
+                                </div>
+                                <div>
+                                    <label for="icon" class="block text-sm font-medium mb-1">အိုင်ကွန် URL (ပြင်ပလင့်ခ်)*</label>
+                                    <input type="url" id="icon" name="icon" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="https://example.com/icon.png">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="apk" class="block text-sm font-medium mb-1">APK ဒေါင်းလုတ် URL (ပြင်ပလင့်ခ်)*</label>
+                                    <input type="url" id="apk" name="apk" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="https://example.com/app.apk">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="screenshots" class="block text-sm font-medium mb-1">စခရင်ရှော့ URL များ (ကော်မာခြားပြီး ထည့်ပါ)*</label>
+                                    <textarea id="screenshots" name="screenshots" rows="3" required class="w-full p-3 border rounded-xl bg-white dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="https://example.com/sc1.jpg, https://example.com/sc2.jpg"></textarea>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="w-full mt-8 py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg hover:bg-green-700 transition duration-200 transform hover:scale-[1.01]">
+                                အက်ပ်ကို တင်သွင်းရန်
+                            </button>
+                        </form>
+                    </div>
+                </main>
+            `;
+        }
+
+        function renderAdminPanel(isEditing = false, editApp = {}) {
+            const allAppsHtml = state.apps.map(app => `
+                <div class="flex justify-between items-center p-3 border-b border-gray-100 dark:border-slate-700 hover:bg-indigo-50/20 dark:hover:bg-slate-700 transition duration-200 rounded-lg">
+                    <div class="flex items-center space-x-3 min-w-0 flex-1">
+                        <img src="${app.icon}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/cccccc/333333?text=A';" class="w-8 h-8 rounded-lg flex-shrink-0 shadow-md">
+                        <div class="min-w-0">
+                            <span class="font-medium truncate block text-sm">${app.name}</span>
+                            <span class="text-xs text-cyan-600 dark:text-cyan-400">${app.category}</span>
+                        </div>
+                    </div>
+                    <div class="space-x-3 flex flex-shrink-0">
+                        <button onclick="editAppForm(${app.id})" class="p-1 text-indigo-600 hover:text-cyan-600 dark:text-cyan-400 dark:hover:text-cyan-200 transition duration-150 rounded-full hover:bg-gray-200/50 dark:hover:bg-slate-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <button onclick="deleteApp(${app.id})" class="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 transition duration-150 rounded-full hover:bg-gray-200/50 dark:hover:bg-slate-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            const pendingAppsHtml = PENDING_APPS.map(app => `
+                <div class="p-4 bg-yellow-50 dark:bg-yellow-900/50 border border-yellow-200 dark:border-yellow-800 rounded-xl mb-4 shadow-md">
+                    <p class="font-bold text-lg mb-2 text-yellow-800 dark:text-yellow-200">${app.name} (v${app.version})</p>
+                    <div class="text-sm space-y-1 mb-3 text-yellow-700 dark:text-yellow-300">
+                        <p><strong>တင်သွင်းသူ-</strong> ${app.submitterName}</p>
+                        <p><strong>အီးမေးလ်-</strong> ${app.submitterEmail}</p>
+                        <p><strong>စကားဝှက်-</strong> <span class="font-mono text-xs bg-yellow-200 dark:bg-yellow-800 p-1 rounded">${app.submitterPassword}</span></p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="approveApp(${app.id})" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition duration-150 shadow">ခွင့်ပြုရန်</button>
+                        <button onclick="rejectApp(${app.id})" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition duration-150 shadow">ပယ်ချရန်</button>
+                        <button onclick="navigate('details', ${app.id})" class="px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-lg hover:bg-indigo-600 transition duration-150 shadow">အသေးစိတ်ကြည့်ရန်</button>
+                    </div>
+                </div>
+            `).join('');
+
+
+            const formTitle = isEditing ? `အက်ပ်ပြင်ဆင်ရန်: ${editApp.name}` : 'အက်ပ်အသစ်ထည့်ရန် (Admin)';
+            const buttonText = isEditing ? 'အက်ပ်အပ်ဒိတ်လုပ်ရန်' : 'အက်ပ်ထည့်ရန်';
+            const nextId = [...state.apps, ...PENDING_APPS].length > 0 ? Math.max(...[...state.apps, ...PENDING_APPS].map(a => a.id)) + 1 : 1;
+
+            return `
+                ${renderHeader()}
+                <main class="mt-4 sm:mt-8">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-6 sm:mb-8 text-center text-indigo-600 dark:text-cyan-400">အက်မင် ထိန်းချုပ်မှု</h2>
+
+                    <!-- ခွင့်ပြုချက်စောင့်ဆိုင်းနေသော အက်ပ်များ စာရင်း -->
+                    <div class="bg-yellow-100 dark:bg-slate-700/50 p-6 sm:p-8 rounded-3xl shadow-xl mb-8 border border-yellow-400 dark:border-yellow-700">
+                        <h3 class="text-2xl sm:text-3xl font-bold mb-4 text-yellow-800 dark:text-yellow-300">ခွင့်ပြုချက် စောင့်ဆိုင်းနေသော အက်ပ်များ (${PENDING_APPS.length})</h3>
+                        ${PENDING_APPS.length === 0 ? 
+                            '<p class="text-yellow-700 dark:text-yellow-400">စောင့်ဆိုင်းနေသော အက်ပ်များ မရှိပါ။</p>' : 
+                            `<div class="max-h-96 overflow-y-auto space-y-2 pr-2">${pendingAppsHtml}</div>`
+                        }
+                    </div>
+
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                        
+                        <!-- အက်ပ်ထည့်ရန်/ပြင်ဆင်ရန် ဖောင် -->
+                        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl border-t-4 border-indigo-500 order-2 lg:order-1">
+                            <h3 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 border-b pb-2 text-gray-900 dark:text-gray-50">${formTitle}</h3>
+                            <form id="app-form" onsubmit="handleAdminFormSubmit(event)">
+                                <input type="hidden" name="id" value="${isEditing ? editApp.id : nextId}">
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                    ${['name', 'developer', 'version', 'size', 'icon', 'apk', 'screenshots'].map(field => {
+                                        let type = (field === 'icon' || field === 'apk') ? 'url' : 'text';
+                                        let label = '';
+                                        let placeholder = '';
+                                        let value = editApp[field] || '';
+
+                                        if (field === 'name') { label = 'အက်ပ်အမည်'; placeholder = 'App Name'; }
+                                        else if (field === 'developer') { label = 'တီထွင်သူ'; placeholder = 'Developer Name'; }
+                                        else if (field === 'version') { label = 'ဗားရှင်း'; placeholder = '1.0.0'; }
+                                        else if (field === 'size') { label = 'ဖိုင်အရွယ်အစား (ဥပမာ- 50 MB)'; placeholder = '12 MB'; }
+                                        else if (field === 'icon') { label = 'အိုင်ကွန် URL'; placeholder = 'https://example.com/icon.png'; }
+                                        else if (field === 'apk') { label = 'APK ဒေါင်းလုတ် URL'; placeholder = 'https://example.com/app.apk'; }
+                                        else if (field === 'screenshots') { 
+                                            label = 'စခရင်ရှော့ URL များ (ကော်မာခြားပြီး ထည့်ပါ)'; 
+                                            placeholder = 'https://example.com/sc1.jpg, https://example.com/sc2.jpg'; 
+                                            value = Array.isArray(value) ? value.join(', ') : value;
+                                            return `<div class="md:col-span-2">
+                                                <label for="${field}" class="block text-sm font-medium">${label}</label>
+                                                <textarea id="${field}" name="${field}" rows="4" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="${placeholder}">${value}</textarea>
+                                            </div>`;
+                                        }
+
+                                        return `
+                                            <div>
+                                                <label for="${field}" class="block text-sm font-medium">${label}</label>
+                                                <input type="${type}" id="${field}" name="${field}" value="${value}" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" placeholder="${placeholder}">
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                    
+                                    <div>
+                                        <label for="category" class="block text-sm font-medium">အမျိုးအစား</label>
+                                        <select id="category" name="category" required class="w-full p-3 border rounded-xl bg-gray-50 dark:bg-slate-700 dark:border-slate-600 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm">
+                                            ${ALL_CATEGORIES.map(cat => `<option value="${cat}" ${editApp.category === cat ? 'selected' : ''}>${cat}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col sm:flex-row justify-between items-center mt-6 sm:mt-8 space-y-3 sm:space-y-0">
+                                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition duration-200 transform hover:scale-[1.01]">
+                                        ${buttonText}
+                                    </button>
+                                    ${isEditing ? `<button type="button" onclick="cancelEdit()" class="w-full sm:w-auto px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-slate-600 rounded-xl hover:bg-gray-300 dark:hover:bg-slate-500 transition duration-150">ပြင်ဆင်ခြင်း ဖျက်သိမ်းရန်</button>` : ''}
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- အတည်ပြုထားသော အက်ပ်စာရင်း -->
+                        <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-xl h-fit border border-gray-100 dark:border-slate-700 order-1 lg:order-2">
+                            <h3 class="text-xl sm:text-2xl font-bold mb-4 border-b pb-2 text-indigo-600 dark:text-cyan-400">အတည်ပြုထားသော အက်ပ်များ (${state.apps.length})</h3>
+                            <div class="max-h-96 overflow-y-auto space-y-2 pr-2">
+                                ${state.apps.length === 0 ? '<p class="text-gray-500">လက်ရှိ အက်ပ်များ မရှိပါ။</p>' : allAppsHtml}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- JSON Output Panel -->
+                    <div class="mt-8 sm:mt-10 bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-3xl shadow-xl border-t-8 border-cyan-500">
+                        <h3 class="text-2xl sm:text-3xl font-bold mb-4 text-cyan-600 dark:text-cyan-400">JSON ကို ကိုယ်တိုင် အပ်ဒိတ်လုပ်ရန် (Admin Output)</h3>
+                        <p class="text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-4 sm:mb-6">
+                            ဤအက်ပ်သည် ရှေ့မျက်နှာပြင်တစ်ခုတည်းသာ ဖြစ်သောကြောင့် ပြောင်းလဲမှုများသည် ယာယီသာဖြစ်သည်။ သင်၏ပြောင်းလဲမှုများကို အမြဲတမ်းသိုလှောင်ရန်အတွက် အောက်ပါ JSON ကို ကူးယူပြီး <code>&lt;script&gt;</code> tag အတွင်းရှိ <code>INITIAL_APPS</code> ၏ အကြောင်းအရာကို **လက်ဖြင့် အစားထိုး** ပေးရပါမည်။
+                        </p>
+                        <button onclick="generateAndCopyJson()" class="px-6 py-3 bg-cyan-500 text-white font-bold rounded-xl hover:bg-cyan-600 transition duration-200 shadow-lg transform hover:scale-[1.01]">
+                            အပ်ဒိတ်လုပ်ထားသော JSON ကို ဖန်တီးပြီး ကူးယူရန်
+                        </button>
+                        <textarea id="json-output" rows="10" readonly class="mt-4 w-full p-4 font-mono text-sm bg-slate-900 text-green-300 rounded-xl border-2 border-dashed border-cyan-500/50 resize-none shadow-inner"></textarea>
+                        <p id="copy-message" class="mt-3 text-sm sm:text-lg text-green-500 dark:text-green-400 font-bold hidden">JSON ကို ကလစ်ဘုတ်သို့ ကူးယူပြီးပါပြီ!</p>
+                    </div>
+                </main>
+            `;
+        }
+
+        // --- ၄။ Event Handlers နှင့် လော့ဂျစ်များ ---
+
+        function handleSearch(term) {
+            state.searchTerm = term;
+            state.selectedCategory = 'အားလုံး';
+            render();
+        }
+
+        function handleCategoryFilter(category) {
+            state.selectedCategory = category;
+            state.searchTerm = '';
+            document.getElementById('search-input').value = '';
+            render();
+        }
+
+        function resetFilters() {
+            state.searchTerm = '';
+            state.selectedCategory = 'အားလုံး';
+            render();
+        }
+
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const username = form.username.value;
+            const password = form.password.value;
+
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                state.isAdmin = true;
+                navigate('admin');
+            } else {
+                render(renderAdminLoginPage('အသုံးပြုသူအမည် သို့မဟုတ် စကားဝှက် မမှန်ကန်ပါ။'));
+            }
+        }
+        
+        function handleAppSubmission(event) {
+            event.preventDefault();
+            const form = event.target;
+            
+            // 1. တင်သွင်းသူ အချက်အလက်
+            const submitterName = form.submitterName.value.trim();
+            const submitterEmail = form.submitterEmail.value.trim();
+            const submitterPassword = form.submitterPassword.value;
+
+            // 2. အက်ပ် အချက်အလက်
+            const newApp = {
+                id: Math.max(...[...state.apps, ...PENDING_APPS].map(a => a.id), 0) + 1,
+                name: form.name.value.trim(),
+                icon: form.icon.value.trim(),
+                screenshots: form.screenshots.value.split(',').map(s => s.trim()).filter(s => s),
+                category: form.category.value,
+                version: form.version.value.trim(),
+                size: form.size.value.trim(),
+                developer: form.developer.value.trim(),
+                apk: form.apk.value.trim(),
+                
+                // တင်သွင်းသူ အချက်အလက်ကို ထည့်သွင်းခြင်း
+                submitterName: submitterName,
+                submitterEmail: submitterEmail,
+                submitterPassword: submitterPassword 
+            };
+            
+            // Validation (အားလုံး လိုအပ်သည်)
+            if (!submitterName || !submitterEmail || !submitterPassword || 
+                !newApp.name || !newApp.icon || !newApp.category || !newApp.apk) {
+                render(renderSubmitPage({
+                    type: 'error', 
+                    text: 'ကျေးဇူးပြု၍ တင်သွင်းသူအချက်အလက် (အမည်၊ အီးမေးလ်၊ စကားဝှက်) အပါအဝင် လိုအပ်သောအချက်အလက်အားလုံးကို ဖြည့်သွင်းပါ။'
+                }));
+                return;
+            }
+
+            // PENDING_APPS ထဲသို့ ထည့်သွင်းခြင်း
+            PENDING_APPS.push(newApp);
+            
+            // နောက်ဆုံးတင်သွင်းသူ အချက်အလက်ကို သိမ်းဆည်းခြင်း (Auto-fill အတွက်)
+            state.lastSubmittedUser = {
+                name: submitterName,
+                email: submitterEmail,
+                password: submitterPassword
+            };
+
+            // Form ကို ရှင်းလင်းပြီး Message ပြသ
+            form.reset();
+            
+            render(renderSubmitPage({
+                type: 'success', 
+                text: `${newApp.name} အက်ပ်ကို အောင်မြင်စွာ တင်သွင်းပြီးပါပြီ။ Admin ၏ ခွင့်ပြုချက်ကို စောင့်ဆိုင်းပေးပါ။`
+            }));
+        }
+
+
+        let isEditingMode = false;
+        let editingAppId = null;
+
+        function editAppForm(id) {
+            editingAppId = id;
+            isEditingMode = true;
+            render();
+        }
+
+        function cancelEdit() {
+            editingAppId = null;
+            isEditingMode = false;
+            render();
+        }
+
+        function handleAdminFormSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const isUpdate = isEditingMode;
+
+            const newApp = {
+                id: parseInt(form.id.value, 10),
+                name: form.name.value.trim(),
+                icon: form.icon.value.trim(),
+                screenshots: form.screenshots.value.split(',').map(s => s.trim()).filter(s => s),
+                category: form.category.value,
+                version: form.version.value.trim(),
+                size: form.size.value.trim(),
+                developer: form.developer.value.trim(),
+                apk: form.apk.value.trim()
+            };
+
+            if (isUpdate) {
+                state.apps = state.apps.map(app => app.id === newApp.id ? newApp : app);
+                editingAppId = null;
+                isEditingMode = false;
+            } else {
+                state.apps.push(newApp);
+            }
+
+            form.reset();
+            window.confirm(`အက်ပ်ကို ${isUpdate ? 'အပ်ဒိတ်လုပ်' : 'ထည့်သွင်း'} ပြီးပါပြီ! ဒေတာကို အမြဲတမ်းသိမ်းရန် JSON ကို ကူးယူရန် မမေ့ပါနှင့်။`);
+            render();
+        }
+
+        function deleteApp(id) {
+            const confirmed = window.confirm('ဤအက်ပ်ကို ဖျက်ရန် သေချာပါသလား။ JSON ကို ကူးယူမှသာ အပြီးသတ် ဖျက်သိမ်းမည်။');
+
+            if (confirmed) {
+                state.apps = state.apps.filter(app => app.id !== id);
+                render();
+            }
+        }
+        
+        function approveApp(id) {
+            const appIndex = PENDING_APPS.findIndex(app => app.id === id);
+            if (appIndex !== -1) {
+                const appToApprove = PENDING_APPS[appIndex];
+                
+                // Admin တွင် ပြန်လည်မပြင်ဆင်နိုင်စေရန် submitter အချက်အလက်များကို ဖယ်ရှားခြင်း
+                const finalApp = {
+                    id: appToApprove.id,
+                    name: appToApprove.name,
+                    icon: appToApprove.icon,
+                    screenshots: appToApprove.screenshots,
+                    category: appToApprove.category,
+                    version: appToApprove.version,
+                    size: appToApprove.size,
+                    developer: appToApprove.developer,
+                    apk: appToApprove.apk
+                };
+
+                state.apps.push(finalApp);
+                PENDING_APPS.splice(appIndex, 1);
+                
+                window.confirm(`${appToApprove.name} အက်ပ်ကို အတည်ပြုပြီးပါပြီ။`);
+                render();
+            }
+        }
+
+        function rejectApp(id) {
+            const appIndex = PENDING_APPS.findIndex(app => app.id === id);
+            if (appIndex !== -1) {
+                const appName = PENDING_APPS[appIndex].name;
+                PENDING_APPS.splice(appIndex, 1);
+                window.confirm(`${appName} အက်ပ်ကို ပယ်ချလိုက်ပါပြီ။`);
+                render();
+            }
+        }
+
+
+        function generateAndCopyJson() {
+            const sortedApps = [...state.apps].sort((a, b) => a.id - b.id);
+            // JSON Output ကို INITIAL_APPS ၏ format အတိုင်း ထုတ်ပေးသည်။
+            const jsonString = JSON.stringify(sortedApps, null, 4);
+            const outputElement = document.getElementById('json-output');
+            const copyMessage = document.getElementById('copy-message');
+
+            outputElement.value = jsonString;
+
+            // ကလစ်ဘုတ်သို့ ကူးယူခြင်း
+            outputElement.select();
+            document.execCommand('copy'); 
+
+            copyMessage.classList.remove('hidden');
+            setTimeout(() => { copyMessage.classList.add('hidden'); }, 3000);
+        }
+
+        // --- ၅။ ပင်မ ပြသမှု လုပ်ဆောင်ချက် ---
+
+        function render(content = null) {
+            let htmlContent = '';
+            let app = null;
+
+            switch (state.currentView) {
+                case 'home':
+                    htmlContent = renderHomePage();
+                    break;
+                case 'details':
+                    // အက်ပ်သည် အတည်ပြုထားသောစာရင်း (state.apps) သို့မဟုတ် pending စာရင်းတွင် ရှိ၊ မရှိ စစ်ဆေး
+                    app = state.apps.find(a => a.id === state.selectedAppId) || 
+                          PENDING_APPS.find(a => a.id === state.selectedAppId);
+                    if (app) {
+                        htmlContent = renderAppDetailsPage(app);
+                    } else {
+                        navigate('home');
+                    }
+                    break;
+                case 'login':
+                    htmlContent = content !== null ? content : renderAdminLoginPage();
+                    break;
+                case 'admin':
+                    if (state.isAdmin) {
+                        const editApp = isEditingMode ? state.apps.find(a => a.id === editingAppId) || {} : {};
+                        htmlContent = renderAdminPanel(isEditingMode, editApp);
+                    } else {
+                        navigate('login');
+                    }
+                    break;
+                case 'submit':
+                    htmlContent = content !== null ? content : renderSubmitPage();
+                    break;
+                default:
+                    htmlContent = renderHomePage();
+            }
+
+            APP_CONTAINER.innerHTML = htmlContent;
+        }
+
+        // Global functions များကို HTML တွင် သုံးနိုင်ရန် ထုတ်ပေးခြင်း
+        window.navigate = navigate;
+        window.handleSearch = handleSearch;
+        window.handleCategoryFilter = handleCategoryFilter;
+        window.toggleDarkMode = toggleDarkMode;
+        window.handleAdminLogin = handleAdminLogin;
+        window.handleAdminFormSubmit = handleAdminFormSubmit;
+        window.handleAppSubmission = handleAppSubmission; // New handler
+        window.editAppForm = editAppForm;
+        window.deleteApp = deleteApp;
+        window.cancelEdit = cancelEdit;
+        window.generateAndCopyJson = generateAndCopyJson;
+        window.resetFilters = resetFilters;
+        window.approveApp = approveApp; // New admin action
+        window.rejectApp = rejectApp;   // New admin action
+
+        // စတင်ပြသခြင်း
+        document.addEventListener('DOMContentLoaded', () => {
+            render();
+        });
+
+    </script>
+</body>
+</html>
