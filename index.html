@@ -40,8 +40,7 @@
         signInWithEmailAndPassword, 
         createUserWithEmailAndPassword, 
         signOut, 
-        GoogleAuthProvider, 
-        signInWithPopup,
+        // ❌ GoogleAuthProvider and signInWithPopup are REMOVED 
         signInAnonymously,
         signInWithCustomToken
     } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
@@ -80,9 +79,8 @@
 
     // Global Constants
     const sharedAppsCollectionPath = "sharedApps";
-    // 🔥 UPDATED ADMIN EMAIL
     const adminEmail = "c388925@gmail.com"; 
-    const initialAuthToken = null; // Set this if using a custom token on load
+    const initialAuthToken = null; 
 
     // =================================================================
     // 3. GLOBAL STATE & TRANSLATIONS
@@ -90,30 +88,29 @@
 
     const translations = {
         en: {
-            APP_TITLE: "ShareApp Store", HOME: "Home", UPLOAD: "Upload", PROFILE: "Profile", SETTINGS: "Settings", ADMIN: "Admin", SIGN_IN: "Sign In", SIGN_UP: "Sign Up", SIGN_OUT: "Sign Out", PASSWORD: "Password", EMAIL: "Email", NO_ACCOUNT: "Need an account? Sign Up", ACCOUNT_LOGIN: "Already have an account? Sign In", OR: "OR", SIGN_IN_WITH_GOOGLE: "Sign in with Google", SECRET_CODE: "Your secret code", DEVELOPER_NOTE: "Note: For demonstration, a placeholder account is used. Please use the Google button.", USER_ID: "User ID", NOT_LOGGED_IN: "Not Logged In", PENDING: "Pending Review", APPROVED: "Approved", DOWNLOAD_OR_OPEN: "Get App", NO_APPS_YET: "No approved apps yet. Be the first to submit!", CATEGORIES: "Categories", ALL: "All", GAMES: "Games", SOCIAL: "Social", PRODUCTIVITY: "Productivity", ENTERTAINMENT: "Entertainment", SEARCH_PLACEHOLDER: "Search for apps...", LATEST_APPS: "Latest Shared Apps", SUBMITTED_BY: "Submitted by", SUBMITTED_DATE: "Date", UNKNOWN: "Unknown", APP_INFO: "App Submission", APP_NAME: "App Name", APP_ICON_LINK: "Icon URL", APP_LINK: "App Link (Play Store, etc.)", CATEGORY: "Category", SELECT_CATEGORY: "Select Category", SUBMIT_APP: "Submit App", LOGIN_REQUIRED: "You must sign in to submit an app.", UPLOAD_SUCCESS: "Upload Successful!", UPLOAD_FAILED: "Upload Failed", DATA_FETCH_FAILED: "Failed to fetch data.", SETTING_THEME: "Theme Settings", LIGHT_MODE: "Light Mode", DARK_MODE: "Dark Mode", THEME_APPLIED: "Theme applied.", SETTING_LANGUAGE: "Language", LANGUAGE_APPLIED: "Language applied.", NO_NAME: "No Name", NO_EMAIL: "No Email", EMAIL_PASSWORD: "Email/Password", YOUR_SUBMISSIONS: "Your Submissions", NO_SUBMISSIONS_YET: "You have not submitted any apps yet.", ACCESS_DENIED: "Access Denied", ACCESS_DENIED_MESSAGE: "You do not have administrative privileges.", ADMIN_AREA: "Moderation Queue", SUBMISSIONS: "Submissions", UNAPPROVE: "Unapprove", APPROVE: "Approve", EDIT_APP: "Edit App Details", SAVE_CHANGES: "Save Changes", CANCEL: "Cancel"
+            APP_TITLE: "ShareApp Store", HOME: "Home", UPLOAD: "Upload", PROFILE: "Profile", SETTINGS: "Settings", ADMIN: "Admin", SIGN_IN: "Sign In", SIGN_UP: "Sign Up", SIGN_OUT: "Sign Out", PASSWORD: "Password", EMAIL: "Email", NO_ACCOUNT: "Need an account? Sign Up", ACCOUNT_LOGIN: "Already have an account? Sign In", OR: "OR", SIGN_IN_WITH_GOOGLE: "Sign in with Google", SECRET_CODE: "Your secret code", DEVELOPER_NOTE: "Note: Please use the Email/Password fields to sign in.", USER_ID: "User ID", NOT_LOGGED_IN: "Not Logged In", PENDING: "Pending Review", APPROVED: "Approved", DOWNLOAD_OR_OPEN: "Get App", NO_APPS_YET: "No approved apps yet. Be the first to submit!", CATEGORIES: "Categories", ALL: "All", GAMES: "Games", SOCIAL: "Social", PRODUCTIVITY: "Productivity", ENTERTAINMENT: "Entertainment", SEARCH_PLACEHOLDER: "Search for apps...", LATEST_APPS: "Latest Shared Apps", SUBMITTED_BY: "Submitted by", SUBMITTED_DATE: "Date", UNKNOWN: "Unknown", APP_INFO: "App Submission", APP_NAME: "App Name", APP_ICON_LINK: "Icon URL", APP_LINK: "App Link (Play Store, etc.)", CATEGORY: "Category", SELECT_CATEGORY: "Select Category", SUBMIT_APP: "Submit App", LOGIN_REQUIRED: "You must sign in to submit an app.", UPLOAD_SUCCESS: "Upload Successful!", UPLOAD_FAILED: "Upload Failed", DATA_FETCH_FAILED: "Failed to fetch data.", SETTING_THEME: "Theme Settings", LIGHT_MODE: "Light Mode", DARK_MODE: "Dark Mode", THEME_APPLIED: "Theme applied.", SETTING_LANGUAGE: "Language", LANGUAGE_APPLIED: "Language applied.", NO_NAME: "No Name", NO_EMAIL: "No Email", EMAIL_PASSWORD: "Email/Password", YOUR_SUBMISSIONS: "Your Submissions", NO_SUBMISSIONS_YET: "You have not submitted any apps yet.", ACCESS_DENIED: "Access Denied", ACCESS_DENIED_MESSAGE: "You do not have administrative privileges.", ADMIN_AREA: "Moderation Queue", SUBMISSIONS: "Submissions", UNAPPROVE: "Unapprove", APPROVE: "Approve", EDIT_APP: "Edit App Details", SAVE_CHANGES: "Save Changes", CANCEL: "Cancel"
         },
         my: {
-            APP_TITLE: "ShareApp စတိုး", HOME: "ပင်မ", UPLOAD: "တင်သွင်းရန်", PROFILE: "ပရိုဖိုင်", SETTINGS: "ချိန်ညှိချက်များ", ADMIN: "စီမံခန့်ခွဲသူ", SIGN_IN: "ဝင်ရောက်ရန်", SIGN_UP: "အကောင့်ဖွင့်ရန်", SIGN_OUT: "အကောင့်ထွက်ရန်", PASSWORD: "လျှို့ဝှက်နံပါတ်", EMAIL: "အီးမေးလ်", NO_ACCOUNT: "အကောင့်မရှိဘူးလား။ အကောင့်ဖွင့်ပါ", ACCOUNT_LOGIN: "အကောင့်ရှိပြီးသားလား။ ဝင်ရောက်ပါ", OR: "သို့မဟုတ်", SIGN_IN_WITH_GOOGLE: "Google ဖြင့် ဝင်ရောက်ရန်", SECRET_CODE: "လျှို့ဝှက်နံပါတ်", DEVELOPER_NOTE: "သတိပေးချက်- မြန်မာနိုင်ငံသားများအတွက်အထိကရည်ရွယ်ပါသည်။", USER_ID: "အသုံးပြုသူ ID", NOT_LOGGED_IN: "မဝင်ရောက်ရသေးပါ", PENDING: "စောင့်ဆိုင်းဆဲ", APPROVED: "ခွင့်ပြုပြီး", DOWNLOAD_OR_OPEN: "App ရယူရန်", NO_APPS_YET: "ခွင့်ပြုထားသော App မရှိသေးပါ။ ပထမဆုံးတင်သွင်းသူ ဖြစ်ပါစေ။", CATEGORIES: "အမျိုးအစားများ", ALL: "အားလုံး", GAMES: "ဂိမ်း", SOCIAL: "လူမှုကွန်ရက်", PRODUCTIVITY: "အလုပ်စွမ်းဆောင်ရည်", ENTERTAINMENT: "ဖျော်ဖြေရေး", SEARCH_PLACEHOLDER: "Apps များ ရှာဖွေပါ...", LATEST_APPS: "နောက်ဆုံးတင်သွင်းသော Apps များ", SUBMITTED_BY: "တင်သွင်းသူ", SUBMITTED_DATE: "တင်သွင်းသည့်နေ့", UNKNOWN: "မသိရှိရ", APP_INFO: "App အချက်အလက်", APP_NAME: "App အမည်", APP_ICON_LINK: "Icon လင့်ခ်", APP_LINK: "App လင့်ခ် (Play Store, etc.)", CATEGORY: "အမျိုးအစား", SELECT_CATEGORY: "အမျိုးအစား ရွေးပါ", SUBMIT_APP: "App တင်သွင်းရန်", LOGIN_REQUIRED: "App တင်သွင်းရန်အတွက် ဝင်ရောက်ရန်လိုအပ်သည်။", UPLOAD_SUCCESS: "တင်သွင်းမှု အောင်မြင်ပါသည်!", UPLOAD_FAILED: "တင်သွင်းမှု မအောင်မြင်ပါ", DATA_FETCH_FAILED: "ဒေတာရယူရာတွင် အမှားဖြစ်ခဲ့သည်။", SETTING_THEME: "Theme ချိန်ညှိချက်များ", LIGHT_MODE: "အလင်းရောင် Theme", DARK_MODE: "အမှောင် Theme", THEME_APPLIED: "Theme ပြောင်းလဲပြီးပါပြီ။", SETTING_LANGUAGE: "ဘာသာစကား", LANGUAGE_APPLIED: "ဘာသာစကား ပြောင်းလဲပြီးပါပြီ။", NO_NAME: "အမည်မရှိ", NO_EMAIL: "အီးမေးလ်မရှိ", EMAIL_PASSWORD: "အီးမေးလ်/စကားဝှက်", YOUR_SUBMISSIONS: "သင်တင်သွင်းခဲ့သော Apps များ", NO_SUBMISSIONS_YET: "သင် App တစ်ခုမှ တင်သွင်းရသေးခြင်း မရှိပါ။", ACCESS_DENIED: "ဝင်ရောက်ခွင့် မပြုပါ", ACCESS_DENIED_MESSAGE: "သင့်တွင် စီမံခန့်ခွဲသူ အခွင့်အရေး မရှိပါ။", ADMIN_AREA: "စီမံခန့်ခွဲမှု", SUBMISSIONS: "တင်သွင်းမှုများ", UNAPPROVE: "ခွင့်ပြုချက် ရုပ်သိမ်း", APPROVE: "ခွင့်ပြုရန်", EDIT_APP: "App အချက်အလက် ပြင်ဆင်ရန်", SAVE_CHANGES: "အပြောင်းအလဲများ သိမ်းဆည်း", CANCEL: "ပယ်ဖျက်မည်"
+            APP_TITLE: "ShareApp စတိုး", HOME: "ပင်မ", UPLOAD: "တင်သွင်းရန်", PROFILE: "ပရိုဖိုင်", SETTINGS: "ချိန်ညှိချက်များ", ADMIN: "စီမံခန့်ခွဲသူ", SIGN_IN: "ဝင်ရောက်ရန်", SIGN_UP: "အကောင့်ဖွင့်ရန်", SIGN_OUT: "အကောင့်ထွက်ရန်", PASSWORD: "လျှို့ဝှက်နံပါတ်", EMAIL: "အီးမေးလ်", NO_ACCOUNT: "အကောင့်မရှိဘူးလား။ အကောင့်ဖွင့်ပါ", ACCOUNT_LOGIN: "အကောင့်ရှိပြီးသားလား။ ဝင်ရောက်ပါ", OR: "သို့မဟုတ်", SIGN_IN_WITH_GOOGLE: "Google ဖြင့် ဝင်ရောက်ရန်", SECRET_CODE: "လျှို့ဝှက်နံပါတ်", DEVELOPER_NOTE: "သတိပေးချက်- အီးမေးလ်/စကားဝှက်ဖြည့်ပြီး ဝင်ရောက်ပါ။", USER_ID: "အသုံးပြုသူ ID", NOT_LOGGED_IN: "မဝင်ရောက်ရသေးပါ", PENDING: "စောင့်ဆိုင်းဆဲ", APPROVED: "ခွင့်ပြုပြီး", DOWNLOAD_OR_OPEN: "App ရယူရန်", NO_APPS_YET: "ခွင့်ပြုထားသော App မရှိသေးပါ။ ပထမဆုံးတင်သွင်းသူ ဖြစ်ပါစေ။", CATEGORIES: "အမျိုးအစားများ", ALL: "အားလုံး", GAMES: "ဂိမ်း", SOCIAL: "လူမှုကွန်ရက်", PRODUCTIVITY: "အလုပ်စွမ်းဆောင်ရည်", ENTERTAINMENT: "ဖျော်ဖြေရေး", SEARCH_PLACEHOLDER: "Apps များ ရှာဖွေပါ...", LATEST_APPS: "နောက်ဆုံးတင်သွင်းသော Apps များ", SUBMITTED_BY: "တင်သွင်းသူ", SUBMITTED_DATE: "တင်သွင်းသည့်နေ့", UNKNOWN: "မသိရှိရ", APP_INFO: "App အချက်အလက်", APP_NAME: "App အမည်", APP_ICON_LINK: "Icon လင့်ခ်", APP_LINK: "App လင့်ခ် (Play Store, etc.)", CATEGORY: "အမျိုးအစား", SELECT_CATEGORY: "အမျိုးအစား ရွေးပါ", SUBMIT_APP: "App တင်သွင်းရန်", LOGIN_REQUIRED: "App တင်သွင်းရန်အတွက် ဝင်ရောက်ရန်လိုအပ်သည်။", UPLOAD_SUCCESS: "တင်သွင်းမှု အောင်မြင်ပါသည်!", UPLOAD_FAILED: "တင်သွင်းမှု မအောင်မြင်ပါ", DATA_FETCH_FAILED: "ဒေတာရယူရာတွင် အမှားဖြစ်ခဲ့သည်။", SETTING_THEME: "Theme ချိန်ညှိချက်များ", LIGHT_MODE: "အလင်းရောင် Theme", DARK_MODE: "အမှောင် Theme", THEME_APPLIED: "Theme ပြောင်းလဲပြီးပါပြီ။", SETTING_LANGUAGE: "ဘာသာစကား", LANGUAGE_APPLIED: "ဘာသာစကား ပြောင်းလဲပြီးပါပြီ။", NO_NAME: "အမည်မရှိ", NO_EMAIL: "အီးမေးလ်မရှိ", EMAIL_PASSWORD: "အီးမေးလ်/စကားဝှက်", YOUR_SUBMISSIONS: "သင်တင်သွင်းခဲ့သော Apps များ", NO_SUBMISSIONS_YET: "သင် App တစ်ခုမှ တင်သွင်းရသေးခြင်း မရှိပါ။", ACCESS_DENIED: "ဝင်ရောက်ခွင့် မပြုပါ", ACCESS_DENIED_MESSAGE: "သင့်တွင် စီမံခန့်ခွဲသူ အခွင့်အရေး မရှိပါ။", ADMIN_AREA: "စီမံခန့်ခွဲမှု", SUBMISSIONS: "တင်သွင်းမှုများ", UNAPPROVE: "ခွင့်ပြုချက် ရုပ်သိမ်း", APPROVE: "ခွင့်ပြုရန်", EDIT_APP: "App အချက်အလက် ပြင်ဆင်ရန်", SAVE_CHANGES: "အပြောင်းအလဲများ သိမ်းဆည်း", CANCEL: "ပယ်ဖျက်မည်"
         },
-        // Thai and Chinese translations are omitted for brevity
     };
 
     let currentState = {
-        view: 'home', // 'home', 'upload', 'profile', 'admin', 'settings', 'login', 'signup'
-        authMode: 'login', // 'login' or 'signup'
-        user: null, // Firebase user object
+        view: 'home', 
+        authMode: 'login', 
+        user: null, 
         userId: null,
         isAuthReady: false,
-        sharedApps: [], // Array of { id, name, link, isApproved, ... }
-        theme: localStorage.getItem('theme') || 'light', // 'light' or 'dark'
-        language: localStorage.getItem('language') || 'my', // 'my', 'en', 'th', 'zh'
+        sharedApps: [], 
+        theme: localStorage.getItem('theme') || 'light', 
+        language: localStorage.getItem('language') || 'my', 
         message: null,
         error: null,
-        editingAppId: null, // ID of the app currently being edited in admin view
+        editingAppId: null,
     };
 
     // =================================================================
-    // 4. CORE FUNCTIONS (Logic remains the same)
+    // 4. CORE FUNCTIONS
     // =================================================================
 
     /** Translation Function */
@@ -152,7 +149,7 @@
         return `<i data-lucide="${name}" class="${classes}"></i>`;
     }
 
-    /** Admin Check (Uses the new Admin Email) */
+    /** Admin Check */
     function isAdmin() {
         return currentState.user && currentState.user.email === adminEmail;
     }
@@ -179,21 +176,8 @@
             showMessage(`${T('SIGN_UP')} ${T('UPLOAD_FAILED')}: ${error.message}`, true);
         }
     }
-
-    async function handleGoogleSignIn() {
-        try {
-            const provider = new GoogleAuthProvider();
-            // ⚠️ NOTE: signInWithPopup often fails in Appcreator24 WebViews (Error 403).
-            // Consider using signInWithRedirect for better compatibility in WebViews, 
-            // but this also requires proper handling of the redirect and state.
-            await signInWithPopup(auth, provider); 
-            showMessage("Google " + T('SIGN_IN') + " " + T('UPLOAD_SUCCESS'));
-            updateState({ view: 'home' });
-        } catch (error) {
-            console.error("Google Sign In Error:", error);
-            showMessage(`Google ${T('SIGN_IN')} ${T('UPLOAD_FAILED')}: ${error.message}`, true);
-        }
-    }
+    
+    // ❌ handleGoogleSignIn() REMOVED 
 
     async function handleSignOut() {
         try {
@@ -206,7 +190,7 @@
         }
     }
 
-    // --- Firestore Data Handlers (Logic remains the same) ---
+    // --- Firestore Data Handlers (Same as before) ---
 
     async function handleAppApproval(appId, isApproved) {
         if (!isAdmin()) return showMessage(T('ACCESS_DENIED'), true);
@@ -222,7 +206,7 @@
 
     async function handleAppDeletion(appId) {
         if (!isAdmin()) return showMessage(T('ACCESS_DENIED'), true);
-        if (!confirm(T('CONFIRM_DELETE'))) return; // Assuming CONFIRM_DELETE is available in translations
+        if (!confirm('Are you sure you want to delete this app?')) return; 
         try {
             await deleteDoc(doc(db, sharedAppsCollectionPath, appId));
             showMessage(T('UPLOAD_SUCCESS') + " (Deleted)"); 
@@ -257,22 +241,21 @@
                 category: category,
                 userId: currentState.userId,
                 userName: currentState.user?.displayName || currentState.user?.email || 'N/A',
-                isApproved: false, // Must be approved by admin
+                isApproved: false, 
                 createdAt: serverTimestamp()
             });
             showMessage(`${T('UPLOAD_SUCCESS')} (${T('PENDING')})`);
-            updateState({ view: 'profile' }); // Go to profile to show pending app
+            updateState({ view: 'profile' }); 
         } catch (error) {
             console.error("Upload Error:", error);
             showMessage(`${T('UPLOAD_FAILED')}: ${error.message.substring(0, 50)}...`, true);
         }
     }
 
-    // --- Firestore Realtime Listener ---
+    // --- Firestore Realtime Listener (Same as before) ---
     function startAppListener() {
         if (!currentState.isAuthReady) return;
 
-        // Query all documents (approved and unapproved)
         const q = query(collection(db, sharedAppsCollectionPath));
 
         onSnapshot(q, (snapshot) => {
@@ -280,7 +263,6 @@
             snapshot.forEach((doc) => {
                 apps.push({ id: doc.id, ...doc.data() });
             });
-            // Sort by latest first (if createdAt exists)
             apps.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
             updateState({ sharedApps: apps });
         }, (error) => {
@@ -290,10 +272,10 @@
     }
 
     // =================================================================
-    // 5. UI VIEW COMPONENTS (Logic remains the same)
+    // 5. UI VIEW COMPONENTS
     // =================================================================
 
-    /** Renders the Header (Top Bar) */
+    /** Renders the Header (Same as before) */
     function renderHeader(titleKey) {
         return `
             <header class="p-4 flex justify-between items-center border-b border-gray-100 sticky top-0 z-10 ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}">
@@ -310,7 +292,7 @@
         `;
     }
 
-    /** Renders the Side Menu */
+    /** Renders the Side Menu (Same as before) */
     function renderSideMenu() {
         const userIdDisplay = currentState.userId ? `${T('USER_ID')}: ${currentState.userId}` : T('NOT_LOGGED_IN');
         return `
@@ -334,10 +316,8 @@
         `;
     }
 
-
-    /** Renders the Home View */
+    /** Renders the Home View (Same as before) */
     function renderHome() {
-        // Only show approved apps on the home page
         const approvedApps = currentState.sharedApps.filter(app => app.isApproved);
 
         const appListHtml = approvedApps.length > 0
@@ -390,7 +370,7 @@
         `;
     }
 
-    /** Renders the Upload App View */
+    /** Renders the Upload App View (Same as before) */
     function renderUpload() {
         return `
             ${renderHeader('UPLOAD')}
@@ -435,7 +415,7 @@
         `;
     }
     
-    /** Renders the Profile View */
+    /** Renders the Profile View (Same as before) */
     function renderProfile() {
         const user = currentState.user;
         const displayName = user?.displayName || T('NO_NAME'); 
@@ -443,7 +423,6 @@
         const photoURL = user?.photoURL || 'https://placehold.co/100x100/A78BFA/ffffff?text=U';
         const provider = user?.providerData?.[0]?.providerId || T('EMAIL_PASSWORD');
 
-        // Filter apps submitted by the current user
         const userApps = currentState.sharedApps.filter(app => app.userId === currentState.userId);
 
         const userAppsHtml = userApps.length > 0
@@ -496,7 +475,7 @@
         `;
     }
 
-    /** Renders the Settings View */
+    /** Renders the Settings View (Same as before) */
     function renderSettings() {
         const langOptions = [
             { code: 'my', name: 'မြန်မာ (Myanmar)' },
@@ -542,7 +521,7 @@
         `;
     }
 
-    /** Renders the Admin View (Moderation) */
+    /** Renders the Admin View (Same as before) */
     function renderAdmin() {
         const isUserAdmin = isAdmin();
 
@@ -559,7 +538,6 @@
              `;
         }
         
-        // Admin is logged in, display all submitted apps for moderation
         const allApps = currentState.sharedApps;
 
         const appListHtml = allApps.length > 0
@@ -626,7 +604,7 @@
                     </div>
                 `;
             }).join('')
-            : `<p class="text-center ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} p-8">${T('NO_APPS_SUBMITTED')}</p>`;
+            : `<p class="text-center ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} p-8">No apps submitted yet.</p>`;
 
         return `
             ${renderHeader('ADMIN')}
@@ -642,7 +620,7 @@
         `;
     }
 
-    /** Renders the Login/Signup View */
+    /** Renders the Login/Signup View (MODIFIED to remove Google Button) */
     function renderAuthView() {
         const isLogin = currentState.authMode === 'login';
         const title = isLogin ? T('SIGN_IN') : T('SIGN_UP');
@@ -672,18 +650,7 @@
                             ${actionButtonText}
                         </button>
                     </form>
-
-                    <div class="flex items-center justify-center">
-                        <div class="flex-grow border-t ${currentState.theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}"></div>
-                        <span class="flex-shrink mx-4 ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} text-sm">${T('OR')}</span>
-                        <div class="flex-grow border-t ${currentState.theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}"></div>
-                    </div>
                     
-                    <button id="google-sign-in-btn" class="w-full py-3 px-4 rounded-lg ${currentState.theme === 'dark' ? 'bg-gray-700 text-white border-gray-600 hover:bg-gray-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'} font-semibold border shadow-sm transition duration-150 ease-in-out flex items-center justify-center">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/2048px-Google_%22G%22_logo.svg.png" alt="Google logo" class="w-5 h-5 mr-3">
-                        ${T('SIGN_IN_WITH_GOOGLE')}
-                    </button>
-
                     <button id="auth-mode-toggle-btn" class="w-full text-sm text-violet-600 font-medium hover:text-violet-500 mt-4">
                         ${isLogin ? T('NO_ACCOUNT') : T('ACCOUNT_LOGIN')}
                     </button>
@@ -692,7 +659,7 @@
         `;
     }
 
-    /** Renders the persistent bottom navigation bar */
+    /** Renders the persistent bottom navigation bar (Same as before) */
     function renderNavBar() {
         const navItems = [
             { id: 'home', labelKey: 'HOME', iconName: 'home' },
@@ -717,13 +684,13 @@
         `;
     }
 
-    /** Main Render Function */
+    /** Main Render Function (Same as before) */
     function renderApp() {
         const appDiv = document.getElementById('app');
         if (!appDiv) return;
 
         let contentHtml;
-        const currentView = currentState.user ? currentState.view : 'login'; // Force login if not authenticated
+        const currentView = currentState.user ? currentState.view : 'login'; 
 
         switch (currentView) {
             case 'home':
@@ -754,41 +721,35 @@
             </div>
         ` : '';
 
-        // Combine all parts
         appDiv.innerHTML = messageBanner + contentHtml + (currentState.user ? renderNavBar() : '');
 
-        // Initialize Lucide icons
         lucide.createIcons();
 
-        // Attach event listeners after rendering
         attachEventListeners(currentView);
     }
 
     // =================================================================
-    // 6. EVENT LISTENERS & INITIALIZATION LOGIC (Logic remains the same)
+    // 6. EVENT LISTENERS & INITIALIZATION LOGIC
     // =================================================================
 
     /** Attach Event Listeners */
     function attachEventListeners(currentView) {
-        // --- 1. General Navigation and Header Listeners (Common to all views) ---
+        // --- 1. General Navigation and Header Listeners (Same as before) ---
         const sideMenu = document.getElementById('side-menu');
 
-        // Menu Toggle Button
         const menuToggleBtn = document.getElementById('menu-toggle-btn');
         if (menuToggleBtn && sideMenu) {
             menuToggleBtn.addEventListener('click', () => sideMenu.classList.remove('hidden'));
         }
 
-        // Side Menu Overlay Close Listener
         if (sideMenu) {
             sideMenu.addEventListener('click', (e) => {
                 if (e.target.hasAttribute('data-menu-close')) {
-                    sideMenu.classList.add('hidden'); // Close menu after selection
+                    sideMenu.classList.add('hidden'); 
                 }
             });
         }
         
-        // Auth/Sign Out Button in Header
         const authActionBtn = document.getElementById('auth-action-btn');
         if (authActionBtn) {
             authActionBtn.addEventListener('click', () => {
@@ -801,19 +762,17 @@
             });
         }
         
-        // Navigation Links (Side Menu and Nav Bar) - uses data-view-target attribute
         document.querySelectorAll('[data-view-target]').forEach(element => {
             element.addEventListener('click', (e) => {
                 e.preventDefault();
                 const targetView = element.getAttribute('data-view-target');
                 updateState({ view: targetView });
                 if (sideMenu) {
-                    sideMenu.classList.add('hidden'); // Close menu after selection
+                    sideMenu.classList.add('hidden'); 
                 }
             });
         });
 
-        // Sign Out from Side Menu 
         const menuSignOutBtn = document.getElementById('menu-sign-out-btn');
         if (menuSignOutBtn) {
             menuSignOutBtn.addEventListener('click', (e) => {
@@ -858,13 +817,8 @@
                 };
             }
             
-            // Google Sign-In button
-            const googleBtn = document.getElementById('google-sign-in-btn');
-            if (googleBtn) {
-                googleBtn.onclick = handleGoogleSignIn;
-            }
+            // ❌ GOOGLE BUTTON LISTENER REMOVED
 
-            // Auth Mode Toggle button
             const authModeToggleBtn = document.getElementById('auth-mode-toggle-btn'); 
             if (authModeToggleBtn) {
                 authModeToggleBtn.addEventListener('click', () => {
@@ -898,7 +852,7 @@
                     const appId = e.currentTarget.getAttribute('data-approve');
                     const app = currentState.sharedApps.find(a => a.id === appId);
                     if (app) {
-                        handleAppApproval(appId, !app.isApproved); // Toggle approval
+                        handleAppApproval(appId, !app.isApproved); 
                     }
                 });
             });
@@ -906,7 +860,6 @@
             document.querySelectorAll('[data-delete]').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const appId = e.currentTarget.getAttribute('data-delete');
-                    // In a real app, you would use a custom modal for confirmation here.
                     handleAppDeletion(appId);
                 });
             });
@@ -937,29 +890,19 @@
         }
     }
 
-    // --- Initial Setup and Authentication ---
+    // --- Initial Setup and Authentication (Same as before) ---
 
-    // Apply saved theme on initial load before first render
     updateTheme(currentState.theme);
 
     onAuthStateChanged(auth, async (user) => {
         if (!currentState.isAuthReady) {
-            // First run, check for custom token or sign in anonymously
             try {
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else if (!user) {
-                    // Sign in anonymously if no custom token and no current user
                     await signInAnonymously(auth);
                 }
             } catch (error) {
-                if (error.code === 'auth/custom-token-mismatch') {
-                    console.warn("Initial Auth Warning: Custom token mismatch. Proceeding with Anonymous Sign-in.", error.message);
-                } else {
-                    console.error("Initial Auth Error:", error);
-                }
-                
-                // Fallback to anonymous sign-in if custom token fails
                 try {
                     await signInAnonymously(auth);
                 } catch (anonError) {
@@ -967,7 +910,6 @@
                 }
             }
 
-            // Re-check user state after initial sign-in attempt
             const finalUser = auth.currentUser;
             const finalUserId = finalUser?.uid || 'anon-' + crypto.randomUUID();
 
@@ -975,24 +917,21 @@
                 user: finalUser, 
                 userId: finalUserId, 
                 isAuthReady: true,
-                view: finalUser && !finalUser.isAnonymous ? 'home' : 'login' // Start at home if signed in and not anonymous, otherwise login
+                view: finalUser && !finalUser.isAnonymous ? 'home' : 'login' 
             });
 
-            // Start data listener only after auth is ready
             startAppListener();
 
         } else {
-            // Subsequent changes (e.g., sign out, sign in)
             const finalUserId = user?.uid || 'anon-' + crypto.randomUUID();
             updateState({ 
                 user: user, 
                 userId: finalUserId,
-                view: user && !user.isAnonymous ? currentState.view : 'login' // If user signs out or is anonymous, go to login
+                view: user && !user.isAnonymous ? currentState.view : 'login' 
             });
         }
     });
 
-    // Initial render while waiting for auth state
     renderApp(); 
 </script>
 
