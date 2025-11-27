@@ -7,19 +7,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Custom gradient for buttons and active elements */
         .gradient-bg {
             background: linear-gradient(90deg, #A78BFA 0%, #8B5CF6 100%);
         }
-        /* Style for active navigation button */
         .nav-button.active {
-            color: #8B5CF6; /* Violet-600 */
+            color: #8B5CF6;
         }
-        /* Ensure the app container uses the full viewport height */
         #app {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        @media (max-width: 640px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -29,9 +36,6 @@
         </div>
 
 <script type="module">
-    // =================================================================
-    // 1. FIREBASE & CORE IMPORTS (SDK Version 12.6.0)
-    // =================================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
     import { 
@@ -39,8 +43,7 @@
         onAuthStateChanged, 
         signInWithEmailAndPassword, 
         createUserWithEmailAndPassword, 
-        signOut, 
-        // ❌ GoogleAuthProvider and signInWithPopup are REMOVED 
+        signOut,
         signInAnonymously,
         signInWithCustomToken
     } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
@@ -56,11 +59,6 @@
         serverTimestamp 
     } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-    // =================================================================
-    // 2. CONFIGURATION & INITIALIZATION (UPDATED)
-    // =================================================================
-    
-    // 🔥 UPDATED FIREBASE CONFIGURATION (shareapp-c916a)
     const firebaseConfig = {
         apiKey: "AIzaSyAUL74mqVCIY1MMclrRhdVbY_VyP4lgQpY",
         authDomain: "waiappstore.firebaseapp.com",
@@ -71,27 +69,23 @@
         measurementId: "G-HH95X102MG"
     };
 
-    // Initialize Firebase Services
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Global Constants
     const sharedAppsCollectionPath = "sharedApps";
     const adminEmail = "c388925@gmail.com"; 
     const initialAuthToken = null; 
 
-    // =================================================================
-    // 3. GLOBAL STATE & TRANSLATIONS
-    // =================================================================
-
     const translations = {
         en: {
-            APP_TITLE: "ShareApp Store", HOME: "Home", UPLOAD: "Upload", PROFILE: "Profile", SETTINGS: "Settings", ADMIN: "Admin", SIGN_IN: "Sign In", SIGN_UP: "Sign Up", SIGN_OUT: "Sign Out", PASSWORD: "Password", EMAIL: "Email", NO_ACCOUNT: "Need an account? Sign Up", ACCOUNT_LOGIN: "Already have an account? Sign In", OR: "OR", SIGN_IN_WITH_GOOGLE: "Sign in with Google", SECRET_CODE: "Your secret code", DEVELOPER_NOTE: "Note: Please use the Email/Password fields to sign in.", USER_ID: "User ID", NOT_LOGGED_IN: "Not Logged In", PENDING: "Pending Review", APPROVED: "Approved", DOWNLOAD_OR_OPEN: "Get App", NO_APPS_YET: "No approved apps yet. Be the first to submit!", CATEGORIES: "Categories", ALL: "All", GAMES: "Games", SOCIAL: "Social", PRODUCTIVITY: "Productivity", ENTERTAINMENT: "Entertainment", SEARCH_PLACEHOLDER: "Search for apps...", LATEST_APPS: "Latest Shared Apps", SUBMITTED_BY: "Submitted by", SUBMITTED_DATE: "Date", UNKNOWN: "Unknown", APP_INFO: "App Submission", APP_NAME: "App Name", APP_ICON_LINK: "Icon URL", APP_LINK: "App Link (Play Store, etc.)", CATEGORY: "Category", SELECT_CATEGORY: "Select Category", SUBMIT_APP: "Submit App", LOGIN_REQUIRED: "You must sign in to submit an app.", UPLOAD_SUCCESS: "Upload Successful!", UPLOAD_FAILED: "Upload Failed", DATA_FETCH_FAILED: "Failed to fetch data.", SETTING_THEME: "Theme Settings", LIGHT_MODE: "Light Mode", DARK_MODE: "Dark Mode", THEME_APPLIED: "Theme applied.", SETTING_LANGUAGE: "Language", LANGUAGE_APPLIED: "Language applied.", NO_NAME: "No Name", NO_EMAIL: "No Email", EMAIL_PASSWORD: "Email/Password", YOUR_SUBMISSIONS: "Your Submissions", NO_SUBMISSIONS_YET: "You have not submitted any apps yet.", ACCESS_DENIED: "Access Denied", ACCESS_DENIED_MESSAGE: "You do not have administrative privileges.", ADMIN_AREA: "Moderation Queue", SUBMISSIONS: "Submissions", UNAPPROVE: "Unapprove", APPROVE: "Approve", EDIT_APP: "Edit App Details", SAVE_CHANGES: "Save Changes", CANCEL: "Cancel"
+            APP_TITLE: "ShareApp Store", HOME: "Home", UPLOAD: "Upload", PROFILE: "Profile", SETTINGS: "Settings", ADMIN: "Admin", SIGN_IN: "Sign In", SIGN_UP: "Sign Up", SIGN_OUT: "Sign Out", PASSWORD: "Password", EMAIL: "Email", NO_ACCOUNT: "Need an account? Sign Up", ACCOUNT_LOGIN: "Already have an account? Sign In", OR: "OR", SIGN_IN_WITH_GOOGLE: "Sign in with Google", SECRET_CODE: "Your secret code", DEVELOPER_NOTE: "Note: Please use the Email/Password fields to sign in.", USER_ID: "User ID", NOT_LOGGED_IN: "Not Logged In", PENDING: "Pending Review", APPROVED: "Approved", DOWNLOAD_OR_OPEN: "Get App", NO_APPS_YET: "No approved apps yet. Be the first to submit!", CATEGORIES: "Categories", ALL: "All", GAMES: "Games", SOCIAL: "Social", PRODUCTIVITY: "Productivity", ENTERTAINMENT: "Entertainment", SEARCH_PLACEHOLDER: "Search for apps...", LATEST_APPS: "Latest Shared Apps", SUBMITTED_BY: "Submitted by", SUBMITTED_DATE: "Date", UNKNOWN: "Unknown", APP_INFO: "App Submission", APP_NAME: "App Name", APP_ICON_LINK: "Icon URL", APP_LINK: "App Link (Play Store, etc.)", CATEGORY: "Category", SELECT_CATEGORY: "Select Category", SUBMIT_APP: "Submit App", LOGIN_REQUIRED: "You must sign in to submit an app.", UPLOAD_SUCCESS: "Upload Successful!", UPLOAD_FAILED: "Upload Failed", DATA_FETCH_FAILED: "Failed to fetch data.", SETTING_THEME: "Theme Settings", LIGHT_MODE: "Light Mode", DARK_MODE: "Dark Mode", THEME_APPLIED: "Theme applied.", SETTING_LANGUAGE: "Language", LANGUAGE_APPLIED: "Language applied.", NO_NAME: "No Name", NO_EMAIL: "No Email", EMAIL_PASSWORD: "Email/Password", YOUR_SUBMISSIONS: "Your Submissions", NO_SUBMISSIONS_YET: "You have not submitted any apps yet.", ACCESS_DENIED: "Access Denied", ACCESS_DENIED_MESSAGE: "You do not have administrative privileges.", ADMIN_AREA: "Moderation Queue", SUBMISSIONS: "Submissions", UNAPPROVE: "Unapprove", APPROVE: "Approve", EDIT_APP: "Edit App Details", SAVE_CHANGES: "Save Changes", CANCEL: "Cancel",
+            PURPOSE: "App Purpose", SCREENSHOTS: "Screenshots", SCREENSHOT1: "Screenshot 1", SCREENSHOT2: "Screenshot 2", SCREENSHOT3: "Screenshot 3", USERNAME: "Username", CONTACT_INFO: "Contact Information", AGE: "Age", LANGUAGE: "Language"
         },
         my: {
-            APP_TITLE: "ShareApp စတိုး", HOME: "ပင်မ", UPLOAD: "တင်သွင်းရန်", PROFILE: "ပရိုဖိုင်", SETTINGS: "ချိန်ညှိချက်များ", ADMIN: "စီမံခန့်ခွဲသူ", SIGN_IN: "ဝင်ရောက်ရန်", SIGN_UP: "အကောင့်ဖွင့်ရန်", SIGN_OUT: "အကောင့်ထွက်ရန်", PASSWORD: "လျှို့ဝှက်နံပါတ်", EMAIL: "အီးမေးလ်", NO_ACCOUNT: "အကောင့်မရှိဘူးလား။ အကောင့်ဖွင့်ပါ", ACCOUNT_LOGIN: "အကောင့်ရှိပြီးသားလား။ ဝင်ရောက်ပါ", OR: "သို့မဟုတ်", SIGN_IN_WITH_GOOGLE: "Google ဖြင့် ဝင်ရောက်ရန်", SECRET_CODE: "လျှို့ဝှက်နံပါတ်", DEVELOPER_NOTE: "သတိပေးချက်- အီးမေးလ်/စကားဝှက်ဖြည့်ပြီး ဝင်ရောက်ပါ။", USER_ID: "အသုံးပြုသူ ID", NOT_LOGGED_IN: "မဝင်ရောက်ရသေးပါ", PENDING: "စောင့်ဆိုင်းဆဲ", APPROVED: "ခွင့်ပြုပြီး", DOWNLOAD_OR_OPEN: "App ရယူရန်", NO_APPS_YET: "ခွင့်ပြုထားသော App မရှိသေးပါ။ ပထမဆုံးတင်သွင်းသူ ဖြစ်ပါစေ။", CATEGORIES: "အမျိုးအစားများ", ALL: "အားလုံး", GAMES: "ဂိမ်း", SOCIAL: "လူမှုကွန်ရက်", PRODUCTIVITY: "အလုပ်စွမ်းဆောင်ရည်", ENTERTAINMENT: "ဖျော်ဖြေရေး", SEARCH_PLACEHOLDER: "Apps များ ရှာဖွေပါ...", LATEST_APPS: "နောက်ဆုံးတင်သွင်းသော Apps များ", SUBMITTED_BY: "တင်သွင်းသူ", SUBMITTED_DATE: "တင်သွင်းသည့်နေ့", UNKNOWN: "မသိရှိရ", APP_INFO: "App အချက်အလက်", APP_NAME: "App အမည်", APP_ICON_LINK: "Icon လင့်ခ်", APP_LINK: "App လင့်ခ် (Play Store, etc.)", CATEGORY: "အမျိုးအစား", SELECT_CATEGORY: "အမျိုးအစား ရွေးပါ", SUBMIT_APP: "App တင်သွင်းရန်", LOGIN_REQUIRED: "App တင်သွင်းရန်အတွက် ဝင်ရောက်ရန်လိုအပ်သည်။", UPLOAD_SUCCESS: "တင်သွင်းမှု အောင်မြင်ပါသည်!", UPLOAD_FAILED: "တင်သွင်းမှု မအောင်မြင်ပါ", DATA_FETCH_FAILED: "ဒေတာရယူရာတွင် အမှားဖြစ်ခဲ့သည်။", SETTING_THEME: "Theme ချိန်ညှိချက်များ", LIGHT_MODE: "အလင်းရောင် Theme", DARK_MODE: "အမှောင် Theme", THEME_APPLIED: "Theme ပြောင်းလဲပြီးပါပြီ။", SETTING_LANGUAGE: "ဘာသာစကား", LANGUAGE_APPLIED: "ဘာသာစကား ပြောင်းလဲပြီးပါပြီ။", NO_NAME: "အမည်မရှိ", NO_EMAIL: "အီးမေးလ်မရှိ", EMAIL_PASSWORD: "အီးမေးလ်/စကားဝှက်", YOUR_SUBMISSIONS: "သင်တင်သွင်းခဲ့သော Apps များ", NO_SUBMISSIONS_YET: "သင် App တစ်ခုမှ တင်သွင်းရသေးခြင်း မရှိပါ။", ACCESS_DENIED: "ဝင်ရောက်ခွင့် မပြုပါ", ACCESS_DENIED_MESSAGE: "သင့်တွင် စီမံခန့်ခွဲသူ အခွင့်အရေး မရှိပါ။", ADMIN_AREA: "စီမံခန့်ခွဲမှု", SUBMISSIONS: "တင်သွင်းမှုများ", UNAPPROVE: "ခွင့်ပြုချက် ရုပ်သိမ်း", APPROVE: "ခွင့်ပြုရန်", EDIT_APP: "App အချက်အလက် ပြင်ဆင်ရန်", SAVE_CHANGES: "အပြောင်းအလဲများ သိမ်းဆည်း", CANCEL: "ပယ်ဖျက်မည်"
+            APP_TITLE: "ShareApp စတိုး", HOME: "ပင်မ", UPLOAD: "တင်သွင်းရန်", PROFILE: "ပရိုဖိုင်", SETTINGS: "ချိန်ညှိချက်များ", ADMIN: "စီမံခန့်ခွဲသူ", SIGN_IN: "ဝင်ရောက်ရန်", SIGN_UP: "အကောင့်ဖွင့်ရန်", SIGN_OUT: "အကောင့်ထွက်ရန်", PASSWORD: "လျှို့ဝှက်နံပါတ်", EMAIL: "အီးမေးလ်", NO_ACCOUNT: "အကောင့်မရှိဘူးလား။ အကောင့်ဖွင့်ပါ", ACCOUNT_LOGIN: "အကောင့်ရှိပြီးသားလား။ ဝင်ရောက်ပါ", OR: "သို့မဟုတ်", SIGN_IN_WITH_GOOGLE: "Google ဖြင့် ဝင်ရောက်ရန်", SECRET_CODE: "လျှို့ဝှက်နံပါတ်", DEVELOPER_NOTE: "သတိပေးချက်- အီးမေးလ်/စကားဝှက်ဖြည့်ပြီး ဝင်ရောက်ပါ။", USER_ID: "အသုံးပြုသူ ID", NOT_LOGGED_IN: "မဝင်ရောက်ရသေးပါ", PENDING: "စောင့်ဆိုင်းဆဲ", APPROVED: "ခွင့်ပြုပြီး", DOWNLOAD_OR_OPEN: "App ရယူရန်", NO_APPS_YET: "ခွင့်ပြုထားသော App မရှိသေးပါ။ ပထမဆုံးတင်သွင်းသူ ဖြစ်ပါစေ။", CATEGORIES: "အမျိုးအစားများ", ALL: "အားလုံး", GAMES: "ဂိမ်း", SOCIAL: "လူမှုကွန်ရက်", PRODUCTIVITY: "အလုပ်စွမ်းဆောင်ရည်", ENTERTAINMENT: "ဖျော်ဖြေရေး", SEARCH_PLACEHOLDER: "Apps များ ရှာဖွေပါ...", LATEST_APPS: "နောက်ဆုံးတင်သွင်းသော Apps များ", SUBMITTED_BY: "တင်သွင်းသူ", SUBMITTED_DATE: "တင်သွင်းသည့်နေ့", UNKNOWN: "မသိရှိရ", APP_INFO: "App အချက်အလက်", APP_NAME: "App အမည်", APP_ICON_LINK: "Icon လင့်ခ်", APP_LINK: "App လင့်ခ် (Play Store, etc.)", CATEGORY: "အမျိုးအစား", SELECT_CATEGORY: "အမျိုးအစား ရွေးပါ", SUBMIT_APP: "App တင်သွင်းရန်", LOGIN_REQUIRED: "App တင်သွင်းရန်အတွက် ဝင်ရောက်ရန်လိုအပ်သည်။", UPLOAD_SUCCESS: "တင်သွင်းမှု အောင်မြင်ပါသည်!", UPLOAD_FAILED: "တင်သွင်းမှု မအောင်မြင်ပါ", DATA_FETCH_FAILED: "ဒေတာရယူရာတွင် အမှားဖြစ်ခဲ့သည်။", SETTING_THEME: "Theme ချိန်ညှိချက်များ", LIGHT_MODE: "အလင်းရောင် Theme", DARK_MODE: "အမှောင် Theme", THEME_APPLIED: "Theme ပြောင်းလဲပြီးပါပြီ။", SETTING_LANGUAGE: "ဘာသာစကား", LANGUAGE_APPLIED: "ဘာသာစကား ပြောင်းလဲပြီးပါပြီ။", NO_NAME: "အမည်မရှိ", NO_EMAIL: "အီးမေးလ်မရှိ", EMAIL_PASSWORD: "အီးမေးလ်/စကားဝှက်", YOUR_SUBMISSIONS: "သင်တင်သွင်းခဲ့သော Apps များ", NO_SUBMISSIONS_YET: "သင် App တစ်ခုမှ တင်သွင်းရသေးခြင်း မရှိပါ။", ACCESS_DENIED: "ဝင်ရောက်ခွင့် မပြုပါ", ACCESS_DENIED_MESSAGE: "သင့်တွင် စီမံခန့်ခွဲသူ အခွင့်အရေး မရှိပါ။", ADMIN_AREA: "စီမံခန့်ခွဲမှု", SUBMISSIONS: "တင်သွင်းမှုများ", UNAPPROVE: "ခွင့်ပြုချက် ရုပ်သိမ်း", APPROVE: "ခွင့်ပြုရန်", EDIT_APP: "App အချက်အလက် ပြင်ဆင်ရန်", SAVE_CHANGES: "အပြောင်းအလဲများ သိမ်းဆည်း", CANCEL: "ပယ်ဖျက်မည်",
+            PURPOSE: "App ၏ ရည်ရွယ်ချက်", SCREENSHOTS: "ပုံရိပ်များ", SCREENSHOT1: "ပုံရိပ် ၁", SCREENSHOT2: "ပုံရိပ် ၂", SCREENSHOT3: "ပုံရိပ် ၃", USERNAME: "အသုံးပြုသူအမည်", CONTACT_INFO: "ဆက်သွယ်ရန်", AGE: "အသက်", LANGUAGE: "ဘာသာစကား"
         },
     };
 
@@ -107,18 +101,14 @@
         message: null,
         error: null,
         editingAppId: null,
+        selectedCategory: 'all',
+        searchQuery: ''
     };
 
-    // =================================================================
-    // 4. CORE FUNCTIONS
-    // =================================================================
-
-    /** Translation Function */
     function T(key) {
         return translations[currentState.language]?.[key] || translations['en'][key] || key;
     }
 
-    /** Theme Management */
     function updateTheme(theme) {
         document.body.classList.remove('bg-white', 'bg-gray-900');
         if (theme === 'dark') {
@@ -131,30 +121,25 @@
         localStorage.setItem('theme', theme);
     }
 
-    /** State Update and Re-render */
     function updateState(newState) {
         Object.assign(currentState, newState);
         renderApp();
         updateTheme(currentState.theme);
     }
 
-    /** Message Display */
     function showMessage(msg, isError = false) {
         updateState({ message: isError ? null : msg, error: isError ? msg : null });
         setTimeout(() => updateState({ message: null, error: null }), 3000);
     }
 
-    /** Icon Utility */
     function icon(name, classes = 'w-6 h-6 mr-2') {
         return `<i data-lucide="${name}" class="${classes}"></i>`;
     }
 
-    /** Admin Check */
     function isAdmin() {
         return currentState.user && currentState.user.email === adminEmail;
     }
 
-    // --- Auth Handlers ---
     async function handleSignIn(email, password) {
         try {
             await signInWithEmailAndPassword(auth, email, password);
@@ -176,8 +161,6 @@
             showMessage(`${T('SIGN_UP')} ${T('UPLOAD_FAILED')}: ${error.message}`, true);
         }
     }
-    
-    // ❌ handleGoogleSignIn() REMOVED 
 
     async function handleSignOut() {
         try {
@@ -189,8 +172,6 @@
             showMessage(`${T('SIGN_OUT')} ${T('UPLOAD_FAILED')}: ${error.message}`, true);
         }
     }
-
-    // --- Firestore Data Handlers (Same as before) ---
 
     async function handleAppApproval(appId, isApproved) {
         if (!isAdmin()) return showMessage(T('ACCESS_DENIED'), true);
@@ -216,11 +197,20 @@
         }
     }
 
-    async function handleAppEdit(appId, name, link, iconLink) {
+    async function handleAppEdit(appId, name, link, iconLink, purpose, screenshots, username, age, language) {
         if (!isAdmin()) return showMessage(T('ACCESS_DENIED'), true);
         try {
             const appRef = doc(db, sharedAppsCollectionPath, appId);
-            await updateDoc(appRef, { name, link, iconLink });
+            await updateDoc(appRef, { 
+                name, 
+                link, 
+                iconLink, 
+                purpose, 
+                screenshots, 
+                username, 
+                age, 
+                language 
+            });
             showMessage(T('SAVE_CHANGES') + " " + T('UPLOAD_SUCCESS'));
             updateState({ editingAppId: null });
         } catch (error) {
@@ -229,7 +219,7 @@
         }
     }
 
-    async function handleAppUpload(name, link, iconLink, category) {
+    async function handleAppUpload(name, link, iconLink, category, purpose, screenshots, username, age, language) {
         if (!currentState.user || currentState.userId.includes('anon')) {
             return showMessage(T('LOGIN_REQUIRED'), true);
         }
@@ -239,6 +229,11 @@
                 link: link,
                 iconLink: iconLink,
                 category: category,
+                purpose: purpose,
+                screenshots: screenshots || [],
+                username: username,
+                age: age,
+                language: language,
                 userId: currentState.userId,
                 userName: currentState.user?.displayName || currentState.user?.email || 'N/A',
                 isApproved: false, 
@@ -252,7 +247,6 @@
         }
     }
 
-    // --- Firestore Realtime Listener (Same as before) ---
     function startAppListener() {
         if (!currentState.isAuthReady) return;
 
@@ -271,11 +265,6 @@
         });
     }
 
-    // =================================================================
-    // 5. UI VIEW COMPONENTS
-    // =================================================================
-
-    /** Renders the Header (Same as before) */
     function renderHeader(titleKey) {
         return `
             <header class="p-4 flex justify-between items-center border-b border-gray-100 sticky top-0 z-10 ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'}">
@@ -292,7 +281,6 @@
         `;
     }
 
-    /** Renders the Side Menu (Same as before) */
     function renderSideMenu() {
         const userIdDisplay = currentState.userId ? `${T('USER_ID')}: ${currentState.userId}` : T('NOT_LOGGED_IN');
         return `
@@ -303,44 +291,86 @@
                     
                     <ul class="space-y-2">
                         <li><a href="#" data-view-target="home" class="flex items-center p-3 text-gray-700 ${currentState.theme === 'dark' ? 'text-gray-200 hover:bg-gray-600' : 'hover:bg-violet-50'} rounded-lg">${icon('home')} <span class="ml-3">${T('HOME')}</span></a></li>
+                        <li><a href="#" data-view-target="upload" class="flex items-center p-3 text-gray-700 ${currentState.theme === 'dark' ? 'text-gray-200 hover:bg-gray-600' : 'hover:bg-violet-50'} rounded-lg">${icon('upload')} <span class="ml-3">${T('UPLOAD')}</span></a></li>
                         <li><a href="#" data-view-target="settings" class="flex items-center p-3 text-gray-700 ${currentState.theme === 'dark' ? 'text-gray-200 hover:bg-gray-600' : 'hover:bg-violet-50'} rounded-lg">${icon('settings')} <span class="ml-3">${T('SETTINGS')}</span></a></li>
                         ${currentState.user ? `
                             <li><a href="#" data-view-target="profile" class="flex items-center p-3 text-gray-700 ${currentState.theme === 'dark' ? 'text-gray-200 hover:bg-gray-600' : 'hover:bg-violet-50'} rounded-lg">${icon('user')} <span class="ml-3">${T('PROFILE')}</span></a></li>
+                            ${isAdmin() ? `<li><a href="#" data-view-target="admin" class="flex items-center p-3 text-gray-700 ${currentState.theme === 'dark' ? 'text-gray-200 hover:bg-gray-600' : 'hover:bg-violet-50'} rounded-lg">${icon('lock')} <span class="ml-3">${T('ADMIN')}</span></a></li>` : ''}
                             <li><a href="#" id="menu-sign-out-btn" class="flex items-center p-3 text-gray-700 ${currentState.theme === 'dark' ? 'text-gray-200 hover:bg-gray-600' : 'hover:bg-violet-50'} rounded-lg">${icon('log-out')} <span class="ml-3">${T('SIGN_OUT')}</span></a></li>
                         ` : `
                             <li><a href="#" data-view-target="login" class="flex items-center p-3 text-gray-700 ${currentState.theme === 'dark' ? 'text-gray-200 hover:bg-gray-600' : 'hover:bg-violet-50'} rounded-lg">${icon('log-in')} <span class="ml-3">${T('SIGN_IN')}</span></a></li>
                         `}
                     </ul>
+                    
+                    <div class="mt-8 pt-4 border-t ${currentState.theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}">
+                        <h3 class="text-sm font-medium ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mb-2">${T('CONTACT_INFO')}</h3>
+                        <div class="space-y-2 text-xs ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}">
+                            <div>Email: <a href="mailto:c388925@gmail.com" class="text-violet-500 hover:text-violet-400">c388925@gmail.com</a></div>
+                            <div>Telegram: <a href="https://t.me/appcreator24myanmar" target="_blank" class="text-violet-500 hover:text-violet-400">@appcreator24myanmar</a></div>
+                            <div>Facebook: <a href="https://m.facebook.com/yan260702/" target="_blank" class="text-violet-500 hover:text-violet-400">Yan</a></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
     }
 
-    /** Renders the Home View (Same as before) */
     function renderHome() {
-        const approvedApps = currentState.sharedApps.filter(app => app.isApproved);
+        let approvedApps = currentState.sharedApps.filter(app => app.isApproved);
+        
+        if (currentState.selectedCategory !== 'all') {
+            approvedApps = approvedApps.filter(app => app.category === currentState.selectedCategory);
+        }
+        
+        if (currentState.searchQuery) {
+            approvedApps = approvedApps.filter(app => 
+                app.name.toLowerCase().includes(currentState.searchQuery.toLowerCase()) ||
+                app.category.toLowerCase().includes(currentState.searchQuery.toLowerCase()) ||
+                (app.purpose && app.purpose.toLowerCase().includes(currentState.searchQuery.toLowerCase()))
+            );
+        }
+
+        const categories = ['all', 'Game', 'Social', 'Productivity', 'Entertainment', 'Education'];
+        const categoryButtons = categories.map(cat => {
+            const isActive = currentState.selectedCategory === cat;
+            return `
+                <button data-category="${cat}" 
+                    class="category-btn ${isActive ? 'bg-violet-500 text-white' : 'bg-gray-100 text-gray-700'} 
+                    ${currentState.theme === 'dark' && !isActive ? 'bg-gray-700 text-gray-300' : ''} 
+                    text-xs font-medium px-3 py-1 rounded-full flex-shrink-0 transition-colors">
+                    ${cat === 'all' ? T('ALL') : 
+                      cat === 'Game' ? T('GAMES') : 
+                      cat === 'Social' ? T('SOCIAL') : 
+                      cat === 'Productivity' ? T('PRODUCTIVITY') : 
+                      cat === 'Entertainment' ? T('ENTERTAINMENT') : 'ပညာရေး'}
+                </button>
+            `;
+        }).join('');
 
         const appListHtml = approvedApps.length > 0
-            ? approvedApps.map(app => `
-                <div class="app-link-card ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-4 shadow-sm rounded-xl border flex flex-col">
-                    <div class="flex items-center mb-2">
-                        <div class="p-1 rounded-lg mr-3 flex-shrink-0 w-10 h-10 flex items-center justify-center">
-                            <img src="${app.iconLink || 'https://placehold.co/40x40/A78BFA/ffffff?text=App'}" 
-                                onerror="this.onerror=null; this.src='https://placehold.co/40x40/A78BFA/ffffff?text=App';"
-                                alt="App Icon" class="w-full h-full object-contain rounded-md">
+            ? `<div class="app-grid">
+                ${approvedApps.map(app => `
+                    <div class="app-link-card ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-4 shadow-sm rounded-xl border flex flex-col">
+                        <div class="flex items-center mb-2">
+                            <div class="p-1 rounded-lg mr-3 flex-shrink-0 w-10 h-10 flex items-center justify-center">
+                                <img src="${app.iconLink || 'https://placehold.co/40x40/A78BFA/ffffff?text=App'}" 
+                                    onerror="this.onerror=null; this.src='https://placehold.co/40x40/A78BFA/ffffff?text=App';"
+                                    alt="App Icon" class="w-full h-full object-contain rounded-md">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-lg font-semibold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'} truncate">${app.name}</p>
+                                <p class="text-xs text-violet-500 font-medium">${app.category}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-lg font-semibold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'} truncate">${app.name}</p>
-                            <p class="text-xs text-violet-500 font-medium">${app.category}</p>
-                        </div>
+                        ${app.purpose ? `<p class="text-sm ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mb-2 line-clamp-2">${app.purpose}</p>` : ''}
+                        <p class="text-sm ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mb-3 truncate">${T('SUBMITTED_BY')}: ${app.userName}</p>
+                        <a href="${app.link}" target="_blank" class="w-full text-center py-2 px-4 rounded-lg text-white font-medium shadow-md transition duration-150 ease-in-out gradient-bg hover:shadow-lg">
+                            ${T('DOWNLOAD_OR_OPEN')}
+                        </a>
+                        <p class="text-xs ${currentState.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} mt-2 text-right">${T('SUBMITTED_DATE')}: ${app.createdAt ? new Date(app.createdAt.toDate()).toLocaleDateString(currentState.language === 'th' ? 'th-TH' : 'en-US') : T('UNKNOWN')}</p>
                     </div>
-                    <p class="text-sm ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mb-3 truncate">${T('SUBMITTED_BY')}: ${app.userName}</p>
-                    <a href="${app.link}" target="_blank" class="w-full text-center py-2 px-4 rounded-lg text-white font-medium shadow-md transition duration-150 ease-in-out gradient-bg hover:shadow-lg">
-                        ${T('DOWNLOAD_OR_OPEN')}
-                    </a>
-                    <p class="text-xs ${currentState.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} mt-2 text-right">${T('SUBMITTED_DATE')}: ${app.createdAt ? new Date(app.createdAt.toDate()).toLocaleDateString(currentState.language === 'th' ? 'th-TH' : 'en-US') : T('UNKNOWN')}</p>
-                </div>
-            `).join('')
+                `).join('')}
+            </div>`
             : `<p class="text-center ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} p-8">${T('NO_APPS_YET')}</p>`;
 
         return `
@@ -349,20 +379,18 @@
             <main class="flex-grow p-4 space-y-4 overflow-y-auto">
                 
                 <div class="relative">
-                    <input type="text" placeholder="${T('SEARCH_PLACEHOLDER')}" class="w-full p-3 pl-10 border ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-200 bg-white'} rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-150">
+                    <input type="text" id="search-input" placeholder="${T('SEARCH_PLACEHOLDER')}" 
+                        value="${currentState.searchQuery}" 
+                        class="w-full p-3 pl-10 border ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-200 bg-white'} rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-150">
                     <span class="absolute left-3 top-1/2 transform -translate-y-1/2 ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}">${icon('search', 'w-4 h-4')}</span>
                 </div>
 
                 <h2 class="text-base font-semibold ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}">${T('CATEGORIES')}</h2>
                 <div class="flex space-x-2 overflow-x-auto pb-2">
-                    <span class="bg-violet-500 text-white text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">${T('ALL')}</span>
-                    <span class="bg-gray-100 ${currentState.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'text-gray-700'} text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">${T('GAMES')}</span>
-                    <span class="bg-gray-100 ${currentState.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'text-gray-700'} text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">${T('SOCIAL')}</span>
-                    <span class="bg-gray-100 ${currentState.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'text-gray-700'} text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">${T('PRODUCTIVITY')}</span>
-                    <span class="bg-gray-100 ${currentState.theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'text-gray-700'} text-xs font-medium px-3 py-1 rounded-full flex-shrink-0">${T('ENTERTAINMENT')}</span>
+                    ${categoryButtons}
                 </div>
                 
-                <h2 class="text-base font-semibold ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} pt-2">${T('LATEST_APPS')}</h2>
+                <h2 class="text-base font-semibold ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} pt-2">${T('LATEST_APPS')} (${approvedApps.length})</h2>
                 <div class="space-y-4">
                     ${appListHtml}
                 </div>
@@ -370,7 +398,6 @@
         `;
     }
 
-    /** Renders the Upload App View (Same as before) */
     function renderUpload() {
         return `
             ${renderHeader('UPLOAD')}
@@ -395,6 +422,41 @@
                     </div>
 
                     <div>
+                        <label for="purpose" class="block text-sm font-medium ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-1">${T('PURPOSE')}</label>
+                        <textarea id="purpose" name="purpose" placeholder="App ၏ ရည်ရွယ်ချက်ကို ရေးပါ..." class="w-full p-3 border rounded-lg focus:ring-violet-500 focus:border-violet-500 ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300'} h-20"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-1">${T('SCREENSHOTS')}</label>
+                        <div class="space-y-2">
+                            <input type="url" id="screenshot1" name="screenshot1" placeholder="${T('SCREENSHOT1')} URL" class="w-full p-3 border rounded-lg focus:ring-violet-500 focus:border-violet-500 ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300'}">
+                            <input type="url" id="screenshot2" name="screenshot2" placeholder="${T('SCREENSHOT2')} URL" class="w-full p-3 border rounded-lg focus:ring-violet-500 focus:border-violet-500 ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300'}">
+                            <input type="url" id="screenshot3" name="screenshot3" placeholder="${T('SCREENSHOT3')} URL" class="w-full p-3 border rounded-lg focus:ring-violet-500 focus:border-violet-500 ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300'}">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="username" class="block text-sm font-medium ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-1">${T('USERNAME')}</label>
+                        <input type="text" id="username" name="username" placeholder="အသုံးပြုသူအမည်" class="w-full p-3 border rounded-lg focus:ring-violet-500 focus:border-violet-500 ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300'}">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="age" class="block text-sm font-medium ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-1">${T('AGE')}</label>
+                            <input type="number" id="age" name="age" placeholder="အသက်" class="w-full p-3 border rounded-lg focus:ring-violet-500 focus:border-violet-500 ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300'}">
+                        </div>
+                        <div>
+                            <label for="language" class="block text-sm font-medium ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-1">${T('LANGUAGE')}</label>
+                            <select id="language" name="language" class="w-full p-3 border rounded-lg focus:ring-violet-500 focus:border-violet-500 ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}">
+                                <option value="မြန်မာ">မြန်မာ</option>
+                                <option value="English">English</option>
+                                <option value="ไทย">ไทย</option>
+                                <option value="中文">中文</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
                         <label for="category" class="block text-sm font-medium ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-1">${T('CATEGORY')}</label>
                         <select id="category" name="category" required class="w-full p-3 border rounded-lg focus:ring-violet-500 focus:border-violet-500 ${currentState.theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}">
                             <option value="">${T('SELECT_CATEGORY')}</option>
@@ -414,8 +476,7 @@
             </main>
         `;
     }
-    
-    /** Renders the Profile View (Same as before) */
+
     function renderProfile() {
         const user = currentState.user;
         const displayName = user?.displayName || T('NO_NAME'); 
@@ -426,35 +487,40 @@
         const userApps = currentState.sharedApps.filter(app => app.userId === currentState.userId);
 
         const userAppsHtml = userApps.length > 0
-            ? userApps.map(app => {
+            ? `<div class="app-grid">
+                ${userApps.map(app => {
                 const statusClass = app.isApproved ? 'bg-green-500' : 'bg-yellow-500';
                 const statusText = app.isApproved ? T('APPROVED') : T('PENDING');
                 return `
-                    <div class="app-link-card ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-3 shadow-sm rounded-xl border flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div class="p-1 rounded-lg mr-3 flex-shrink-0 w-10 h-10 flex items-center justify-center">
-                                <img src="${app.iconLink || 'https://placehold.co/40x40/A78BFA/ffffff?text=App'}" 
-                                    onerror="this.onerror=null; this.src='https://placehold.co/40x40/A78BFA/ffffff?text=App';"
-                                    alt="App Icon" class="w-full h-full object-contain rounded-md">
+                    <div class="app-link-card ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-3 shadow-sm rounded-xl border flex flex-col">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <div class="p-1 rounded-lg mr-3 flex-shrink-0 w-10 h-10 flex items-center justify-center">
+                                    <img src="${app.iconLink || 'https://placehold.co/40x40/A78BFA/ffffff?text=App'}" 
+                                        onerror="this.onerror=null; this.src='https://placehold.co/40x40/A78BFA/ffffff?text=App';"
+                                        alt="App Icon" class="w-full h-full object-contain rounded-md">
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'} truncate">${app.name}</p>
+                                    <p class="text-xs ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}">${T('CATEGORY')}: ${app.category}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm font-semibold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'} truncate">${app.name}</p>
-                                <p class="text-xs ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}">${T('CATEGORY')}: ${app.category}</p>
-                            </div>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded-full text-white ${statusClass}">
+                                ${statusText}
+                            </span>
                         </div>
-                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full text-white ${statusClass}">
-                            ${statusText}
-                        </span>
+                        ${app.purpose ? `<p class="text-sm ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mb-2 line-clamp-2">${app.purpose}</p>` : ''}
                     </div>
                 `;
-            }).join('')
+            }).join('')}
+            </div>`
             : `<p class="text-center ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} p-4">${T('NO_SUBMISSIONS_YET')}</p>`;
 
         return `
             ${renderHeader('PROFILE')}
             ${renderSideMenu()}
             <main class="flex-grow p-6 overflow-y-auto flex flex-col items-center">
-                <div class="${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-lg border w-full max-w-sm text-center">
+                <div class="${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} p-6 rounded-xl shadow-lg border w-full max-w-sm text-center mb-6">
                     <img src="${photoURL}" onerror="this.onerror=null; this.src='https://placehold.co/100x100/A78BFA/ffffff?text=U';" alt="Profile Image" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-violet-100">
                     
                     <h2 class="text-2xl font-bold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-1">${displayName}</h2>
@@ -465,8 +531,10 @@
                         ${icon('log-out', 'w-5 h-5 mr-2 inline-block align-middle')} ${T('SIGN_OUT')}
                     </button>
                     <p class="text-xs ${currentState.theme === 'dark' ? 'text-gray-500' : 'text-gray-400'} mt-4 break-all">${T('USER_ID')}: ${currentState.userId}</p>
+                </div>
 
-                    <h3 class="text-xl font-bold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'} mt-6 mb-3 border-t pt-4 ${currentState.theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}">${T('YOUR_SUBMISSIONS')}</h3>
+                <div class="w-full">
+                    <h3 class="text-xl font-bold ${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-3">${T('YOUR_SUBMISSIONS')}</h3>
                     <div class="w-full space-y-3">
                         ${userAppsHtml}
                     </div>
@@ -475,7 +543,6 @@
         `;
     }
 
-    /** Renders the Settings View (Same as before) */
     function renderSettings() {
         const langOptions = [
             { code: 'my', name: 'မြန်မာ (Myanmar)' },
@@ -516,12 +583,32 @@
                             `).join('')}
                         </div>
                     </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-3">${T('CONTACT_INFO')}</h3>
+                        <div class="space-y-3 ${currentState.theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} p-4 rounded-lg">
+                            <div class="flex items-center">
+                                ${icon('mail', 'w-4 h-4 mr-2 text-violet-500')}
+                                <span class="flex-1 ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}">Email:</span>
+                                <a href="mailto:c388925@gmail.com" class="text-violet-500 hover:text-violet-400">c388925@gmail.com</a>
+                            </div>
+                            <div class="flex items-center">
+                                ${icon('send', 'w-4 h-4 mr-2 text-violet-500')}
+                                <span class="flex-1 ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}">Telegram:</span>
+                                <a href="https://t.me/appcreator24myanmar" target="_blank" class="text-violet-500 hover:text-violet-400">@appcreator24myanmar</a>
+                            </div>
+                            <div class="flex items-center">
+                                ${icon('thumbs-up', 'w-4 h-4 mr-2 text-violet-500')}
+                                <span class="flex-1 ${currentState.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}">Facebook:</span>
+                                <a href="https://m.facebook.com/yan260702/" target="_blank" class="text-violet-500 hover:text-violet-400">Yan</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         `;
     }
 
-    /** Renders the Admin View (Same as before) */
     function renderAdmin() {
         const isUserAdmin = isAdmin();
 
@@ -560,6 +647,9 @@
                                 <label class="block text-sm ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}">${T('APP_ICON_LINK')}</label>
                                 <input type="url" name="iconLink" value="${app.iconLink || ''}" placeholder="${T('APP_ICON_LINK')}" class="w-full p-2 border rounded-md ${currentState.theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'}">
                                 
+                                <label class="block text-sm ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}">${T('PURPOSE')}</label>
+                                <textarea name="purpose" class="w-full p-2 border rounded-md ${currentState.theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'} h-20">${app.purpose || ''}</textarea>
+                                
                                 <div class="flex space-x-2 pt-2">
                                     <button type="submit" class="flex-1 py-2 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600">${T('SAVE_CHANGES')}</button>
                                     <button type="button" data-cancel-edit="${app.id}" class="py-2 px-4 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600">${T('CANCEL')}</button>
@@ -587,6 +677,7 @@
                                 ${statusText}
                             </span>
                         </div>
+                        ${app.purpose ? `<p class="text-sm ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mt-2">${app.purpose}</p>` : ''}
                         <p class="text-sm ${currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} mt-2 mb-3">
                             ${T('SUBMITTED_BY')}: ${app.userName} | ${T('SUBMITTED_DATE')}: ${app.createdAt ? new Date(app.createdAt.toDate()).toLocaleDateString(currentState.language === 'th' ? 'th-TH' : 'en-US') : T('UNKNOWN')}
                         </p>
@@ -620,7 +711,6 @@
         `;
     }
 
-    /** Renders the Login/Signup View (MODIFIED to remove Google Button) */
     function renderAuthView() {
         const isLogin = currentState.authMode === 'login';
         const title = isLogin ? T('SIGN_IN') : T('SIGN_UP');
@@ -659,7 +749,6 @@
         `;
     }
 
-    /** Renders the persistent bottom navigation bar (Same as before) */
     function renderNavBar() {
         const navItems = [
             { id: 'home', labelKey: 'HOME', iconName: 'home' },
@@ -669,13 +758,16 @@
             { id: 'settings', labelKey: 'SETTINGS', iconName: 'settings' },
         ];
 
-        const navHtml = navItems.map(item => `
-            <button data-view-target="${item.id}" 
-                    class="nav-button p-2 flex flex-col items-center justify-center text-xs transition duration-150 ${currentState.view === item.id ? 'active' : ''}">
-                ${icon(item.iconName, 'w-5 h-5 mb-1')}
-                <span class="mt-0">${T(item.labelKey)}</span>
-            </button>
-        `).join('');
+        const navHtml = navItems.map(item => {
+            if (item.id === 'admin' && !isAdmin()) return '';
+            return `
+                <button data-view-target="${item.id}" 
+                        class="nav-button p-2 flex flex-col items-center justify-center text-xs transition duration-150 ${currentState.view === item.id ? 'active text-violet-600' : (currentState.theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}">
+                    ${icon(item.iconName, 'w-5 h-5 mb-1')}
+                    <span class="mt-0">${T(item.labelKey)}</span>
+                </button>
+            `;
+        }).join('');
 
         return `
             <nav class="sticky bottom-0 w-full ${currentState.theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-t shadow-lg p-2 flex justify-around flex-shrink-0 z-10">
@@ -684,7 +776,6 @@
         `;
     }
 
-    /** Main Render Function (Same as before) */
     function renderApp() {
         const appDiv = document.getElementById('app');
         if (!appDiv) return;
@@ -728,13 +819,7 @@
         attachEventListeners(currentView);
     }
 
-    // =================================================================
-    // 6. EVENT LISTENERS & INITIALIZATION LOGIC
-    // =================================================================
-
-    /** Attach Event Listeners */
     function attachEventListeners(currentView) {
-        // --- 1. General Navigation and Header Listeners (Same as before) ---
         const sideMenu = document.getElementById('side-menu');
 
         const menuToggleBtn = document.getElementById('menu-toggle-btn');
@@ -784,7 +869,22 @@
             });
         }
         
-        // --- 2. View-Specific Listeners ---
+        if (currentView === 'home') {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    updateState({ searchQuery: e.target.value });
+                });
+            }
+
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const category = e.currentTarget.getAttribute('data-category');
+                    updateState({ selectedCategory: category });
+                });
+            });
+        }
+        
         if (currentView === 'upload') {
             const uploadForm = document.getElementById('upload-form');
             if (uploadForm) {
@@ -794,7 +894,20 @@
                     const appLink = document.getElementById('appLink').value;
                     const appIconLink = document.getElementById('appIconLink').value;
                     const category = document.getElementById('category').value;
-                    await handleAppUpload(appName, appLink, appIconLink, category);
+                    const purpose = document.getElementById('purpose').value;
+                    const screenshot1 = document.getElementById('screenshot1').value;
+                    const screenshot2 = document.getElementById('screenshot2').value;
+                    const screenshot3 = document.getElementById('screenshot3').value;
+                    const username = document.getElementById('username').value;
+                    const age = document.getElementById('age').value;
+                    const language = document.getElementById('language').value;
+                    
+                    const screenshots = [];
+                    if (screenshot1) screenshots.push(screenshot1);
+                    if (screenshot2) screenshots.push(screenshot2);
+                    if (screenshot3) screenshots.push(screenshot3);
+                    
+                    await handleAppUpload(appName, appLink, appIconLink, category, purpose, screenshots, username, age, language);
                 };
             }
         } else if (currentView === 'profile') {
@@ -816,8 +929,6 @@
                     }
                 };
             }
-            
-            // ❌ GOOGLE BUTTON LISTENER REMOVED
 
             const authModeToggleBtn = document.getElementById('auth-mode-toggle-btn'); 
             if (authModeToggleBtn) {
@@ -827,7 +938,6 @@
                 });
             }
         } else if (currentView === 'settings') {
-            // Theme buttons
             document.getElementById('light-mode-btn')?.addEventListener('click', () => {
                 updateState({ theme: 'light' });
                 showMessage(T('THEME_APPLIED'));
@@ -837,7 +947,6 @@
                 showMessage(T('THEME_APPLIED'));
             });
 
-            // Language buttons
             document.getElementById('language-options')?.querySelectorAll('button').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const lang = e.currentTarget.getAttribute('data-lang');
@@ -846,7 +955,6 @@
                 });
             });
         } else if (currentView === 'admin') {
-            // Admin Moderation Listeners
             document.querySelectorAll('[data-approve]').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const appId = e.currentTarget.getAttribute('data-approve');
@@ -884,13 +992,12 @@
                     const name = form.name.value;
                     const link = form.link.value;
                     const iconLink = form.iconLink.value;
-                    await handleAppEdit(appId, name, link, iconLink);
+                    const purpose = form.purpose.value;
+                    await handleAppEdit(appId, name, link, iconLink, purpose);
                 };
             });
         }
     }
-
-    // --- Initial Setup and Authentication (Same as before) ---
 
     updateTheme(currentState.theme);
 
