@@ -30,7 +30,7 @@
 
 <script type="module">
     // =================================================================
-    // 1. FIREBASE & CORE IMPORTS
+    // 1. FIREBASE & CORE IMPORTS (SDK Version 12.6.0)
     // =================================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
@@ -58,16 +58,18 @@
     } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
     // =================================================================
-    // 2. CONFIGURATION & INITIALIZATION
+    // 2. CONFIGURATION & INITIALIZATION (UPDATED)
     // =================================================================
+    
+    // 🔥 UPDATED FIREBASE CONFIGURATION (shareapp-c916a)
     const firebaseConfig = {
-        apiKey: "AIzaSyAUL74mqVCIY1MMclrRhdVbY_VyP4lgQpY",
-        authDomain: "waiappstore.firebaseapp.com",
-        projectId: "waiappstore",
-        storageBucket: "waiappstore.firebasestorage.app",
-        messagingSenderId: "161610339691",
-        appId: "1:161610339691:web:ce59fafb6a21729030682e",
-        measurementId: "G-HH95X102MG"
+        apiKey: "AIzaSyAx2skPPpZGzlqVPU-7kLitK7rcBVtdbPo",
+        authDomain: "shareapp-c916a.firebaseapp.com",
+        projectId: "shareapp-c916a",
+        storageBucket: "shareapp-c916a.firebasestorage.app",
+        messagingSenderId: "851046860058",
+        appId: "1:851046860058:web:8cef6b61bfee099e2558a3",
+        measurementId: "G-J1NFMH9HP4"
     };
 
     // Initialize Firebase Services
@@ -78,7 +80,8 @@
 
     // Global Constants
     const sharedAppsCollectionPath = "sharedApps";
-    const adminEmail = "waiyan@example.com"; 
+    // 🔥 UPDATED ADMIN EMAIL
+    const adminEmail = "c388925@gmail.com"; 
     const initialAuthToken = null; // Set this if using a custom token on load
 
     // =================================================================
@@ -87,14 +90,12 @@
 
     const translations = {
         en: {
-            APP_TITLE: "ShareApp Store", HOME: "Home", UPLOAD: "Upload", PROFILE: "Profile", SETTINGS: "Settings", ADMIN: "Admin", SIGN_IN: "Sign In", SIGN_UP: "Sign Up", SIGN_OUT: "Sign Out", PASSWORD: "Password", EMAIL: "Email", NO_ACCOUNT: "Need an account? Sign Up", ACCOUNT_LOGIN: "Already have an account? Sign In", OR: "OR", SIGN_IN_WITH_GOOGLE: "Sign in with Google", SECRET_CODE: "Your secret code", DEVELOPER_NOTE: "Note: For demonstration, a placeholder account is used. Please use the Google button.", USER_ID: "User ID", NOT_LOGGED_IN: "Not Logged In", PENDING: "Pending Review", APPROVED: "Approved", DOWNLOAD_OR_OPEN: "Get App", NO_APPS_YET: "No approved apps yet. Be the first to submit!", CATEGORIES: "Categories", ALL: "All", GAMES: "Games", SOCIAL: "Social", PRODUCTIVITY: "Productivity", ENTERTAINMENT: "Entertainment", SEARCH_PLACEHOLDER: "Search for apps...", LATEST_APPS: "Latest Shared Apps", SUBMITTED_BY: "Submitted by", SUBMITTED_DATE: "Date", UNKNOWN: "Unknown", APP_INFO: "App Submission", APP_NAME: "App Name", APP_ICON_LINK: "Icon URL", APP_LINK: "App Link (Play Store, etc.)", CATEGORY: "Category", SELECT_CATEGORY: "Select Category", SUBMIT_APP: "Submit App", LOGIN_REQUIRED: "You must sign in to submit an app.", UPLOAD_SUCCESS: "Upload Successful!", UPLOAD_FAILED: "Upload Failed", DATA_FETCH_FAILED: "Failed to fetch data.", SETTING_THEME: "Theme Settings", LIGHT_MODE: "Light Mode", DARK_MODE: "Dark Mode", SETTING_LANGUAGE: "Language", THEME_APPLIED: "Theme applied.", LANGUAGE_APPLIED: "Language applied.", NO_NAME: "No Name", NO_EMAIL: "No Email", EMAIL_PASSWORD: "Email/Password", YOUR_SUBMISSIONS: "Your Submissions", NO_SUBMISSIONS_YET: "You have not submitted any apps yet.", ACCESS_DENIED: "Access Denied", ACCESS_DENIED_MESSAGE: "You do not have administrative privileges.", ADMIN_AREA: "Moderation Queue", SUBMISSIONS: "Submissions", UNAPPROVE: "Unapprove", APPROVE: "Approve", EDIT_APP: "Edit App Details", SAVE_CHANGES: "Save Changes", CANCEL: "Cancel"
+            APP_TITLE: "ShareApp Store", HOME: "Home", UPLOAD: "Upload", PROFILE: "Profile", SETTINGS: "Settings", ADMIN: "Admin", SIGN_IN: "Sign In", SIGN_UP: "Sign Up", SIGN_OUT: "Sign Out", PASSWORD: "Password", EMAIL: "Email", NO_ACCOUNT: "Need an account? Sign Up", ACCOUNT_LOGIN: "Already have an account? Sign In", OR: "OR", SIGN_IN_WITH_GOOGLE: "Sign in with Google", SECRET_CODE: "Your secret code", DEVELOPER_NOTE: "Note: For demonstration, a placeholder account is used. Please use the Google button.", USER_ID: "User ID", NOT_LOGGED_IN: "Not Logged In", PENDING: "Pending Review", APPROVED: "Approved", DOWNLOAD_OR_OPEN: "Get App", NO_APPS_YET: "No approved apps yet. Be the first to submit!", CATEGORIES: "Categories", ALL: "All", GAMES: "Games", SOCIAL: "Social", PRODUCTIVITY: "Productivity", ENTERTAINMENT: "Entertainment", SEARCH_PLACEHOLDER: "Search for apps...", LATEST_APPS: "Latest Shared Apps", SUBMITTED_BY: "Submitted by", SUBMITTED_DATE: "Date", UNKNOWN: "Unknown", APP_INFO: "App Submission", APP_NAME: "App Name", APP_ICON_LINK: "Icon URL", APP_LINK: "App Link (Play Store, etc.)", CATEGORY: "Category", SELECT_CATEGORY: "Select Category", SUBMIT_APP: "Submit App", LOGIN_REQUIRED: "You must sign in to submit an app.", UPLOAD_SUCCESS: "Upload Successful!", UPLOAD_FAILED: "Upload Failed", DATA_FETCH_FAILED: "Failed to fetch data.", SETTING_THEME: "Theme Settings", LIGHT_MODE: "Light Mode", DARK_MODE: "Dark Mode", THEME_APPLIED: "Theme applied.", SETTING_LANGUAGE: "Language", LANGUAGE_APPLIED: "Language applied.", NO_NAME: "No Name", NO_EMAIL: "No Email", EMAIL_PASSWORD: "Email/Password", YOUR_SUBMISSIONS: "Your Submissions", NO_SUBMISSIONS_YET: "You have not submitted any apps yet.", ACCESS_DENIED: "Access Denied", ACCESS_DENIED_MESSAGE: "You do not have administrative privileges.", ADMIN_AREA: "Moderation Queue", SUBMISSIONS: "Submissions", UNAPPROVE: "Unapprove", APPROVE: "Approve", EDIT_APP: "Edit App Details", SAVE_CHANGES: "Save Changes", CANCEL: "Cancel"
         },
         my: {
             APP_TITLE: "ShareApp စတိုး", HOME: "ပင်မ", UPLOAD: "တင်သွင်းရန်", PROFILE: "ပရိုဖိုင်", SETTINGS: "ချိန်ညှိချက်များ", ADMIN: "စီမံခန့်ခွဲသူ", SIGN_IN: "ဝင်ရောက်ရန်", SIGN_UP: "အကောင့်ဖွင့်ရန်", SIGN_OUT: "အကောင့်ထွက်ရန်", PASSWORD: "လျှို့ဝှက်နံပါတ်", EMAIL: "အီးမေးလ်", NO_ACCOUNT: "အကောင့်မရှိဘူးလား။ အကောင့်ဖွင့်ပါ", ACCOUNT_LOGIN: "အကောင့်ရှိပြီးသားလား။ ဝင်ရောက်ပါ", OR: "သို့မဟုတ်", SIGN_IN_WITH_GOOGLE: "Google ဖြင့် ဝင်ရောက်ရန်", SECRET_CODE: "လျှို့ဝှက်နံပါတ်", DEVELOPER_NOTE: "သတိပေးချက်- စမ်းသပ်ရန်အတွက်သာ။ Google ခလုတ်ကို အသုံးပြုပါ။", USER_ID: "အသုံးပြုသူ ID", NOT_LOGGED_IN: "မဝင်ရောက်ရသေးပါ", PENDING: "စောင့်ဆိုင်းဆဲ", APPROVED: "ခွင့်ပြုပြီး", DOWNLOAD_OR_OPEN: "App ရယူရန်", NO_APPS_YET: "ခွင့်ပြုထားသော App မရှိသေးပါ။ ပထမဆုံးတင်သွင်းသူ ဖြစ်ပါစေ။", CATEGORIES: "အမျိုးအစားများ", ALL: "အားလုံး", GAMES: "ဂိမ်း", SOCIAL: "လူမှုကွန်ရက်", PRODUCTIVITY: "အလုပ်စွမ်းဆောင်ရည်", ENTERTAINMENT: "ဖျော်ဖြေရေး", SEARCH_PLACEHOLDER: "Apps များ ရှာဖွေပါ...", LATEST_APPS: "နောက်ဆုံးတင်သွင်းသော Apps များ", SUBMITTED_BY: "တင်သွင်းသူ", SUBMITTED_DATE: "တင်သွင်းသည့်နေ့", UNKNOWN: "မသိရှိရ", APP_INFO: "App အချက်အလက်", APP_NAME: "App အမည်", APP_ICON_LINK: "Icon လင့်ခ်", APP_LINK: "App လင့်ခ် (Play Store, etc.)", CATEGORY: "အမျိုးအစား", SELECT_CATEGORY: "အမျိုးအစား ရွေးပါ", SUBMIT_APP: "App တင်သွင်းရန်", LOGIN_REQUIRED: "App တင်သွင်းရန်အတွက် ဝင်ရောက်ရန်လိုအပ်သည်။", UPLOAD_SUCCESS: "တင်သွင်းမှု အောင်မြင်ပါသည်!", UPLOAD_FAILED: "တင်သွင်းမှု မအောင်မြင်ပါ", DATA_FETCH_FAILED: "ဒေတာရယူရာတွင် အမှားဖြစ်ခဲ့သည်။", SETTING_THEME: "Theme ချိန်ညှိချက်များ", LIGHT_MODE: "အလင်းရောင် Theme", DARK_MODE: "အမှောင် Theme", THEME_APPLIED: "Theme ပြောင်းလဲပြီးပါပြီ။", SETTING_LANGUAGE: "ဘာသာစကား", LANGUAGE_APPLIED: "ဘာသာစကား ပြောင်းလဲပြီးပါပြီ။", NO_NAME: "အမည်မရှိ", NO_EMAIL: "အီးမေးလ်မရှိ", EMAIL_PASSWORD: "အီးမေးလ်/စကားဝှက်", YOUR_SUBMISSIONS: "သင်တင်သွင်းခဲ့သော Apps များ", NO_SUBMISSIONS_YET: "သင် App တစ်ခုမှ တင်သွင်းရသေးခြင်း မရှိပါ။", ACCESS_DENIED: "ဝင်ရောက်ခွင့် မပြုပါ", ACCESS_DENIED_MESSAGE: "သင့်တွင် စီမံခန့်ခွဲသူ အခွင့်အရေး မရှိပါ။", ADMIN_AREA: "စီမံခန့်ခွဲမှု", SUBMISSIONS: "တင်သွင်းမှုများ", UNAPPROVE: "ခွင့်ပြုချက် ရုပ်သိမ်း", APPROVE: "ခွင့်ပြုရန်", EDIT_APP: "App အချက်အလက် ပြင်ဆင်ရန်", SAVE_CHANGES: "အပြောင်းအလဲများ သိမ်းဆည်း", CANCEL: "ပယ်ဖျက်မည်"
         },
-        // Thai and Chinese translations were partially included in the original HTML code 
-        // but are omitted here for brevity of the combined code block.
-        // You would typically include the full translation set here.
+        // Thai and Chinese translations are omitted for brevity
     };
 
     let currentState = {
@@ -112,7 +113,7 @@
     };
 
     // =================================================================
-    // 4. CORE FUNCTIONS (Included from your original parts)
+    // 4. CORE FUNCTIONS (Logic remains the same)
     // =================================================================
 
     /** Translation Function */
@@ -151,7 +152,7 @@
         return `<i data-lucide="${name}" class="${classes}"></i>`;
     }
 
-    /** Admin Check */
+    /** Admin Check (Uses the new Admin Email) */
     function isAdmin() {
         return currentState.user && currentState.user.email === adminEmail;
     }
@@ -182,7 +183,10 @@
     async function handleGoogleSignIn() {
         try {
             const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
+            // ⚠️ NOTE: signInWithPopup often fails in Appcreator24 WebViews (Error 403).
+            // Consider using signInWithRedirect for better compatibility in WebViews, 
+            // but this also requires proper handling of the redirect and state.
+            await signInWithPopup(auth, provider); 
             showMessage("Google " + T('SIGN_IN') + " " + T('UPLOAD_SUCCESS'));
             updateState({ view: 'home' });
         } catch (error) {
@@ -202,7 +206,7 @@
         }
     }
 
-    // --- Firestore Data Handlers ---
+    // --- Firestore Data Handlers (Logic remains the same) ---
 
     async function handleAppApproval(appId, isApproved) {
         if (!isAdmin()) return showMessage(T('ACCESS_DENIED'), true);
@@ -286,7 +290,7 @@
     }
 
     // =================================================================
-    // 5. UI VIEW COMPONENTS (Included from your original parts)
+    // 5. UI VIEW COMPONENTS (Logic remains the same)
     // =================================================================
 
     /** Renders the Header (Top Bar) */
@@ -761,7 +765,7 @@
     }
 
     // =================================================================
-    // 6. EVENT LISTENERS & INITIALIZATION LOGIC (Included from your final part)
+    // 6. EVENT LISTENERS & INITIALIZATION LOGIC (Logic remains the same)
     // =================================================================
 
     /** Attach Event Listeners */
@@ -940,7 +944,7 @@
 
     onAuthStateChanged(auth, async (user) => {
         if (!currentState.isAuthReady) {
-            // First run, check for custom token
+            // First run, check for custom token or sign in anonymously
             try {
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
