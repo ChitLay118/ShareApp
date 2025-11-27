@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShareApp</title>
+    <title>ShareApp စီမံခန့်ခွဲမှုစနစ်</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -19,6 +19,10 @@
             transform: translateY(-4px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -29,12 +33,12 @@
             <p class="ml-4 text-indigo-700">ဒေတာများ တင်နေပါသည်...</p>
         </div>
 
-        <header class="bg-indigo-600 shadow-md p-4 sticky top-0 z-40">
+        <header class="bg-indigo-700 shadow-xl p-4 sticky top-0 z-40">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <h1 id="app-title" class="text-2xl font-bold text-white">အက်ပလီကေးရှင်း စတိုး</h1>
+                <h1 id="app-title" class="text-3xl font-extrabold text-white">ShareApp</h1>
                 <div class="flex space-x-3 items-center">
                     <div class="relative group">
-                        <button id="lang-button" class="bg-indigo-700 text-white p-2 rounded-full hover:bg-indigo-800 transition">
+                        <button id="lang-button" class="bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-500 transition">
                             <i class="fas fa-globe"></i> <span id="current-lang-text">MM</span>
                         </button>
                         <div id="lang-dropdown" class="absolute right-0 mt-2 w-24 bg-white rounded-lg shadow-xl hidden group-hover:block transition duration-200">
@@ -43,13 +47,13 @@
                         </div>
                     </div>
                     
-                    <button id="settings-button" class="bg-indigo-700 text-white p-2 rounded-full hover:bg-indigo-800 transition" onclick="toggleModal('settings-modal')">
+                    <button id="settings-button" class="bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-500 transition" onclick="toggleModal('settings-modal')">
                         <i class="fas fa-cog"></i>
                     </button>
 
-                    <button id="add-app-button" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition hidden" onclick="toggleModal('add-app-modal')">
-                        <i class="fas fa-plus mr-1"></i> <span id="add-app-btn-text">App တင်ရန်</span>
-                    </button>
+                    <button id="auth-button" class="px-3 py-2 rounded-lg transition font-semibold" onclick="handleAuthAction()">
+                        </button>
+
                     <span id="user-status" class="text-white text-sm"></span>
                 </div>
             </div>
@@ -70,8 +74,35 @@
         </main>
     </div>
 
+    <div id="login-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 modal-content">
+            <h2 id="login-modal-title" class="text-2xl font-bold mb-6 text-indigo-700 text-center">Admin Login</h2>
+            <form id="login-form" onsubmit="adminLogin(event)">
+                
+                <div class="mb-4">
+                    <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="login-email" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" value="c388925@gmail.com">
+                </div>
+                <div class="mb-6">
+                    <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="login-password" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" value="wai118234">
+                </div>
+
+                <div class="flex justify-between items-center space-x-3">
+                    <button type="button" class="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition" onclick="toggleModal('login-modal', false)">
+                        <span id="cancel-btn-text">ပယ်ဖျက်မည်</span>
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                        <span id="login-btn-text">ဝင်မည်</span>
+                    </button>
+                </div>
+                <p id="login-warning" class="text-center text-xs text-red-500 mt-3 hidden">Login မရပါက Firebase Email/Password ကို Enable လုပ်ပါ။</p>
+            </form>
+        </div>
+    </div>
+    
     <div id="add-app-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6 modal-content">
             <h2 id="add-app-modal-title" class="text-2xl font-bold mb-4 text-indigo-700">App အသစ်တင်သွင်းရန်</h2>
             <form id="add-app-form" onsubmit="submitApp(event)">
                 
@@ -118,7 +149,7 @@
                 </div>
 
                 <div class="flex justify-end space-x-3">
-                    <button type="button" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition" onclick="toggleModal('add-app-modal')">
+                    <button type="button" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition" onclick="toggleModal('add-app-modal', false)">
                         <span id="cancel-btn-text">ပယ်ဖျက်မည်</span>
                     </button>
                     <button type="submit" class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
@@ -130,7 +161,7 @@
     </div>
 
     <div id="detail-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl p-6 overflow-y-auto max-h-[90vh]">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl p-6 modal-content">
             <h2 id="detail-app-name" class="text-3xl font-bold mb-4 text-indigo-700"></h2>
             
             <div id="detail-screenshots" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
@@ -151,7 +182,7 @@
                 <a id="detail-download-link" href="#" target="_blank" class="px-6 py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition font-bold flex items-center">
                     <i class="fas fa-download mr-2"></i> <span id="download-btn-text">ဒေါင်းလုတ်ဆွဲရန်</span>
                 </a>
-                <button type="button" class="px-6 py-3 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition" onclick="toggleModal('detail-modal')">
+                <button type="button" class="px-6 py-3 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition" onclick="toggleModal('detail-modal', false)">
                     <span id="close-btn-text">ပိတ်မည်</span>
                 </button>
             </div>
@@ -159,7 +190,7 @@
     </div>
 
     <div id="settings-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 modal-content">
             <h2 id="settings-modal-title" class="text-2xl font-bold mb-4 text-indigo-700">ဆက်တင်များ</h2>
             <div class="space-y-4">
                 <h3 id="contact-us-title" class="text-xl font-semibold text-gray-700">ဆက်သွယ်ရန်</h3>
@@ -184,7 +215,7 @@
             </div>
 
             <div class="flex justify-end mt-6">
-                <button type="button" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition" onclick="toggleModal('settings-modal')">
+                <button type="button" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition" onclick="toggleModal('settings-modal', false)">
                     <span id="settings-close-text">ပိတ်မည်</span>
                 </button>
             </div>
@@ -193,17 +224,14 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-        import { getFirestore, doc, addDoc, onSnapshot, collection, query, getDocs, where } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { getFirestore, addDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
         
-        // Firestore logs ကိုပြသရန် (debugging အတွက်)
         setLogLevel('Debug');
 
-        // Global Variables from Canvas Environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // User-provided fallback config
             apiKey: "AIzaSyAUL74mqVCIY1MMclrRhdVbY_VyP4lgQpY",
             authDomain: "waiappstore.firebaseapp.com",
             projectId: "waiappstore",
@@ -213,9 +241,8 @@
         };
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
-        // Admin credentials
         const ADMIN_EMAIL = "c388925@gmail.com";
-        // const ADMIN_PASSWORD = "wai118234"; // Password login is disabled/failing, so we rely on token/anonymous auth and email check
+        const ADMIN_PASSWORD = "wai118234";
 
         let app;
         let auth;
@@ -226,13 +253,15 @@
         let allApps = [];
         let currentFilter = 'All';
 
-        // --- Language Configuration (Burmese/English) ---
-        let currentLang = 'MM'; // Default to Burmese
+        // --- Language Configuration ---
+        let currentLang = 'MM';
 
         const MM_TEXT = {
-            'app-title': 'အက်ပလီကေးရှင်း စတိုး',
+            'app-title': 'ShareApp',
             'current-lang-text': 'MM',
             'add-app-btn-text': 'App တင်ရန်',
+            'login-btn-text': 'ဝင်မည်',
+            'login-prompt-text': 'Admin Login',
             'no-apps-text': 'ဤအမျိုးအစားအတွက် App များ မရှိသေးပါ။',
             'add-app-modal-title': 'App အသစ်တင်သွင်းရန်',
             'cancel-btn-text': 'ပယ်ဖျက်မည်',
@@ -250,14 +279,18 @@
             'detail-purpose-label': 'ရည်ရွယ်ချက်',
             'detail-desc-label': 'အကျဉ်းချုပ် ဖော်ပြချက်',
             'cat-all-text': 'အမျိုးအစား အားလုံး',
+            'login-modal-title': 'Admin Login',
             'login-success': 'Admin အဖြစ် ဝင်ရောက်ပြီး',
-            'user-status-anon': 'အမည်မသိ သုံးစွဲသူ',
+            'user-status-anon': 'သုံးစွဲသူ',
+            'logout-text': 'ထွက်ရန်'
         };
 
         const EN_TEXT = {
-            'app-title': 'Application Store',
+            'app-title': 'ShareApp',
             'current-lang-text': 'EN',
             'add-app-btn-text': 'Submit App',
+            'login-btn-text': 'Login',
+            'login-prompt-text': 'Admin Login',
             'no-apps-text': 'No apps found for this category.',
             'add-app-modal-title': 'Submit New Application',
             'cancel-btn-text': 'Cancel',
@@ -275,8 +308,10 @@
             'detail-purpose-label': 'Purpose',
             'detail-desc-label': 'Description',
             'cat-all-text': 'All Categories',
+            'login-modal-title': 'Admin Login',
             'login-success': 'Logged in as Admin',
-            'user-status-anon': 'Anonymous User',
+            'user-status-anon': 'User',
+            'logout-text': 'Logout'
         };
 
         const categories = {
@@ -292,7 +327,6 @@
             currentLang = lang;
             const TEXT = lang === 'MM' ? MM_TEXT : EN_TEXT;
 
-            // Update all UI texts using IDs
             for (const key in TEXT) {
                 const element = document.getElementById(key);
                 if (element) {
@@ -300,26 +334,18 @@
                 }
             }
 
-            // Re-render categories to update text
+            // Manually update placeholder/value for login form
+            document.getElementById('login-modal-title').textContent = TEXT['login-modal-title'];
+            
             renderCategories();
-            // Re-render app list to update texts inside cards/details
-            filterApps(currentFilter); 
-
-            // Update user status
+            filterApps(currentFilter);
             updateUserStatus(isAuthenticated, isAdmin, currentUserId);
         }
 
-        // --- Utility Functions ---
-
         function toggleModal(modalId, show = true) {
             const modal = document.getElementById(modalId);
-            if (show) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
+            modal.classList.toggle('hidden', !show);
+            modal.classList.toggle('flex', show);
         }
 
         function createMessage(message, isError = false) {
@@ -334,14 +360,13 @@
             }, 3000);
         }
 
-        // --- Authentication and Initialization (FIXED) ---
+        // --- Authentication Functions (NEW LOGIN LOGIC) ---
 
         async function handleInitialAuth() {
             try {
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
-                    // Fallback to anonymous if no custom token
                     await signInAnonymously(auth);
                 }
             } catch (error) {
@@ -350,24 +375,61 @@
             }
         }
 
+        async function adminLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                toggleModal('login-modal', false);
+                createMessage(currentLang === 'MM' ? "Admin အဖြစ် အောင်မြင်စွာ ဝင်ရောက်ပါသည်" : "Successfully logged in as Admin");
+            } catch (error) {
+                console.error("Admin login failed:", error);
+                document.getElementById('login-warning').classList.remove('hidden');
+                createMessage(currentLang === 'MM' ? "Login မအောင်မြင်ပါ၊ Email/Password ကိုစစ်ဆေးပါ သို့မဟုတ် Firebase တွင် Enable လုပ်ပါ" : "Login failed. Check credentials or enable Email/Password in Firebase.", true);
+            }
+        }
+
+        async function handleAuthAction() {
+            if (isAdmin) {
+                // If admin, show the submit app modal
+                toggleModal('add-app-modal', true);
+            } else if (isAuthenticated) {
+                // If non-admin user, log out
+                await signOut(auth);
+                createMessage(currentLang === 'MM' ? "အောင်မြင်စွာ ထွက်ပြီးပါပြီ" : "Logged out successfully");
+            } else {
+                // If not logged in, show login modal
+                toggleModal('login-modal', true);
+            }
+        }
+
+
         function updateUserStatus(isAuth, isAdm, userId) {
             const statusElement = document.getElementById('user-status');
-            const addAppButton = document.getElementById('add-app-button');
+            const authButton = document.getElementById('auth-button');
             const TEXT = currentLang === 'MM' ? MM_TEXT : EN_TEXT;
 
             if (isAdm) {
+                // Admin UI: Submit App Button (Primary action)
                 statusElement.innerHTML = `<i class="fas fa-crown text-yellow-300 mr-1"></i> ${TEXT['login-success']}`;
-                addAppButton.classList.remove('hidden');
+                authButton.innerHTML = `<i class="fas fa-plus mr-1"></i> ${TEXT['add-app-btn-text']}`;
+                authButton.className = 'px-3 py-2 rounded-lg transition font-semibold bg-green-500 text-white hover:bg-green-600';
             } else if (isAuth) {
+                // Authenticated Non-Admin UI: Logout Button
                 statusElement.textContent = `UID: ${userId.substring(0, 8)}...`;
-                addAppButton.classList.add('hidden');
+                authButton.innerHTML = `<i class="fas fa-sign-out-alt mr-1"></i> ${TEXT['logout-text']}`;
+                authButton.className = 'px-3 py-2 rounded-lg transition font-semibold bg-red-500 text-white hover:bg-red-600';
             } else {
+                // Anonymous UI: Login Button
                 statusElement.textContent = TEXT['user-status-anon'];
-                addAppButton.classList.add('hidden');
+                authButton.innerHTML = `<i class="fas fa-user-lock mr-1"></i> ${TEXT['login-prompt-text']}`;
+                authButton.className = 'px-3 py-2 rounded-lg transition font-semibold bg-yellow-500 text-gray-800 hover:bg-yellow-600';
             }
         }
         
-        // --- Firestore Data Functions (FIXED Error Handling) ---
+        // --- Firebase Init and Listener ---
 
         function initFirebase() {
             try {
@@ -375,13 +437,12 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // Set up auth state observer
                 onAuthStateChanged(auth, (user) => {
                     document.getElementById('loading-spinner').classList.add('hidden');
                     if (user) {
                         currentUserId = user.uid;
                         isAuthenticated = true;
-                        // Check if the authenticated user's email matches the Admin email (if email is available)
+                        // Check if the authenticated user's email matches the Admin email (for UI control)
                         isAdmin = user.email === ADMIN_EMAIL; 
                     } else {
                         currentUserId = null;
@@ -389,12 +450,9 @@
                         isAdmin = false;
                     }
                     updateUserStatus(isAuthenticated, isAdmin, currentUserId);
-
-                    // Start listening for app data once auth is ready
                     setupAppListener();
                 });
 
-                // Attempt authentication using custom token or anonymous login
                 handleInitialAuth();
 
             } catch (error) {
@@ -421,7 +479,6 @@
                     }
                 });
 
-                // Render categories and then filter/render apps
                 renderCategories(Array.from(fetchedCategories));
                 filterApps(currentFilter);
             }, (error) => {
@@ -446,12 +503,12 @@
                 name: document.getElementById('app-name').value,
                 category: document.getElementById('app-category').value,
                 description: document.getElementById('app-description').value,
-                purpose: document.getElementById('app-purpose').value, // New field
+                purpose: document.getElementById('app-purpose').value,
                 downloadLink: document.getElementById('app-link').value,
-                userName: document.getElementById('app-username').value, // New field
-                screenshot1: document.getElementById('screenshot-1').value, // New field
-                screenshot2: document.getElementById('screenshot-2').value, // New field
-                screenshot3: document.getElementById('screenshot-3').value, // New field
+                userName: document.getElementById('app-username').value,
+                screenshot1: document.getElementById('screenshot-1').value,
+                screenshot2: document.getElementById('screenshot-2').value,
+                screenshot3: document.getElementById('screenshot-3').value,
                 userId: currentUserId,
                 timestamp: Date.now()
             };
@@ -474,18 +531,16 @@
 
         function renderCategories(fetchedCategories = ['All']) {
             const filtersContainer = document.getElementById('category-filters');
-            filtersContainer.innerHTML = ''; // Clear previous buttons
+            filtersContainer.innerHTML = '';
             
-            // Ensure unique categories are used
             const uniqueCategories = Array.from(new Set(fetchedCategories)).sort();
-
             const TEXT = currentLang === 'MM' ? MM_TEXT : EN_TEXT;
 
             uniqueCategories.forEach(category => {
                 const button = document.createElement('button');
-                button.className = `category-btn px-4 py-2 rounded-full transition ${category === currentFilter ? 'bg-indigo-700 text-white shadow-md' : 'bg-white text-indigo-600 hover:bg-indigo-100'}`;
+                button.className = `category-btn px-4 py-2 rounded-full transition text-sm ${category === currentFilter ? 'bg-indigo-700 text-white shadow-md' : 'bg-white text-indigo-600 hover:bg-indigo-100'}`;
                 button.setAttribute('data-category', category);
-                button.textContent = categories[category] || category; // Use Burmese map or fallback to category name
+                button.textContent = categories[category] || category;
                 button.onclick = () => filterApps(category);
                 filtersContainer.appendChild(button);
             });
@@ -494,16 +549,14 @@
         function filterApps(category) {
             currentFilter = category;
             
-            // Update button styles
             document.querySelectorAll('.category-btn').forEach(btn => {
                 const isSelected = btn.getAttribute('data-category') === category;
-                btn.className = `category-btn px-4 py-2 rounded-full transition ${isSelected ? 'bg-indigo-700 text-white shadow-md' : 'bg-white text-indigo-600 hover:bg-indigo-100'}`;
+                btn.className = `category-btn px-4 py-2 rounded-full transition text-sm ${isSelected ? 'bg-indigo-700 text-white shadow-md' : 'bg-white text-indigo-600 hover:bg-indigo-100'}`;
             });
 
-            // Filter the apps
             const filteredApps = allApps
                 .filter(app => category === 'All' || app.category === category)
-                .sort((a, b) => b.timestamp - a.timestamp); // Sort by newest first
+                .sort((a, b) => b.timestamp - a.timestamp);
 
             renderAppList(filteredApps);
         }
@@ -539,10 +592,8 @@
             const app = allApps.find(a => a.id === appId);
             if (!app) return;
 
-            // Get the current language texts
             const TEXT = currentLang === 'MM' ? MM_TEXT : EN_TEXT;
             
-            // 1. Update Detail Modal Content
             document.getElementById('detail-app-name').textContent = app.name;
             document.getElementById('detail-app-category').textContent = categories[app.category] || app.category;
             document.getElementById('detail-app-username').textContent = app.userName || (currentLang === 'MM' ? 'အမည်မသိ' : 'Unknown');
@@ -550,7 +601,6 @@
             document.getElementById('detail-app-description').textContent = app.description;
             document.getElementById('detail-download-link').href = app.downloadLink;
             
-            // Update labels
             document.getElementById('detail-category-label').textContent = TEXT['detail-category-label'];
             document.getElementById('detail-username-label').textContent = TEXT['detail-username-label'];
             document.getElementById('detail-purpose-label').textContent = TEXT['detail-purpose-label'];
@@ -558,7 +608,6 @@
             document.getElementById('download-btn-text').textContent = TEXT['download-btn-text'];
             document.getElementById('close-btn-text').textContent = TEXT['close-btn-text'];
 
-            // 2. Render Screenshots
             const screenshotsContainer = document.getElementById('detail-screenshots');
             screenshotsContainer.innerHTML = '';
 
@@ -576,8 +625,7 @@
                 }
             });
 
-            // 3. Show Modal
-            toggleModal('detail-modal');
+            toggleModal('detail-modal', true);
         }
 
         // Initialize on load
@@ -589,10 +637,12 @@
         window.filterApps = filterApps;
         window.showAppDetails = showAppDetails;
         window.setLanguage = setLanguage;
+        window.adminLogin = adminLogin; // New function exposed
+        window.handleAuthAction = handleAuthAction; // New function exposed
 
         // Initial language setup
         document.addEventListener('DOMContentLoaded', () => {
-            setLanguage('MM'); // Set default Burmese on load
+            setLanguage('MM');
         });
     </script>
 </body>
