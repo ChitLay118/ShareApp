@@ -135,7 +135,8 @@
         error: null,
         editingAppId: null,
         selectedCategory: 'all',
-        searchQuery: ''
+        searchQuery: '',
+        showWelcomeMessage: false // New state to control welcome message
     };
 
     function T(key) {
@@ -187,7 +188,7 @@
                          onerror="this.src='https://placehold.co/600x400/A78BFA/ffffff?text=Screenshot+${index + 1}'">
                 </div>
             `).join('')
-            : `<p class="text-center text-gray-500 py-4">${T('NO_SCREENSHOTS')}</p>`;
+            : `<p class="text-center text-gray-500 py-4">No screenshots available</p>`;
 
         modalBody.innerHTML = `
             <div class="${currentState.theme === 'dark' ? 'text-white' : 'text-gray-800'}">
@@ -236,7 +237,7 @@
     async function handleSignIn(email, password) {
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            showMessage(T('SIGN_IN') + " " + T('UPLOAD_SUCCESS'));
+            // Don't show welcome message on successful login
             updateState({ view: 'home' }); 
         } catch (error) {
             console.error("Sign In Error:", error);
@@ -247,7 +248,7 @@
     async function handleSignUp(email, password) {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
-            showMessage(T('SIGN_UP') + " " + T('UPLOAD_SUCCESS'));
+            // Don't show welcome message on successful signup
             updateState({ view: 'home' });
         } catch (error) {
             console.error("Sign Up Error:", error);
